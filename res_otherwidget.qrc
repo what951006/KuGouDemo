@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/">
+        <file>image/otherWidget/selected.png</file>
+    </qresource>
+</RCC>

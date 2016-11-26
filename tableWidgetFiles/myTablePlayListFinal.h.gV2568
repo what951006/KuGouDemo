@@ -1,0 +1,63 @@
+#ifndef MYTABLEPLAYLISTFINAL_H
+#define MYTABLEPLAYLISTFINAL_H
+#include<dateBase/myDateBase.h>
+#include <QObject>
+#include <QWidget>
+#include"mytablewidget.h"
+#include<QScrollArea>
+#include"playingWidget.h"
+#include"myshowtablebutton.h"
+#include<QDebug>
+#include<QWheelEvent>
+#include"myMediaList.h"
+//#include"mainwindow.h"
+//class middleLeftStackWidget0;
+//class myTableWidget;
+
+class myTablePlayListFinal:public absWidget
+{
+    Q_OBJECT
+public:
+   explicit myTablePlayListFinal(QWidget*parent=0);
+    ~myTablePlayListFinal(){}
+    void getlistfromDateBase();
+    void setAutoLayout();
+  //  static unsigned long getMusicTime(WCHAR*);
+
+    myDateBase *datebase(){return m_datebase;}
+    myMediaList *playList(){return m_playList;}
+
+
+    myTableWidget *m_table;
+    myShowTableButton *m_Btntable;
+    myMediaList *m_playList;
+
+    void updateCount(){slot_setSongCount();}
+    QString ShowButtonName(){return m_PlayListname;}
+    void setShowButtonName(QString playListName="新建列表"){m_Btntable->m_playlistName->setText(playListName);m_PlayListname=playListName;}
+protected:
+    void wheelEvent(QWheelEvent *);
+public slots:
+    void slot_emptyList();
+    void slot_showHideTable();
+    void slot_setSongCount();
+    void slot_animationfinished(){m_isGiven=false;m_scrollValue=0;}
+    void slot_animation(QVariant );
+
+    void slot_addSong();
+    void slot_addSongFolder();
+
+    void slot_addSongFromSearchTable(QStringList name,QStringList url,QStringList dur);
+
+    void slot_playSongFromSearchTable(QStringList name,QStringList url,QStringList dur);
+private:
+    myDateBase *m_datebase;
+    QString m_PlayListname;
+    QPropertyAnimation *m_animation;
+    bool m_isGiven;
+    int m_scrollValue;
+    int m_saveScrollValue;
+//    myDateBase *m_datebase;
+};
+
+#endif // MYTABLEPLAYLISTFINAL_H
