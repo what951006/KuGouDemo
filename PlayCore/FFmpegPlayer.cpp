@@ -7,7 +7,6 @@
 #include"Global_ValueGather.h"
 #define USE_MUTE 1
 
-qint64 starttime=0;
 static bool isquit=false; //清空了
 int VOL=80;
 // 包队列初始化
@@ -399,18 +398,9 @@ int video_thread(void *arg)
     emit ffplayerPointer->sig_CurImageChange(QImage()); //刷新下MV背景
 }
 
-int interrupt_cb(void *ctx)//只有正在播放才会做这个函数//网络不畅就会一直做这里 1秒10连发
+int interrupt_cb(void *ctx)//网络不畅就会一直做这里 ，正在播放也会call这里但频率不如网络不畅高
 {
    mediaState *MS=(mediaState*)ctx;
-   //超时！ 15秒
-   qint64 curtime=QTime::currentTime().hour()*3600+QTime::currentTime().minute()*60+QTime::currentTime().second();
-   if(curtime==starttime+15)//用于点开播放超时! 15秒
-      return -1;
-   //
-   MS->isBuffering=true;
-   ffplayerPointer->updateStatus();
- //   qDebug()<<"is buffering"<<curtime;
-
    return 0;
 }
 
@@ -532,8 +522,6 @@ void FFmpegPlayer::run()
     isquit=0;
     SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_TIMER);
 
-
-    starttime=QTime::currentTime().hour()*3600+QTime::currentTime().minute()*60+QTime::currentTime().second();
     // 读取文件头，将格式相关信息存放在AVFormatContext结构体中
     if (avformat_open_input(&m_MS.afct, m_url.toUtf8().data(), nullptr, nullptr) != 0)
     {
@@ -667,22 +655,17 @@ void FFmpegPlayer::run()
             }
             else
             {
+                AVPacket packet; //分配一个packet
+                av_new_packet(&packet, 10);
+                strcpy((char*)packet.data,FLUSH_DATA);
 
                 if (m_MS.audiostream >= 0) //audio
                 {
-                    AVPacket packet; //分配一个packet
-                    av_new_packet(&packet, 10);
-                    strcpy((char*)packet.data,FLUSH_DATA);
-
                     packet_queue_flush(&m_MS.audioq); //清除队列
                     packet_queue_put(&m_MS.audioq, &packet); //往队列中存入用来清除的包
                 }
                 if (m_MS.videostream >= 0)
                 {
-                    AVPacket packet; //分配一个packet
-                    av_new_packet(&packet, 10);
-                    strcpy((char*)packet.data,FLUSH_DATA);
-
                     packet_queue_flush(&m_MS.videoq); //清除队列
                     packet_queue_put(&m_MS.videoq, &packet); //往队列中存入用来清除的包
                     m_MS.video_clock = 0;
@@ -693,17 +676,6 @@ void FFmpegPlayer::run()
 
         if (m_MS.audioq.size > MAX_AUDIO_SIZE || m_MS.videoq.size > MAX_VIDEO_SIZE)//防止一下子把音频全部读完了~
             continue;
-
-        double aprecent=((double)m_MS.audioq.size/MAX_AUDIO_SIZE); //
-        double vprecent=((double)m_MS.videoq.size/MAX_VIDEO_SIZE);
-
-        double temp=vprecent>aprecent? vprecent:aprecent; //选小的
-        if(temp<0.99)
-        {
-            emit ffplayerPointer->sig_BufferingPrecent(temp);
-
-        }
-        ///
 
         get= av_read_frame(m_MS.afct, &packet); //read frame
         if(get==0)//=0就是正确的~再添加进队列
