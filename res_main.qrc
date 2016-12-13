@@ -1,0 +1,8 @@
+<RCC>
+    <qresource prefix="/">
+        <file>image/main/kwgou.rc</file>
+        <file>image/main/trayIcon.png</file>
+        <file>image/main/kugou.ico</file>
+        <file>image/skin/默认.jpg</file>
+    </qresource>
+</RCC>

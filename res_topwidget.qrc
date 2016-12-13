@@ -1,0 +1,48 @@
+<RCC>
+    <qresource prefix="/">
+        <file>image/topwidget/btn_close (1).png</file>
+        <file>image/topwidget/btn_close (2).png</file>
+        <file>image/topwidget/btn_close (3).png</file>
+        <file>image/topwidget/btn_game (1).png</file>
+        <file>image/topwidget/btn_game (2).png</file>
+        <file>image/topwidget/btn_game (3).png</file>
+        <file>image/topwidget/btn_mini (1).png</file>
+        <file>image/topwidget/btn_mini (2).png</file>
+        <file>image/topwidget/btn_mini (3).png</file>
+        <file>image/topwidget/btn_miniframe (1).png</file>
+        <file>image/topwidget/btn_miniframe (2).png</file>
+        <file>image/topwidget/btn_miniframe (3).png</file>
+        <file>image/topwidget/btn_miniframe (4).png</file>
+        <file>image/topwidget/btn_playcard (1).png</file>
+        <file>image/topwidget/btn_playcard (2).png</file>
+        <file>image/topwidget/btn_playcard (3).png</file>
+        <file>image/topwidget/btn_skin (1).png</file>
+        <file>image/topwidget/btn_skin (2).png</file>
+        <file>image/topwidget/btn_skin (3).png</file>
+        <file>image/topwidget/btn_tool (1).png</file>
+        <file>image/topwidget/btn_tool (2).png</file>
+        <file>image/topwidget/btn_tool (3).png</file>
+        <file>image/topwidget/btn_tool (4).png</file>
+        <file>image/topwidget/btn_message (1).png</file>
+        <file>image/topwidget/btn_message (2).png</file>
+        <file>image/topwidget/btn_message (3).png</file>
+        <file>image/topwidget/btn_message (4).png</file>
+        <file>image/topwidget/btn_setting (1).png</file>
+        <file>image/topwidget/btn_setting (2).png</file>
+        <file>image/topwidget/btn_setting (3).png</file>
+        <file>image/topwidget/btn_mobile (1).png</file>
+        <file>image/topwidget/btn_mobile (2).png</file>
+        <file>image/topwidget/btn_mobile (3).png</file>
+        <file>image/topwidget/btn_mobile (4).png</file>
+        <file>image/topwidget/label_icon.png</file>
+        <file>image/topwidget/btn_ return(1).png</file>
+        <file>image/topwidget/btn_ return(2).png</file>
+        <file>image/topwidget/btn_ return(3).png</file>
+        <file>image/topwidget/btn_refresh(1).png</file>
+        <file>image/topwidget/btn_refresh(2).png</file>
+        <file>image/topwidget/btn_refresh(3).png</file>
+        <file>image/topwidget/btn_search (1).png</file>
+        <file>image/topwidget/btn_search (2).png</file>
+        <file>image/topwidget/btn_search (3).png</file>
+    </qresource>
+</RCC>

@@ -1,0 +1,29 @@
+<RCC>
+    <qresource prefix="/">
+        <file>image/trayMenu/menu_close.png</file>
+        <file>image/trayMenu/menu_lock.png</file>
+        <file>image/trayMenu/menu_log.png</file>
+        <file>image/trayMenu/menu_lrc.png</file>
+        <file>image/trayMenu/menu_setting.png</file>
+        <file>image/trayMenu/menu_next (1).png</file>
+        <file>image/trayMenu/menu_next (2).png</file>
+        <file>image/trayMenu/menu_next (3).png</file>
+        <file>image/trayMenu/menu_next (4).png</file>
+        <file>image/trayMenu/menu_pause (1).png</file>
+        <file>image/trayMenu/menu_pause (2).png</file>
+        <file>image/trayMenu/menu_pause (3).png</file>
+        <file>image/trayMenu/menu_pause (4).png</file>
+        <file>image/trayMenu/menu_play (1).png</file>
+        <file>image/trayMenu/menu_play (2).png</file>
+        <file>image/trayMenu/menu_play (3).png</file>
+        <file>image/trayMenu/menu_play (4).png</file>
+        <file>image/trayMenu/menu_previous (1).png</file>
+        <file>image/trayMenu/menu_previous (2).png</file>
+        <file>image/trayMenu/menu_previous (3).png</file>
+        <file>image/trayMenu/menu_previous (4).png</file>
+        <file>image/trayMenu/menu_vol (1).png</file>
+        <file>image/trayMenu/menu_vol (2).png</file>
+        <file>image/trayMenu/menu_vol (3).png</file>
+        <file>image/trayMenu/menu_vol (4).png</file>
+    </qresource>
+</RCC>
