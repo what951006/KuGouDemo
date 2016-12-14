@@ -1,0 +1,97 @@
+<RCC>
+    <qresource prefix="/">
+        <file>image/middlewidget/btn_cloud (1).png</file>
+        <file>image/middlewidget/btn_cloud (2).png</file>
+        <file>image/middlewidget/btn_cloud (3).png</file>
+        <file>image/middlewidget/btn_download (1).png</file>
+        <file>image/middlewidget/btn_download (2).png</file>
+        <file>image/middlewidget/btn_download (3).png</file>
+        <file>image/middlewidget/btn_music (1).png</file>
+        <file>image/middlewidget/btn_music (2).png</file>
+        <file>image/middlewidget/btn_music (3).png</file>
+        <file>image/middlewidget/btn_phone (1).png</file>
+        <file>image/middlewidget/btn_phone (2).png</file>
+        <file>image/middlewidget/btn_phone (3).png</file>
+        <file>image/middlewidget/btn_radio (1).png</file>
+        <file>image/middlewidget/btn_radio (2).png</file>
+        <file>image/middlewidget/btn_radio (3).png</file>
+        <file>image/middlewidget/indicator.png</file>
+        <file>image/middlewidget/lab_backups.png</file>
+        <file>image/middlewidget/lab_2DC.png</file>
+        <file>image/middlewidget/net_connect (1).png</file>
+        <file>image/middlewidget/net_connect (2).png</file>
+        <file>image/middlewidget/net_connect (3).png</file>
+        <file>image/middlewidget/net_connect (4).png</file>
+        <file>image/middlewidget/wire_connect (1).png</file>
+        <file>image/middlewidget/wire_connect (2).png</file>
+        <file>image/middlewidget/wire_connect (3).png</file>
+        <file>image/middlewidget/wire_connect (4).png</file>
+        <file>image/middlewidget/btn_mask.png</file>
+        <file>image/middlewidget/btn_cross (1).png</file>
+        <file>image/middlewidget/btn_cross (2).png</file>
+        <file>image/middlewidget/btn_cross (3).png</file>
+        <file>image/middlewidget/btn_cross (4).png</file>
+        <file>image/middlewidget/btn_del (1).png</file>
+        <file>image/middlewidget/btn_del (2).png</file>
+        <file>image/middlewidget/btn_del (3).png</file>
+        <file>image/middlewidget/btn_del (4).png</file>
+        <file>image/middlewidget/btn_love (1).png</file>
+        <file>image/middlewidget/btn_love (2).png</file>
+        <file>image/middlewidget/btn_love (3).png</file>
+        <file>image/middlewidget/btn_love (4).png</file>
+        <file>image/middlewidget/btn_more (1).png</file>
+        <file>image/middlewidget/btn_more (2).png</file>
+        <file>image/middlewidget/btn_more (3).png</file>
+        <file>image/middlewidget/btn_more (4).png</file>
+        <file>image/middlewidget/lab_Author.png</file>
+        <file>image/middlewidget/btn_downloadmini (1).png</file>
+        <file>image/middlewidget/btn_downloadmini (2).png</file>
+        <file>image/middlewidget/btn_downloadmini (3).png</file>
+        <file>image/middlewidget/btn_downloadmini (4).png</file>
+        <file>image/middlewidget/indicator_down (1).png</file>
+        <file>image/middlewidget/indicator_down (2).png</file>
+        <file>image/middlewidget/indicator_menu (1).png</file>
+        <file>image/middlewidget/indicator_menu (2).png</file>
+        <file>image/middlewidget/indicator_menu (3).png</file>
+        <file>image/middlewidget/indicator_top (1).png</file>
+        <file>image/middlewidget/indicator_top (2).png</file>
+        <file>image/middlewidget/lab_add.png</file>
+        <file>image/middlewidget/lab_addfolder.png</file>
+        <file>image/middlewidget/loading.png</file>
+        <file>image/middlewidget/btn_searchadd (1).png</file>
+        <file>image/middlewidget/btn_searchadd (2).png</file>
+        <file>image/middlewidget/btn_searchadd (3).png</file>
+        <file>image/middlewidget/btn_searchadd (4).png</file>
+        <file>image/middlewidget/btn_searchplay (1).png</file>
+        <file>image/middlewidget/btn_searchplay (2).png</file>
+        <file>image/middlewidget/btn_searchplay (3).png</file>
+        <file>image/middlewidget/btn_searchplay (4).png</file>
+        <file>css/QWebViewStyle.css</file>
+        <file>image/middlewidget/btn_islove (1).png</file>
+        <file>image/middlewidget/btn_islove (2).png</file>
+        <file>image/middlewidget/btn_islove (3).png</file>
+        <file>image/middlewidget/btn_addtips (1).png</file>
+        <file>image/middlewidget/btn_addtips (2).png</file>
+        <file>image/middlewidget/btn_addtips (3).png</file>
+        <file>image/middlewidget/btn_addtips (4).png</file>
+        <file>image/middlewidget/btn_mv (1).png</file>
+        <file>image/middlewidget/btn_mv (2).png</file>
+        <file>image/middlewidget/btn_mv (3).png</file>
+        <file>image/middlewidget/btn_mv (4).png</file>
+        <file>image/middlewidget/lab_success.png</file>
+        <file>image/middlewidget/btn_listhide (1).png</file>
+        <file>image/middlewidget/btn_listhide (2).png</file>
+        <file>image/middlewidget/btn_listhide (3).png</file>
+        <file>image/middlewidget/btn_listshow (1).png</file>
+        <file>image/middlewidget/btn_listshow (2).png</file>
+        <file>image/middlewidget/btn_listshow (3).png</file>
+        <file>image/middlewidget/btn_location (1).png</file>
+        <file>image/middlewidget/btn_location (2).png</file>
+        <file>image/middlewidget/btn_location (3).png</file>
+        <file>image/middlewidget/btn_search (1).png</file>
+        <file>image/middlewidget/btn_search (2).png</file>
+        <file>image/middlewidget/btn_search (3).png</file>
+        <file>image/middlewidget/checked.png</file>
+        <file>image/middlewidget/unchecked.png</file>
+    </qresource>
+</RCC>
