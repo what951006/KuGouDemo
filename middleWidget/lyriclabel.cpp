@@ -244,7 +244,7 @@ int LyricLabel::itemCount() const
 
 void LyricLabel::slot_timerWork()
 {
-    if(m_itemOffset!=0)
+   if(m_itemOffset!=0)
         return;
 
     int interval=0;
@@ -284,7 +284,7 @@ void LyricLabel::positionChanged(qint64 length)
     if (m_isScrolled) //if we are scrolling the lyric content just return
         return;
     int index = m_lyric->getIndex(length); //using binary search for the current lyric index;
-    if (index != m_currentItem&&m_itemOffset==0)
+   if (index != m_currentItem&&m_itemOffset==0)
     {
         m_maskLength=-1000;
         m_currentRollrect=QRect(0,0,0,0);
@@ -294,7 +294,7 @@ void LyricLabel::positionChanged(qint64 length)
         emit sig_currentLrcChange(m_lyric->getLineAt(index),m_lyric->getLineAt(index+1));
         this->scrollTo(index);
     }
-     slot_timerWork();
+      slot_timerWork();
 }
 
 void LyricLabel::setPostion(qint64 pos)

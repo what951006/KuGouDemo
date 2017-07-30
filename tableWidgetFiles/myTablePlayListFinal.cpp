@@ -217,7 +217,7 @@ void myTablePlayListFinal::updateConvientButton()
 #else
     int y=0;
     QVector<myTablePlayListFinal*> &vector=m_midleft0->myTablePlayListFinalVector();
-    for(int i=0;i<vector.size();i++)
+    for(int i=0;i<vector.size();++i)
     {
         myTablePlayListFinal*f=vector.value(i);
         if(f==this)

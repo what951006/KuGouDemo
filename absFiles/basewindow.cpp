@@ -54,14 +54,10 @@ Widget::Widget(QWidget *parent):QWidget(parent)
     m_curindex=0;
     m_issetpix=false;
     m_isShowSingerBG=true;
-
-    m_netPix=QPixmap("");
-    m_localPix=QPixmap("");
-    m_curPix=QPixmap("");
 }
 void Widget::setPixmap(const QPixmap &pix)
 {
-    m_localPix=pix;
+    m_netPic=pix;
     update();
 }
 
@@ -73,60 +69,61 @@ void Widget::setShowSingerBG(bool is)
 void Widget::setCurrentIndex(int i)
 {
     m_curindex=i;
+    if(5==m_curindex && m_netPic.width()!=0)
+        m_issetpix=true;
+    else
+        m_issetpix=false;
+
     update();
 }
 
 void Widget::clearBg()
 {
     m_issetpix=false;
-    m_localPix=QPixmap("");
+    m_netPic=QPixmap("");
     update();
 }
 
 
 void Widget::setSkin(const QString &skin)
 {
-    m_netPix=QPixmap(skin);
+    m_skinPic=QPixmap(skin);
     m_curPixPath=skin;
     update();
 }
 
 void Widget::paintEvent(QPaintEvent *e)
 {
-    QWidget::paintEvent(e);
-    QStyleOption opt;
-    opt.init(this);
     QPainter p(this);
-    style()->drawPrimitive(QStyle::PE_Widget, &opt, &p, this);
-    p.setRenderHints(QPainter::SmoothPixmapTransform,true);//消锯齿
+  //  p.setRenderHints(QPainter::SmoothPixmapTransform,true);//消锯齿
 
-    if(m_curindex==5&&m_localPix.width()!=0)
-        m_issetpix=true;
-    else
-        m_issetpix=false;
 
-    double d =(double)m_netPix.height()/m_netPix.width();
-    int h=d*width();
-    int w=height()/d;
-    p.drawPixmap(0,0,width(),h,m_netPix);
-    m_curPix=m_netPix.scaled(width(),h);
-    if(h<height())//如果图片高度小于窗口高度
+
+    if( !m_issetpix)
     {
-        p.drawPixmap(0,0,w,height(),m_netPix);
-        m_curPix=m_netPix.scaled(w,height());
-    }
-
-    if(m_issetpix&&m_isShowSingerBG)
-    {
-        double d =(double)m_localPix.height()/m_localPix.width();
+        double d =(double)m_skinPic.height()/m_skinPic.width();
         int h=d*width();
         int w=height()/d;
-        p.drawPixmap(0,0,width(),h,m_localPix);
-        m_curPix=m_localPix.scaled(width(),h);
+        p.drawPixmap(0,0,width(),h,m_skinPic);
+        m_curPix=m_skinPic.scaled(width(),h);
         if(h<height())//如果图片高度小于窗口高度
         {
-             p.drawPixmap(0,0,w,height(),m_localPix);
-             m_curPix=m_localPix.scaled(w,height());
+            p.drawPixmap(0,0,w,height(),m_skinPic);
+            m_curPix=m_skinPic.scaled(w,height());
+        }
+        return;
+    }
+    if(m_issetpix && m_isShowSingerBG)
+    {
+        double d =(double)m_netPic.height()/m_netPic.width();
+        int h=d*width();
+        int w=height()/d;
+        p.drawPixmap(0,0,width(),h,m_netPic);
+        m_curPix=m_netPic.scaled(width(),h);
+        if(h<height())//如果图片高度小于窗口高度
+        {
+             p.drawPixmap(0,0,w,height(),m_netPic);
+             m_curPix=m_netPic.scaled(w,height());
         }
     }
 }

@@ -1,28 +1,26 @@
 #ifndef FFMPEGPLAYER_H
 #define FFMPEGPLAYER_H
 
+#include <QImage>
+#include <windows.h>
+
 #define MAX_AUDIO_FRAME_SIZE  192000
 #define SDL_AUDIO_BUFFER_SIZE  1024
-#define MAX_AUDIO_SIZE ( 10*16 * 1024)
-#define MAX_VIDEO_SIZE ( 10*256 * 1024)
+#define MAX_AUDIO_SIZE (25 * 16 * 1024)
+#define MAX_VIDEO_SIZE (25 * 256 * 1024)
 #define FLUSH_DATA "FLUSH"
 
 extern "C"
 {
-    #include <libavcodec\avcodec.h>
-    #include <libavformat\avformat.h>
-    #include <libswscale\swscale.h>
-    #include <libswresample\swresample.h>
-    #include <include/SDL2/SDL.h>
-    #include <include/SDL2/SDL_thread.h>
+    # include <libavcodec\avcodec.h>
+    # include <libavformat\avformat.h>
+    # include <libswscale\swscale.h>
+    # include <libswresample\swresample.h>
+    # include <include/SDL2/SDL.h>
+    # include <include/SDL2/SDL_thread.h>
 }
 
-extern int VOL;
 #include<QThread>
-#include<QTimer>
-#include<QImage>
-
-enum PlayerStatus{playingStatus,pausingStatus,stopStatus,bufferingStatus};
 
 typedef struct PacketQueue {
     AVPacketList *first_pkt, *last_pkt;
@@ -32,39 +30,32 @@ typedef struct PacketQueue {
     SDL_cond *cond;
 } PacketQueue;
 
-
+enum PlayerStatus{playingStatus,pausingStatus,stopStatus,bufferingStatus};
 
 
 typedef struct{
-    AVFormatContext* afct; //
-    AVPacket pkt; //
-    ////////////////////////////common part
-    SwrContext* swr_ctx ;//
-    AVFrame *wanted_frame;//
-    uint8_t* audio_pkt_data;
-    int audio_pkt_size; //
-    AVFrame *frame; //
+    AVFormatContext* fct; //格式上下文
 
-    AVCodecContext *acct;//
-    AVStream *audio_st;
-    int audiostream;
-    double audio_clock;
-    unsigned int audio_buf_size; //
-    unsigned int audio_buf_index; //
-    bool isBuffering;
+    AVFrame *wanted_frame;//音频目标帧
+    AVCodecContext *acct;//音频解码上下文
+    AVStream *aStream;
+    PacketQueue audioq; //音频队列
+
+    HANDLE VideoHD;
+    HANDLE AudioHD;
+
+    AVCodecContext *vcct;//视频解码上下文
+    AVStream *vStream;
+    PacketQueue videoq; //视频队列
+
     bool seek_req;
-    qint64 seek_pos;
-    PacketQueue audioq; //
-    ///////////////////// audio and video
-    AVCodecContext *vcct;
-    int videostream;
+    int seek_pos;
+
     double video_clock;
-    PacketQueue videoq;
-    AVStream *video_st;
-    SDL_Thread *video_tid;  //视频线程id
+    double audio_clock;
 }mediaState;
 
-
+extern int g_nVol;
 
 
 class FFmpegPlayer : public QThread
@@ -72,7 +63,9 @@ class FFmpegPlayer : public QThread
     Q_OBJECT
 public:
     explicit FFmpegPlayer(QObject *parent = 0);
-    void setMedia(const QString,bool isMV=false);
+    ~FFmpegPlayer(){}
+//---------------------------------
+    void setMedia(const QString &url,bool isMV=false);
     void stop();
     void pause(){SDL_PauseAudio(1);}
     void play(){ SDL_PauseAudio(0);}
@@ -82,15 +75,25 @@ public:
     PlayerStatus getPlayerStatus() const;
 
     /*duration with now playing the media */
-    inline qint64 getDuration(){ if(!m_MS.acct)return 0;return m_MS.afct->duration;}
+    inline qint64 getDuration(){ if(!m_MS.acct)return 0;return m_MS.fct->duration;}
 
     /*get current media time value*/
     inline qint64 getCurrentTime(){return m_MS.audio_clock*1000000;}
 
     QTimer *m_timer;
-    void FreeAllocSpace();
-protected:
 
+//----------------------------------
+
+
+
+    PlayerStatus getPlayerStatus();
+
+    bool IsThreadRunning(HANDLE);
+    void FreeCommSpace();
+    void FreeVideoAlloc();
+    void FreeAudioAlloc();
+    void SetPos(int pos);
+protected:
     virtual void run();
 signals:
     void sig_BufferingPrecent(double);
@@ -101,10 +104,11 @@ signals:
     void sig_CurrentMediaFinished();
     void sig_CurrentMediaStatus(PlayerStatus);
     void sig_CurrentMediaError();
+
 public slots:
     void slot_timerWork();
 
-    void setVol(int vol){VOL=vol;}
+    void setVol(int vol){g_nVol=vol;}
 
     void seek(qint64 );
 private:

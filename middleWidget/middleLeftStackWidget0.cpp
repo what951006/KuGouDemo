@@ -418,8 +418,8 @@ void middleLeftStackWidget0::slot_verScrBarChange(int value)
        if(!f->m_table->isHidden())
         final=f;
     }
-    if(final)
-    final->updateConvientButton();
+   /* if(final)
+    final->updateConvientButton();*/
 
 }
 /////////////////////////////////////////////////////////////////////////////////////

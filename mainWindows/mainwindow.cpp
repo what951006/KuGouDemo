@@ -112,7 +112,7 @@ void mainWindow::setOriginalStatus()
     m_bottomwid->m_mainslider->setRange(0,0);
     m_middwid->m_rightWid->m_lrcwid->clearLrc();
     m_middwid->m_rightWid->m_lrcwid->scrollTo(0);
-    m_deskTopLrc->setOriginalStatus();
+   // m_deskTopLrc->setOriginalStatus();
 }
 
 int mainWindow::curVol()
@@ -169,10 +169,10 @@ void mainWindow::initWidgetMISC()
     connect(m_skinwid->m_skincontwid,SIGNAL(sig_setBackground(QString)),m_mainwid,SLOT(setSkin(QString)));
     connect(m_skinwid->m_btnAdjustWindow,SIGNAL(clicked(bool)),this,SLOT(slot_adjustWindowNormalSize()));
 
-    m_deskTopLrc=new deskTopLrcWidget;
+  /*  m_deskTopLrc=new deskTopLrcWidget;
     m_deskTopLrc->show();
     connect(m_middwid->m_rightWid->m_lrcwid,SIGNAL(sig_currentLrcChange(QString,QString)),m_deskTopLrc,SLOT(slot_currentLrcChange(QString,QString)));
-    connect(m_middwid->m_rightWid->m_lrcwid,SIGNAL(sig_currentPrecentChange(QString,float&,int&)),m_deskTopLrc,SLOT(slot_precentChange(QString,float&,int&)));
+    connect(m_middwid->m_rightWid->m_lrcwid,SIGNAL(sig_currentPrecentChange(QString,float&,int&)),m_deskTopLrc,SLOT(slot_precentChange(QString,float&,int&)));*/
 }
 
 void mainWindow::initNetwork()
@@ -536,14 +536,15 @@ void mainWindow::slot_setPlayerPlayOrPause()
 }
 void mainWindow::slot_OpenDeskTopLrc()
 {
-    if(m_deskTopLrc->isHidden())
+   /* if(m_deskTopLrc->isHidden())
         m_deskTopLrc->show();
     else
-        m_deskTopLrc->hide();
+        m_deskTopLrc->hide();*/
 }
 
 void mainWindow::slot_timelineAnimation(int value)
 {
+    qDebug()<<"timer line??";
     setBackgroundPixmap(m_pixvector.value(value));
 }
 

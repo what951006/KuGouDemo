@@ -52,7 +52,7 @@ public:
    void clearBackground();
    void setBackgroundPixmap(const QPixmap&);
 
-  inline deskTopLrcWidget*deskTopLrcWid(){return m_deskTopLrc;}
+//  inline deskTopLrcWidget*deskTopLrcWid(){return m_deskTopLrc;}
   inline middleLeftStackWidget0* middleStack0(){return m_midstack0;}
   inline FFmpegPlayer* player(){return m_ffplayer;}
   inline TopWidgets*topWidget(){return m_topwid;}
@@ -106,7 +106,7 @@ private:
    trayIconMenu *m_traymenu;
    MyNetWork *m_net;
    PlayMode pMode; //use for saving the now playmode when exited
-   deskTopLrcWidget *m_deskTopLrc;
+//   deskTopLrcWidget *m_deskTopLrc;
    FFmpegPlayer *m_ffplayer;
    middleLeftStackWidget0* m_midstack0;
 

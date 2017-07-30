@@ -23,7 +23,6 @@ public:
    void setCurrentIndex(int);
    inline int CurrentIndex(){return m_curindex;}
    void clearBg();
-   inline QPixmap currentSkin(){return m_curPix;}
    const QString currentSkinPath(){return m_curPixPath;}
    inline QPixmap getRectPix(const QRect&rect){update();return  m_curPix.copy(rect);}
 public slots:
@@ -32,10 +31,10 @@ protected:
     void paintEvent(QPaintEvent *e);
 private:
     QString m_curPixPath;
-    QPixmap m_localPix;
-    QPixmap m_netPix;
+    QPixmap m_netPic;
+    QPixmap m_skinPic;
     QPixmap m_curPix; //not the normal size
-    QRect m_rect;
+
     bool m_issetpix;
     bool m_isShowSingerBG;
     int m_curindex;

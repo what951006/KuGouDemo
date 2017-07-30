@@ -7,7 +7,7 @@ TextMovingWidget::TextMovingWidget(const QString str ,QWidget *parent)
 {
     _timer=new QTimer(this);
     connect(_timer,SIGNAL(timeout()),this,SLOT(slot_UpdateTextGeometry()));
-    _timer->start(30);
+   // _timer->start(30);
 }
 
 TextMovingWidget::~TextMovingWidget()
@@ -57,10 +57,10 @@ int TextMovingWidget::getDirection(const QString &text)
 
 void TextMovingWidget::showEvent(QShowEvent *)
 {
-    if(isHidden())
+    /*if(isHidden())
         _timer->stop();
     else
-        _timer->start(30);
+        _timer->start(30);*/
 }
 
 void TextMovingWidget::slot_UpdateTextGeometry()
