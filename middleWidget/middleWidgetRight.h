@@ -9,6 +9,7 @@
 //#include"WebWidget.h"
 #include"MvWidget.h"
 #include"baseWidget.h"
+#include "LyricWidget.h"
 class mainWindow;
 class middleSearchWidget;
 class LyricLabel;
@@ -29,7 +30,8 @@ public:
    void setDrawLine(bool draw=true){m_isdrawline=draw;}
 
    QStackedWidget *m_stackWid;
-   LyricLabel * m_lrcwid;
+//LyricLabel * m_lrcwid;
+   LyricWidget *m_lrcwid;
    middleSearchWidget*m_searchwid;
    static QColor bgcolor;
 public slots:

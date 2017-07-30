@@ -15,7 +15,8 @@ $$PWD/buttonstackedwidget.cpp\
 $$PWD/middleSearchTableWidget.cpp \
 $$PWD/WebWidget.cpp \
 $$PWD/middleconvienttwobutton.cpp \
-    $$PWD/MvWidget.cpp
+$$PWD/MvWidget.cpp \
+$$PWD/LyricWidget.cpp
 
 HEADERS +=\
 $$PWD/middleLeftStackWidget0.h\
@@ -33,7 +34,8 @@ $$PWD/buttonstackedwidget.h\
 $$PWD/middleSearchTableWidget.h \
 $$PWD/WebWidget.h \
 $$PWD/middleconvienttwobutton.h \
-    $$PWD/decodekrc.h \
-    $$PWD/MvWidget.h
+$$PWD/decodekrc.h \
+$$PWD/MvWidget.h \
+$$PWD/LyricWidget.h
 
 LIBS+= -L$$PWD/zlib/ -lzdll

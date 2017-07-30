@@ -67,7 +67,7 @@ void middleWidgetRight::init()
         m_stackWid->addWidget(new baseWidget(this));
         m_stackWid->addWidget(new baseWidget(this));
         m_stackWid->addWidget(m_MvWid=new MvWidget(this));
-        m_stackWid->addWidget(m_lrcwid=new LyricLabel(false,this));
+        m_stackWid->addWidget(m_lrcwid=new LyricWidget);
         m_stackWid->addWidget(m_searchwid=new middleSearchWidget(this));
 #endif
 
@@ -130,7 +130,7 @@ void middleWidgetRight::init()
 void middleWidgetRight::setInitMainWindow(mainWindow *p)
 {
    m_mainWindow=p;
-   m_lrcwid->setInitMainWindow(p);
+   //m_lrcwid->setInitMainWindow(p);
 }
 
 void middleWidgetRight::slot_setSearchStack()//搜索界面

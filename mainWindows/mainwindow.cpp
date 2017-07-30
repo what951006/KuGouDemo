@@ -110,8 +110,8 @@ void mainWindow::setOriginalStatus()
     m_bottomwid->m_labposition->setText("00:00/00:00");
     m_bottomwid->m_labnowPlayname->setText("极视听音乐");
     m_bottomwid->m_mainslider->setRange(0,0);
-    m_middwid->m_rightWid->m_lrcwid->clearLrc();
-    m_middwid->m_rightWid->m_lrcwid->scrollTo(0);
+   // m_middwid->m_rightWid->m_lrcwid->clearLrc();
+  //  m_middwid->m_rightWid->m_lrcwid->scrollTo(0);
    // m_deskTopLrc->setOriginalStatus();
 }
 
@@ -378,7 +378,7 @@ void mainWindow::slot_currentMediaChanged(const QString &media, bool isMV)//setn
                 return;
               QByteArray byt=file3.readAll();
               file3.close();
-              m_middwid->m_rightWid->m_lrcwid->analyzeLrc(byt,path2lrc);
+              m_middwid->m_rightWid->m_lrcwid->analyzeLrcContent(byt,path2lrc);
           }
           else//如果两个地方都没有歌词文件
           {
