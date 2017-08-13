@@ -36,9 +36,6 @@ public:
 
     QString GetLrcByIndex(int index);
 
-//get start pos by index
-    qint64 GetPosByindex(int index);
-
 //get the lrc by time
     QString GetLrcByTime(qint64 time);
 
@@ -46,37 +43,34 @@ public:
     int GetIndexByTime(qint64 time);
 
 //get mask length
-    void GetMaskLen(int nFontSize,int nFreq);
+    void GetMaskLen(qint64 pos,int nFontSize,int nFreq);
+//-----------------original function------------
+public:
+    void analyzeLrcContent(QByteArray&,const QString &filePath=NULL);
 
+    void getPosInfo(qint64 pos,int &interval,float &precent,QString &str,int index);
+    inline  qint64 getPostion(int index){return index>=0&&index <m_lrcMap.values().size()?m_lrcMap.keys().at(index):0;}
 
-    void analyzeLrcContent(QByteArray&,const QString &filePath);
+    QString m_filedir;
+    QMap<qint64,QMap<qint64,qint64>> m_lrcintervalmap;
+    QMap<qint64,QMap<qint64,QString>> m_lrcwordsmap;
 
-    void clearLrc();
-
-    void getPosInfo(int &interval, float &precent, QString &str);
 protected:
     virtual void paintEvent(QPaintEvent*event);
-
 private slots:
     void slot_timer();
 
     void positionChanged(qint64 length);
 private:
 //Draw single row text
+
     void DrawItem(QPainter&Painter,ItemInfo &index);
 
-//
-    QMap<qint64,QString> m_lineMap;
-    QList<QMap<int,QString>> m_word_list;
-    QList<QMap<int ,int>> m_interval_list; //interval,间隔时间
-    QList<QMap<int ,float>> m_percent_list; //float,比例
-//
 
-    QString m_strCurLrc;
     QTimer m_timer;
     QFont m_normalFont;
+    QMap<qint64,QString> m_lrcMap;
     qint64 m_nCurPos;
-    qint64 m_nCurStartPos;
     float m_nMaskLen;
     int m_nCurIndex;
     int m_nSroIndex;

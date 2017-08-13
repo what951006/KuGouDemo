@@ -1,8 +1,10 @@
 #include "myMediaList.h"
 #include<QTime>
-#include<tableWidgetFiles/mytablewidget.h>
+#include "myTablePlayListFinal.h"
+
 myMediaList::myMediaList(QObject *parent) : QObject(parent)
 {
+    m_pFinal=NULL;
     m_musicIndex=0;
     m_list.empty();
     setPlayMode(PlayMode::playInOrder);
@@ -67,11 +69,10 @@ int myMediaList::preMediaIndex()//上一曲
 void myMediaList::slot_removeSong(int index)
 {
     m_list.removeAt(index);
-    myTableWidget*t=parent()->findChild<myTableWidget*>();
-    int PlayWidindex=t->currentSongIndex();
+
+    int PlayWidindex=m_pFinal->m_table.m_playingWid.currentSongIndex();
     if(PlayWidindex>=index)
     {
         m_musicIndex--;
     }
-
 }

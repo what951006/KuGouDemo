@@ -6,16 +6,16 @@
 #include<QEventLoop>
 #include<QDebug>
 
-#define USE_NETCLOUD 0
+#define USE_NETCLOUD 1
 
-const static QString bgurl="http://artistpicserver.kuwo.cn/pic.web?type=big_artist_pic&pictype=url&content=list&&id=0&from=pc&json=1&version=1&width=1920&height=1080&name=%1";
-const static QString songurl="http://itwusun.com/search/wy/%1?&f=json&size=50&p=%2&sign=itwusun";
+#define BG_URL "http://artistpicserver.kuwo.cn/pic.web?type=big_artist_pic&pictype=url&content=list&&id=0&from=pc&json=1&version=1&width=1920&height=1080&name=%1"
+#define SONG_URL "http://itwusun.com/search/wy/%1?&f=json&size=50&p=%2&sign=itwusun"
 
-const static QString KGLrcPart0="http://songsearch.kugou.com/song_search_v2?keyword=%1&page=1&pagesize=40&filter=0&bitrate=0&isfuzzy=0&inputtype=2&platform=PcFilter&userid=312986171&clientver=8100&iscorrection=3";
-const static QString KGLrcPart1="http://lyrics.kugou.com/search?ver=1&man=no&client=pc&keyword=%1&duration=%2&hash=%3";//&hash=9c6fd9b90800f7a37f6821c07bc0f906 9C6FD9B90800F7A37F6821C07BC0F906 b3c9045aa086236dc78a59357bdf73ac
-const static QString KGLrcPart2="http://lyrics.kugou.com/download?ver=1&client=pc&id=%1&accesskey=%2&fmt=krc";
+#define KGLrcPart0 "http://songsearch.kugou.com/song_search_v2?keyword=%1&page=1&pagesize=40&filter=0&bitrate=0&isfuzzy=0&inputtype=2&platform=PcFilter&userid=312986171&clientver=8100&iscorrection=3"
+#define KGLrcPart1 "http://lyrics.kugou.com/search?ver=1&man=no&client=pc&keyword=%1&duration=%2&hash=%3"//&hash=9c6fd9b90800f7a37f6821c07bc0f906 9C6FD9B90800F7A37F6821C07BC0F906 b3c9045aa086236dc78a59357bdf73ac
+#define KGLrcPart2 "http://lyrics.kugou.com/download?ver=1&client=pc&id=%1&accesskey=%2&fmt=krc"
 
-const static QString ITWUSUN="http://api.itwusun.com/music/search/wy/%1?format=json&keyword=%2&sign=a5cc0a8797539d3a1a4f7aeca5b695b9";
+#define ITWUSUN "http://api.itwusun.com/music/search/wy/%1?format=json&keyword=%2&sign=a5cc0a8797539d3a1a4f7aeca5b695b9"
 /*
  *  a new API =====>    http://s.music.163.com/search/get/?type=1&s=  歌曲名/歌手名  &limit=5000
  *  a new API too-----> http://api.itwusun.com/music/search/wy/2?format=json&keyword=陈奕迅&sign=a5cc0a8797539d3a1a4f7aeca5b695b9
@@ -117,6 +117,7 @@ MyNetWork::MyNetWork(QObject *parent) : QObject(parent)
 
 MyNetWork::~MyNetWork()
 {
+
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void MyNetWork::requestalbum(const QString &name,const QString &savelocal)
@@ -161,12 +162,12 @@ void MyNetWork::requestalbum(const QString &name,const QString &savelocal)
         if(reply2->error()==QNetworkReply::NoError)
         {
             QByteArray byt=reply2->readAll();
-            emit setpic(byt,name);
     ///save
             QPixmap pix;
             pix.loadFromData(byt);
             pix.save(savelocal);
     ///
+            emit setpic(savelocal,name);
             reply2->deleteLater();
         }
         else
@@ -195,14 +196,17 @@ void MyNetWork::requestSong(const QString &str)//请求歌曲
     QNetworkAccessManager mangersong;
 #if USE_NETCLOUD
     requestsong.setHeader(QNetworkRequest::ContentTypeHeader,"application/x-www-form-urlencoded");
-    requestsong.setRawHeader("Connection","Keep-Alive");
-    requestsong.setUrl(QUrl("http://music.163.com/api/search/pc"));
-    requestsong.setRawHeader("Cookie","os=pc");
+    requestsong.setRawHeader("Referer","http://music.163.com");
+    requestsong.setRawHeader("Origin","http://music.163.com");
     requestsong.setRawHeader("Host","music.163.com");
-    requestsong.setRawHeader("MUSIC_U","5339640232");
-    requestsong.setRawHeader("Referer","http://music.163.com/");
+    requestsong.setRawHeader("Connection","Keep-Alive");
+//    requestsong.setRawHeader("Accept-Encoding","gzip,deflate");
+
+
+
     requestsong.setHeader(QNetworkRequest::ContentTypeHeader,"application/x-www-form-urlencoded");
-    QNetworkReply *reply1= mangersong.post(requestsong,"offset=0&total=true&limit=100&type=1&s="+byt);
+    requestsong.setUrl(QUrl("http://music.163.com/api/search/pc"));
+    QNetworkReply *reply1= mangersong.post(requestsong,"offset=0&limit=40&type=1&s="+byt);
 
 
 #else
@@ -243,12 +247,12 @@ void MyNetWork::requestSongNextPage()
     QNetworkAccessManager mangersong;
 #if USE_NETCLOUD
     requestsong.setUrl(QUrl("http://music.163.com/api/search/pc"));
-    requestsong.setRawHeader("Cookie","os=pc");
+    requestsong.setRawHeader("Origin","http://music.163.com");
     requestsong.setRawHeader("Host","music.163.com");
     requestsong.setRawHeader("MUSIC_U","5339640232");
     requestsong.setRawHeader("Referer","http://music.163.com/");
     requestsong.setHeader(QNetworkRequest::ContentTypeHeader,"application/x-www-form-urlencoded");
-    QByteArray bytarray="offset=50&total=true&limit=100&type=1&s="+byt+"?";
+    QByteArray bytarray="offset=0&limit=100&type=1&s="+byt;
 
     QNetworkReply *reply1= mangersong.post(requestsong,bytarray);
 #else
@@ -270,17 +274,22 @@ void MyNetWork::requestSongNextPage()
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void MyNetWork::requestlrc(const QString &lrcname,qint64 totaltime,const QString &lrcloaction)//请求歌词
+void MyNetWork::requestlrc(const QString &lrcname,qint64 nTotalTime,const QString &lrcloaction)//请求歌词
 {
-    if(totaltime==0)
+    if(0==nTotalTime)
         return;
     QString songname=lrcname;
     songname.replace("&"," ");
 
+    QString strTemp(KGLrcPart0);
+    strTemp=strTemp.arg(songname);
+
+
     QNetworkRequest requestlrc0;
     QNetworkAccessManager mangerlrc0;
-    requestlrc0.setUrl(QUrl(KGLrcPart0.arg(songname)));
+    requestlrc0.setUrl(strTemp);
     QNetworkReply *reply0=mangerlrc0.get(requestlrc0);
+
 
     QEventLoop loop0;
     connect(&mangerlrc0,SIGNAL(finished(QNetworkReply*)),&loop0,SLOT(quit()));
@@ -299,9 +308,11 @@ void MyNetWork::requestlrc(const QString &lrcname,qint64 totaltime,const QString
     QJsonObject obj02= array0.at(0).toObject();
     QString hash= obj02.value("FileHash").toString();
 
+
+    strTemp=KGLrcPart1;
     QNetworkRequest requestlrc1;
     QNetworkAccessManager mangerlrc1;
-    requestlrc1.setUrl(QUrl(KGLrcPart1.arg(songname).arg(totaltime).arg(hash)));
+    requestlrc1.setUrl(strTemp.arg(songname).arg(nTotalTime).arg(hash));
     QNetworkReply *reply1= mangerlrc1.get(requestlrc1);
 ///loop1
     QEventLoop loop1;
@@ -322,9 +333,11 @@ void MyNetWork::requestlrc(const QString &lrcname,qint64 totaltime,const QString
     QString accesskey= obj1.value("accesskey").toString();
     QString id=obj1.value("id").toString();
 
+
+    strTemp=KGLrcPart2;
     QNetworkRequest requestlrc2;
     QNetworkAccessManager mangerlrc2;
-    requestlrc2.setUrl(KGLrcPart2.arg(id).arg(accesskey));
+    requestlrc2.setUrl(strTemp.arg(id).arg(accesskey));
     QNetworkReply *reply2= mangerlrc2.get(requestlrc2);
 ///loop2
     QEventLoop loop2;
@@ -377,17 +390,17 @@ const QImage &MyNetWork::BgWhiteChange(QImage &image , int brightness)
 
 void MyNetWork::requestMv(const QString &mvname)
 {
+    QString strTemp(ITWUSUN);
     QByteArray byt=QString(mvname).replace("&"," ").toUtf8().toPercentEncoding();
     QNetworkRequest request;
     QNetworkAccessManager manger;
-    request.setUrl(ITWUSUN.arg(1).arg(QString(byt)));
+    request.setUrl(strTemp.arg(1).arg(QString(byt)));
     QNetworkReply *reply1= manger.get(request);
 ///loop1
     QEventLoop loop1;
     connect(reply1,SIGNAL(finished()),&loop1,SLOT(quit()));
     loop1.exec();
 ///
-
 
    if(reply1->error()==QNetworkReply::NoError)
    {
@@ -410,48 +423,47 @@ void MyNetWork::requestMv(const QString &mvname)
 
 void MyNetWork::requestBgPic(const QString &author)
 {
-    QString url=bgurl.arg(author);
-    QNetworkAccessManager manger;
-    QNetworkReply *reply=manger.get(QNetworkRequest(url));
+    QString strTemp(BG_URL);
+    strTemp=strTemp.arg(author);
 
-    QEventLoop loop1;
-    connect(&manger,SIGNAL(finished(QNetworkReply*)),&loop1,SLOT(quit()));
-    loop1.exec();
-    QByteArray byt=reply->readAll();
+    QNetworkAccessManager manger;
+    QNetworkReply *reply;
+    reply=manger.get(QNetworkRequest(strTemp));
+
+    QEventLoop loop;
+    connect(&manger,SIGNAL(finished(QNetworkReply*)),&loop,SLOT(quit()));
+    loop.exec();
+    QByteArray bytTemp=reply->readAll();
     reply->deleteLater();
 
-    QJsonDocument doc=QJsonDocument::fromJson(byt);
+    QJsonDocument doc=QJsonDocument::fromJson(bytTemp);
     QJsonObject obj=doc.object();
     QJsonArray array=obj.value("array").toArray();
 
-    QVector<QPixmap> m_pixvector;
+    QStringList picList;
     for(int i=0;i<array.count();i++)
     {
-
-       QJsonObject obj1= array.at(i).toObject();
-       QString url=obj1.value("bkurl").toString();
-       if(!url.isEmpty())//如果不为空
+       obj= array.at(i).toObject();
+       strTemp=obj.value("bkurl").toString();
+       if(!strTemp.isEmpty())//如果不为空
        {
-           QNetworkAccessManager *manger2=new QNetworkAccessManager(this);
-           QNetworkReply *reply2=manger2->get(QNetworkRequest(url));
+           reply=manger.get(QNetworkRequest(strTemp));
+           connect(&manger,SIGNAL(finished(QNetworkReply*)),&loop,SLOT(quit()));
+           loop.exec();
 
-           QEventLoop loop2;
-           connect(manger2,SIGNAL(finished(QNetworkReply*)),&loop2,SLOT(quit()));
-           loop2.exec();
-
-           QByteArray byt2=reply2->readAll();
+           bytTemp=reply->readAll();
 
            QImage image;
-           image.loadFromData(byt2);
-           BgWhiteChange(image,-50);
-           image.save(QString("D:/ExcellentAlbum/%1/%2.jpg").arg(author).arg(i));
+           image.loadFromData(bytTemp);
+           image=BgWhiteChange(image,-50);
+           strTemp=QString("D:/ExcellentAlbum/%1/%2.jpg").arg(author).arg(i);
+           image.save(strTemp);
 
-           m_pixvector<<QPixmap::fromImage(image);
 
-           manger2->deleteLater();
-           reply2->deleteLater();
+           picList<<strTemp;
+           reply->deleteLater();
        }
     }
-    if(!m_pixvector.isEmpty())
-    emit sig_setBgpix(m_pixvector,author);
+    if(!picList.isEmpty())
+        emit sig_setBgpix(picList,author);
 }

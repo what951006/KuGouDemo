@@ -22,7 +22,8 @@ public:
     void init();
     void initMenu();
 
-    void setFinalWidget(QWidget*p);
+    void setTableFinal(myTablePlayListFinal*p);
+
     void setTableShowIndicator();
     void setTableHideIndicator();
     void setEnabledMenuItem(bool isSetting=false); //menu!!

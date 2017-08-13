@@ -7,8 +7,6 @@
 #include<QVBoxLayout>
 
 #include"Global_ValueGather.h"
-#include"lyriclabel.h"
-#include"lyric.h"
 #include"FFmpegPlayer.h"
 
 deskTopLrcWidget::deskTopLrcWidget(QWidget *parent)

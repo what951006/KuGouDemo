@@ -5,6 +5,7 @@
 #include<qgridlayout.h>
 #include<QMessageBox>
 #include<QVBoxLayout>
+#include <QApplication>
 
 #include"myTablePlayListFinal.h"
 #include"middleLeftStackWidget0.h"
@@ -12,7 +13,9 @@
 #include"middleconvienttwobutton.h"
 
 
-myTableWidget::myTableWidget(QWidget *parent):QTableWidget(parent)
+myTableWidget::myTableWidget(QWidget *parent):
+    QTableWidget(parent),
+    m_playingWid(this)
 {
     init();
     initPlayingWidget();
@@ -25,7 +28,7 @@ myTableWidget::myTableWidget(QWidget *parent):QTableWidget(parent)
 
 void myTableWidget::slot_btnloveclicked()
 {
-    myTableWidget*table= (myTableWidget*)m_middleftStack0->myTablePlayListFinalVector().last()->m_table;
+    myTableWidget *table= (myTableWidget*)(&m_middleftStack0->myTablePlayListFinalVector().last()->m_table);
 
     if(!m_groupWid->isLoved())//其余列表中存喜爱的 则删除它
     {
@@ -39,7 +42,6 @@ void myTableWidget::slot_btnloveclicked()
            myTablePlayListFinal*plove=m_middleftStack0->myTablePlayListFinalVector().last(); //第二个列表中
 
            plove->addToPlayList(songname,url,m_text.simplified());
-
            m_middleftStack0->showAddtips(); //show the tips  that add successfully
        }
 }
@@ -215,17 +217,17 @@ void myTableWidget::init()
 }
 void myTableWidget::slot_cellClicked(int, int)
 {
-    QVector<myTablePlayListFinal *> &wList=m_middleftStack0->myTablePlayListFinalVector();
+    /*QVector<myTablePlayListFinal *> &wList=m_middleftStack0->myTablePlayListFinalVector();
      foreach (myTablePlayListFinal* f, wList) {
          if(f->m_table!=this)//用来找其它的
          {
-             f->m_table->setCurrentCell(-1,0);
+             f->m_table.setCurrentCell(-1,0);
          }
-      }
+      }*/
 }
 bool myTableWidget::eventFilter(QObject *o, QEvent *e)
 {
-    if(o==m_playingWid)
+    if(o==&m_playingWid)
     {
         QWheelEvent *ev=static_cast<QWheelEvent*>(e);
         if(e->type()==QEvent::Wheel)
@@ -294,12 +296,12 @@ void myTableWidget::slot_playingWidgetLoveBtnClicked()  //this slot is used by p
        if(plovelist->songUrlList().contains(m_finalWidget->songUrlList().value(index)))//if true  then delete
        {
             int plistindex=  plovelist->songUrlList().indexOf(m_finalWidget->songUrlList().value(index));
-            plovelist->m_table->slot_cellEnter(-1,0);
-            plovelist->m_table->removeRow(plistindex);
-            emit plovelist->m_table->sig_delIndex(plistindex);
+            plovelist->m_table.slot_cellEnter(-1,0);
+            plovelist->m_table.removeRow(plistindex);
+            emit plovelist->m_table.sig_delIndex(plistindex);
             myDataBase::deleteSong(plovelist->ShowButtonName(),plistindex);
 
-            m_playingWid->setUnloveState();
+            m_playingWid.setUnloveState();
             emit sig_setLoveState(false);
             m_middleftStack0->showRemovetips();
        }
@@ -309,7 +311,7 @@ void myTableWidget::slot_playingWidgetLoveBtnClicked()  //this slot is used by p
             QString url=m_finalWidget->songUrlList().value(index).toString();
             plovelist->addToPlayList(songname,url,m_text.simplified());
 
-            m_playingWid->setLoveState();
+            m_playingWid.setLoveState();
             emit sig_setLoveState(true);
             m_middleftStack0->showAddtips(); //show the tips  that add successfully
        }
@@ -317,10 +319,9 @@ void myTableWidget::slot_playingWidgetLoveBtnClicked()  //this slot is used by p
 }
 void myTableWidget::initPlayingWidget()
 {
-    m_playingWid=new playingWidget(this);
-    m_playingWid->raise();
-    m_playingWid->hide();
-    m_playingWid->installEventFilter(this);
+    m_playingWid.raise();
+    m_playingWid.hide();
+    m_playingWid.installEventFilter(this);
 
     QHBoxLayout *hlyout=new QHBoxLayout;
     m_addWid=new myTableAddWidget(this);
@@ -330,8 +331,8 @@ void myTableWidget::initPlayingWidget()
 
     connect(m_addWid->m_add,SIGNAL(clicked(bool)),this,SIGNAL(sig_addSong()));
     connect(m_addWid->m_addFolder,SIGNAL(clicked(bool)),this,SIGNAL(sig_addSongFolder()));
-    connect(m_playingWid->m_btnDel,SIGNAL(clicked(bool)),this,SLOT(slot_playingWidgetDelBtnClicked()));
-    connect(m_playingWid->m_btnLove,SIGNAL(clicked(bool)),this,SLOT(slot_playingWidgetLoveBtnClicked()));
+    connect(&m_playingWid.m_btnDel,SIGNAL(clicked(bool)),this,SLOT(slot_playingWidgetDelBtnClicked()));
+    connect(&m_playingWid.m_btnLove,SIGNAL(clicked(bool)),this,SLOT(slot_playingWidgetLoveBtnClicked()));
 
 }
 void myTableWidget::slot_doublick(int r, int c,bool isMv)
@@ -339,18 +340,21 @@ void myTableWidget::slot_doublick(int r, int c,bool isMv)
     if(rowCount()==0)
         return;
 
+     myTablePlayListFinal::setCurrentList(m_finalWidget); //设置当前列表
+
+
      QFont font1;
      font1.setPixelSize(12);//12字号是默认的
 
      foreach (myTablePlayListFinal* wp, m_middleftStack0->myTablePlayListFinalVector()) {
-          int curindex=wp->m_table->currentSongIndex();
-          wp->m_table->setRowHeight(curindex,32);
-          wp->m_table->m_playingWid->hide();//把其它的都隐藏起来
-          wp->m_table->m_playingWid->setCurrentSongItem(NULL);
-          if(wp->m_table->item(curindex,1)!=Q_NULLPTR)
+          int curindex=wp->m_table.currentSongIndex();
+          wp->m_table.setRowHeight(curindex,32);
+          wp->m_table.m_playingWid.hide();//把其它的都隐藏起来
+          wp->m_table.m_playingWid.setCurrentSongItem(NULL);
+          if(wp->m_table.item(curindex,1)!=Q_NULLPTR)
           {
-              wp->m_table->item(curindex,1)->setFont(font1);
-              wp->m_table->item(curindex,2)->setFont(font1);
+              wp->m_table.item(curindex,1)->setFont(font1);
+              wp->m_table.item(curindex,2)->setFont(font1);
           }
         }
 
@@ -363,9 +367,9 @@ void myTableWidget::slot_doublick(int r, int c,bool isMv)
          item(r,2)->setFont(font2);
 
         setRowHeight(r,52);
-        m_playingWid->setCurrentSongItem(item(r,c));
-        m_playingWid->setSongName(item(r,1)->text());
-        m_playingWid->show();
+        m_playingWid.setCurrentSongItem(item(r,c));
+        m_playingWid.setSongName(item(r,1)->text());
+        m_playingWid.show();
         updatePlayingWidgetPos();
 
         if(isMv)
@@ -375,12 +379,12 @@ void myTableWidget::slot_doublick(int r, int c,bool isMv)
 
        if(m_middleftStack0->myTablePlayListFinalVector().last()->songUrlList().contains(m_finalWidget->songUrlList().value(r)))
        {
-           m_playingWid->setLoveState();
+           m_playingWid.setLoveState();
            emit sig_setLoveState(true);
        }
        else
        {
-           m_playingWid->setUnloveState();
+           m_playingWid.setUnloveState();
            emit sig_setLoveState(false);
        }
 
@@ -404,21 +408,21 @@ void myTableWidget::setAutoLayoutSize()
         foreach(myTablePlayListFinal *f,m_middleftStack0->myTablePlayListFinalVector())
         {
             int height=0;
-            int btnheight=f->m_Btntable->height();
-            if(!f->m_table->isHidden())//如果显示的话
+            int btnheight=f->m_Btntable.height();
+            if(!f->m_table.isHidden())//如果显示的话
             {
-                for(int i=0;i<f->m_table->rowCount();i++)
-                    height+=f->m_table->rowHeight(i);
+                for(int i=0;i<f->m_table.rowCount();i++)
+                    height+=f->m_table.rowHeight(i);
 
-                if(f->m_table->rowCount()==0)
+                if(f->m_table.rowCount()==0)
                     height=m_addWid->height();
-                f->m_table->setMinimumHeight(height);
+                f->m_table.setMinimumHeight(height);
                 f->setMaximumHeight(height+btnheight);
                 minheight+=(height+btnheight);
             }
             else
             {
-                f->m_table->setMinimumHeight(height);
+                f->m_table.setMinimumHeight(height);
                 f->setMaximumHeight(btnheight);
                 minheight+=(btnheight);
             }
@@ -430,7 +434,7 @@ void myTableWidget::setAutoLayoutSize()
 
 int myTableWidget::currentSongIndex()
 {
-    return m_playingWid->currentSongIndex();
+    return m_playingWid.currentSongIndex();
 }
 
 void myTableWidget::updatePlayingWidgetPos()
@@ -444,17 +448,18 @@ void myTableWidget::updatePlayingWidgetPos()
         height+=rh;
     }
     if(index==-1)//没有播放的
-       m_playingWid->hide();
+       m_playingWid.hide();
     if(rowHeight(index)==0)
-         m_playingWid->hide();
+         m_playingWid.hide();
     else
-         m_playingWid->show();
-    m_playingWid->raise();
-    m_playingWid->setGeometry(0,height,width()-1,52);
+         m_playingWid.show();
+    m_playingWid.raise();
+    m_playingWid.setGeometry(0,height,width()-1,52);
 }
 
 void myTableWidget::removeSong(int row,bool setAutoLayout)
 {
+
     int curindex=currentSongIndex();
     if(row<=-1)
         return;
@@ -474,14 +479,14 @@ void myTableWidget::removeSong(int row,bool setAutoLayout)
             emit sig_delIndex(curindex);
             myDataBase::deleteSong(m_finalWidget->ShowButtonName(),curindex);
             removeRow(curindex);
-            m_playingWid->setCurrentSongItem(NULL);
+            m_playingWid.setCurrentSongItem(NULL);
         }
         else
         {
             emit sig_delIndex(curindex);
             myDataBase::deleteSong(m_finalWidget->ShowButtonName(),curindex);
             removeRow(curindex);
-            m_playingWid->setCurrentSongItem(NULL);
+            m_playingWid.setCurrentSongItem(NULL);
             m_middleftStack0->slot_btnnextSong();//下一曲
         }
     }
@@ -501,13 +506,13 @@ void myTableWidget::removeSong(int row,bool setAutoLayout)
 void myTableWidget::showEvent(QShowEvent *e)
 {
     QTableWidget::showEvent(e);
-    m_finalWidget->m_Btntable->setTableShowIndicator();
+    m_finalWidget->m_Btntable.setTableShowIndicator();
     setAutoLayoutSize();
 }
 void myTableWidget::hideEvent(QHideEvent *e)
 {
     QTableWidget::hideEvent(e);
-    m_finalWidget->m_Btntable->setTableHideIndicator();
+    m_finalWidget->m_Btntable.setTableHideIndicator();
     setAutoLayoutSize();
 }
 void myTableWidget::resizeEvent(QResizeEvent *e)
@@ -515,7 +520,7 @@ void myTableWidget::resizeEvent(QResizeEvent *e)
     QTableWidget::resizeEvent(e);
 
     horizontalHeader()->resizeSection(1,width()-140);//resizeHeader
-    m_playingWid->resize(width()-1,52);
+    m_playingWid.resize(width()-1,52);
     ////////////////////
 }
 void myTableWidget::mouseMoveEvent(QMouseEvent *e)
@@ -541,7 +546,6 @@ void myTableWidget::leaveEvent(QEvent *e)
 }
 void myTableWidget::slot_cellEnter(int row, int c)
 {
-
     if(item(m_prebgItem,c)!=Q_NULLPTR&&row!=m_prebgItem)
     {
         removeCellWidget(m_prebgItem,0);
@@ -614,8 +618,8 @@ void myTableWidget::slot_rowCountChanged()//如果空
     if(rowCount()==0)
     {
         m_addWid->show();
-        m_playingWid->hide();
-        m_playingWid->setOriginalState();
+        m_playingWid.hide();
+        m_playingWid.setOriginalState();
     }
     else
     {

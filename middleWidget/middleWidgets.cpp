@@ -6,8 +6,14 @@
 #include"myPushButton.h"
 #include"QHBoxLayout"
 #include<QPainter>
-middleWidgets::middleWidgets(QWidget *parent) : baseWidget(parent)
+middleWidgets::middleWidgets(QWidget *parent)
+    : baseWidget(parent),
+      m_leftWid(this),
+      m_rightWid(this),
+      m_btnhidelist(this)
 {
+    m_rightWid.setInitMiddleWidget(this);//have to init this
+
     setStyleSheet("baseWidget{background:white;}");
     initLayout();
 
@@ -16,43 +22,31 @@ middleWidgets::middleWidgets(QWidget *parent) : baseWidget(parent)
 void middleWidgets::initLayout()
 {
     QHBoxLayout *hyout=new QHBoxLayout;
-    m_rightWid=new middleWidgetRight(this);
-    m_rightWid->setInitMiddleWidget(this);//have to init this
 
-
-    m_leftWid=new middleWidgetLeft(this);
-    m_btnhidelist=new myPushButton(this);
-    m_btnhidelist->setFixedSize(13,55);
-    m_btnhidelist->hide();
+    m_btnhidelist.setFixedSize(13,55);
+    m_btnhidelist.hide();
     setlistHideStyle();
 
-    hyout->addWidget(m_leftWid);
-    hyout->addWidget(m_btnhidelist);
-    hyout->addWidget(m_rightWid);
+    hyout->addWidget(&m_leftWid);
+    hyout->addWidget(&m_btnhidelist);
+    hyout->addWidget(&m_rightWid);
     hyout->setSpacing(0);
     hyout->setContentsMargins(0,0,0,0);
     setLayout(hyout);
-    connect(m_btnhidelist,SIGNAL(clicked(bool)),this,SLOT(slot_btnclicked()));
+    connect(&m_btnhidelist,SIGNAL(clicked(bool)),this,SLOT(slot_btnclicked()));
 }
 
-void middleWidgets::setInitParent(mainWindow *p)
-{
-    m_mainWindow=p;
-    m_leftWid->setInitMainWindow(p);
-    m_rightWid->setInitMainWindow(p);
-
-}
 
 void middleWidgets::setlistShowStyle()
 {
-    m_btnhidelist->setStyleSheet("QPushButton{border-image:url(:/image/middlewidget/btn_listshow (1).png)}"
+    m_btnhidelist.setStyleSheet("QPushButton{border-image:url(:/image/middlewidget/btn_listshow (1).png)}"
                                  "QPushButton:hover{border-image:url(:/image/middlewidget/btn_listshow (2).png)}"
                                  "QPushButton:pressed{border-image:url(:/image/middlewidget/btn_listshow (3).png)}");
 }
 
 void middleWidgets::setlistHideStyle()
 {
-    m_btnhidelist->setStyleSheet("QPushButton{border-image:url(:/image/middlewidget/btn_listhide (1).png)}"
+    m_btnhidelist.setStyleSheet("QPushButton{border-image:url(:/image/middlewidget/btn_listhide (1).png)}"
                                  "QPushButton:hover{border-image:url(:/image/middlewidget/btn_listhide (2).png)}"
                                  "QPushButton:pressed{border-image:url(:/image/middlewidget/btn_listhide (3).png)}");
 }
@@ -60,9 +54,9 @@ void middleWidgets::setlistHideStyle()
 void middleWidgets::setBtnShowHide(bool isshow)
 {
     if(isshow)
-        m_btnhidelist->show();
+        m_btnhidelist.show();
     else
-        m_btnhidelist->hide();
+        m_btnhidelist.hide();
 
 }
 
@@ -82,15 +76,15 @@ void middleWidgets::paintEvent(QPaintEvent *e)
 
 void middleWidgets::slot_btnclicked()
 {
-    if(m_leftWid->isHidden())//如果是隐藏的
+    if(m_leftWid.isHidden())//如果是隐藏的
     {
-        m_leftWid->show();
+        m_leftWid.show();
          setlistHideStyle();
 
     }
     else
     {
-        m_leftWid->hide();
+        m_leftWid.hide();
        setlistShowStyle();
     }
 }

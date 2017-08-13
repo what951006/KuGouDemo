@@ -10,7 +10,6 @@ class Widget;
 
 
 
-extern mainWindow *mainwid;
 
 extern middleLeftStackWidget0* midstack0Pointer;
 

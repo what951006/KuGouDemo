@@ -8,6 +8,7 @@
 #include<Qimage>
 #include<QPixmap>
 
+
 class MyNetWork : public QObject
 {
     Q_OBJECT
@@ -22,8 +23,8 @@ signals:
     void sig_reqSongNextPagefinished(const QByteArray&);
 
     void dolrcworkfinished(const QByteArray&,const QString&);
-    void setpic(const QByteArray&,const QString&);
-    void sig_setBgpix(const QVector<QPixmap>&,const QString& author);
+    void setpic(const QString&strPath,const QString&strName);
+    void sig_setBgpix(const QStringList&,const QString& author);
 public slots:
     void requestMv(const QString&);
     void requestalbum(const QString &name,const QString &savelocal);

@@ -59,4 +59,3 @@ RESOURCES += \
     res_bottomwidget.qrc
 
 RC_FILE = image/main/kwgou.rc
-

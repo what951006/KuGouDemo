@@ -26,8 +26,8 @@ void baseWidget::mousePressEvent(QMouseEvent *e)
 
 void baseWidget::mouseMoveEvent(QMouseEvent *e)
 {
-    if(mainwid)
-       mainwid->mouseMoveEvent(e);
+    if(mainWindow::GetInstance())
+       mainWindow::GetInstance()->mouseMoveEvent(e);
     QWidget::mouseMoveEvent(e);
 }
 

@@ -20,49 +20,48 @@
 #include"middlewidgetleft.h"
 
 static QColor  BGcolor=QColor(230,230,230);
+myTablePlayListFinal * myTablePlayListFinal::s_pCurList=NULL;
 
-myTablePlayListFinal::myTablePlayListFinal(QWidget*parent):baseWidget(parent)
+myTablePlayListFinal::myTablePlayListFinal(QWidget*parent):
+    baseWidget(parent),
+    m_PlayListname("新建列表")
 {
-    m_PlayListname="新建列表";
+    m_table.setTableFinal(this);
+    m_Btntable.setTableFinal(this);
+    m_playList.setTableFinal(this);
+
     setMouseTracking(true);
-    this->setAcceptDrops(true);
+    setAcceptDrops(true);
 
-    m_playList=new myMediaList(this);//列表 2016年6月30日 14:53:27
-    m_table=new myTableWidget(this);
-    m_table->setinitMyTableFinal(this);//some connection was initialized here
-
-    m_Btntable=new myShowTableButton(this);
-    m_Btntable->setFinalWidget(this);
-
-    connect(m_Btntable,SIGNAL(sig_emptyList()),this,SLOT(slot_emptyList()));//清空列表
-    connect(m_Btntable,SIGNAL(sig_addSong()),this,SLOT(slot_addSong()));//添加歌曲
-    connect(m_table,SIGNAL(sig_RowCountChange()),m_Btntable,SLOT(slot_updateSongCount()));//歌曲列表改变信息
-    connect(m_table,SIGNAL(sig_RowCountChange()),m_Btntable,SLOT(slot_updateSongCount()));//歌曲列表改变信息
-    connect(m_Btntable,SIGNAL(clicked(bool)),this,SLOT(slot_showHideTable()));
-    connect(m_table,SIGNAL(sig_delIndex(int)),m_playList,SLOT(slot_removeSong(int)));//从列表中删除
-    connect(m_table,SIGNAL(sig_addSong()),this,SLOT(slot_addSong()));//添加歌曲
-    connect(m_table,SIGNAL(sig_addSongFolder()),this,SLOT(slot_addSongFolder()));
+    connect(&m_Btntable,SIGNAL(sig_emptyList()),this,SLOT(slot_emptyList()));//清空列表
+    connect(&m_Btntable,SIGNAL(sig_addSong()),this,SLOT(slot_addSong()));//添加歌曲
+    connect(&m_table,SIGNAL(sig_RowCountChange()),&m_Btntable,SLOT(slot_updateSongCount()));//歌曲列表改变信息
+    connect(&m_table,SIGNAL(sig_RowCountChange()),&m_Btntable,SLOT(slot_updateSongCount()));//歌曲列表改变信息
+    connect(&m_Btntable,SIGNAL(clicked(bool)),this,SLOT(slot_showHideTable()));
+    connect(&m_table,SIGNAL(sig_delIndex(int)),&m_playList,SLOT(slot_removeSong(int)));//从列表中删除
+    connect(&m_table,SIGNAL(sig_addSong()),this,SLOT(slot_addSong()));//添加歌曲
+    connect(&m_table,SIGNAL(sig_addSongFolder()),this,SLOT(slot_addSongFolder()));
 
     QVBoxLayout *vlyout1=new QVBoxLayout;
     setMinimumSize(310,40);
     setMaximumWidth(380);
 
-    vlyout1->addWidget(m_Btntable);
-    vlyout1->addWidget(m_table);
+    vlyout1->addWidget(&m_Btntable);
+    vlyout1->addWidget(&m_table);
     vlyout1->setContentsMargins(0,0,0,0);
     vlyout1->setSpacing(0);
     setLayout(vlyout1);
 }
 void myTablePlayListFinal::addToPlayList(const QString &name,const QString &url,const QString &dur)
 {
-    int rowcount= m_table->rowCount();
-    m_table->insertRow(rowcount);
-    m_table->setItem(rowcount,0,new QTableWidgetItem(""));
-    m_table->setItem(rowcount,1, new QTableWidgetItem(name));
-    m_table->setItem(rowcount,2, new QTableWidgetItem(QString(dur+"    ")));
-    m_table->item(rowcount,2)->setTextAlignment(Qt::AlignRight|Qt::AlignVCenter);
+    int rowcount= m_table.rowCount();
+    m_table.insertRow(rowcount);
+    m_table.setItem(rowcount,0,new QTableWidgetItem(""));
+    m_table.setItem(rowcount,1, new QTableWidgetItem(name));
+    m_table.setItem(rowcount,2, new QTableWidgetItem(QString(dur+"    ")));
+    m_table.item(rowcount,2)->setTextAlignment(Qt::AlignRight|Qt::AlignVCenter);
 
-    m_playList->addPlayList(url);
+    m_playList.addPlayList(url);
     myDataBase::addSong(ShowButtonName(),name,url,dur);
 }
 
@@ -100,7 +99,7 @@ void myTablePlayListFinal::dropEvent(QDropEvent *event)
            {
                    QFileInfo info(files.value(i).toLocalFile());
                    QString m_name=info.completeBaseName();
-                   if(!m_playList->m_list.contains(files.value(i)))
+                   if(!m_playList.m_list.contains(files.value(i)))
                    {
                        QString filePath=files.value(i).toLocalFile();
                        player.setMedia(QUrl(filePath));
@@ -131,23 +130,23 @@ void myTablePlayListFinal::dropEvent(QDropEvent *event)
 void myTablePlayListFinal::slot_emptyList()//清空列表
 {
     int i=0;
-    int count=m_table->rowCount();
+    int count=m_table.rowCount();
     int mb= QMessageBox::warning(NULL,"warning","确定要清空？",QMessageBox::Ok|QMessageBox::Cancel);
     if(mb==QMessageBox::Cancel)
         return;
 
     myDataBase::emptyList(ShowButtonName());
 
-   if(m_midleft0->nowPlayFinalTable()==this)//如果正在播放的
+   if(s_pCurList == this)//如果正在播放的
      {
         stopCurrentSong();
      }
     while(i<count)
     {
-        int row=m_table->rowCount()-1;
-        m_table->slot_cellEnter(-1,0);
-        emit m_table->sig_delIndex(row);
-        m_table->removeRow(row);
+        int row=m_table.rowCount()-1;
+        m_table.slot_cellEnter(-1,0);
+        emit m_table.sig_delIndex(row);
+        m_table.removeRow(row);
         i++;
     }
     setAutoLayout();
@@ -155,8 +154,8 @@ void myTablePlayListFinal::slot_emptyList()//清空列表
 
 void myTablePlayListFinal::setAutoLayout()
 {
-    m_table->setAutoLayoutSize();
-    updateConvientButton();
+    m_table.setAutoLayoutSize();
+  //  updateConvientButton();
 }
 
 void myTablePlayListFinal::updateBGcolor()
@@ -165,22 +164,22 @@ void myTablePlayListFinal::updateBGcolor()
     update();
 }
 
-void myTablePlayListFinal::setCurrentSongAlbumPic(QPixmap pix)
+void myTablePlayListFinal::setCurrentSongAlbumPic(const QString &strPath)
 {
-    m_table->m_playingWid->m_btnLab->setIcon(pix.scaled(52,52));
+    m_table.m_playingWid.m_btnLab.setIcon(QPixmap(strPath).scaled(52,52));
 }
 
 const QString myTablePlayListFinal::currentSongDuration()
 {
-    int index= m_table->currentSongIndex();
-    QTableWidgetItem *it=m_table->item(index,2);
+    int index= m_table.currentSongIndex();
+    QTableWidgetItem *it=m_table.item(index,2);
     if(it!=Q_NULLPTR)
     {
         QString text=it->text();
-        return text.isEmpty()? m_table->getHoverDuration().simplified():text.simplified();
+        return text.isEmpty()? m_table.getHoverDuration().simplified():text.simplified();
     }
     else
-        return m_table->getHoverDuration().simplified();
+        return m_table.getHoverDuration().simplified();
 }
 
 int myTablePlayListFinal::currentSongDurationToInt()
@@ -191,9 +190,9 @@ int myTablePlayListFinal::currentSongDurationToInt()
 
 void myTablePlayListFinal::stopCurrentSong()
 {
-    m_midleft0->mainWindows()->player()->pause();
-    m_midleft0->mainWindows()->player()->setMedia(NULL);
-    m_table->m_playingWid->setCurrentSongItem(NULL);
+    mainWindow::GetInstance()->player()->pause();
+    mainWindow::GetInstance()->player()->setMedia(NULL);
+    m_table.m_playingWid.setCurrentSongItem(NULL);
     m_midleft0->setOriginalStatus();
 }
 
@@ -230,7 +229,7 @@ void myTablePlayListFinal::updateConvientButton()
     }
     else
     {
-        m_midleft0->convientShowTableBtn()->setFinalWidget(this);
+      //  m_midleft0->convientShowTableBtn()->setFinalWidget(this);
         m_midleft0->convientShowTableBtn()->show();
         if(this== m_midleft0->myTablePlayListFinalVector().first()||this== m_midleft0->myTablePlayListFinalVector().last())
             m_midleft0->convientShowTableBtn()->setEnabledMenuItem(false);
@@ -238,9 +237,9 @@ void myTablePlayListFinal::updateConvientButton()
             m_midleft0->convientShowTableBtn()->setEnabledMenuItem(true);
         foreach (myTablePlayListFinal*f, m_midleft0->myTablePlayListFinalVector())
         {
-            disconnect(m_midleft0->convientShowTableBtn(),SIGNAL(clicked(bool)),f->m_Btntable,SLOT(click()));
+            disconnect(m_midleft0->convientShowTableBtn(),SIGNAL(clicked(bool)),&f->m_Btntable,SLOT(click()));
         }
-        connect(m_midleft0->convientShowTableBtn(),SIGNAL(clicked(bool)),m_Btntable,SLOT(click()));
+        connect(m_midleft0->convientShowTableBtn(),SIGNAL(clicked(bool)),&m_Btntable,SLOT(click()));
     }
 #endif
 }
@@ -248,28 +247,28 @@ void myTablePlayListFinal::updateConvientButton()
 
 const QList<QUrl>& myTablePlayListFinal::songUrlList()
 {
-    return m_playList->m_list;
+    return m_playList.m_list;
 }
 
 void myTablePlayListFinal::slot_showHideTable()
 {
-    updateConvientButton();
-    if(!m_table->isHidden())
+  //  updateConvientButton();
+    if(!m_table.isHidden())
     {
-        m_table->hide();
+        m_table.hide();
         foreach(myTablePlayListFinal *f,m_midleft0->myTablePlayListFinalVector())
-                f->m_table->hide();
+                f->m_table.hide();
         m_midleft0->convientShowTableBtn()->hide();
 
     }
     else
     {
-       m_table->show();
+       m_table.show();
            foreach(myTablePlayListFinal *f,m_midleft0->myTablePlayListFinalVector())
            {
                if(f!=this)//如果显示的话
                {
-                   f->m_table->hide();
+                   f->m_table.hide();
                }
            }
     }
@@ -284,15 +283,15 @@ void myTablePlayListFinal::getlistfromDateBase()//从数据库中获取列表
    QStringList listduration=vec.at(2);
    for(int i=0;i<listname.count();i++)
    {
-        m_table->insertRow(i);
-        m_table->setItem(i,0,new QTableWidgetItem(""));
-        m_table->setItem(i,1,new QTableWidgetItem(listname.value(i)));
-        m_table->setItem(i,2,new QTableWidgetItem(listduration.value(i)+"    "));
-        m_table->item(i,2)->setTextAlignment(Qt::AlignRight|Qt::AlignVCenter);
+        m_table.insertRow(i);
+        m_table.setItem(i,0,new QTableWidgetItem(""));
+        m_table.setItem(i,1,new QTableWidgetItem(listname.value(i)));
+        m_table.setItem(i,2,new QTableWidgetItem(listduration.value(i)+"    "));
+        m_table.item(i,2)->setTextAlignment(Qt::AlignRight|Qt::AlignVCenter);
 
-        m_playList->addPlayList(listurl.value(i));
+        m_playList.addPlayList(listurl.value(i));
    }
-   m_Btntable-> slot_updateSongCount();
+   m_Btntable. slot_updateSongCount();
 }
 
 void myTablePlayListFinal::slot_addSong()
@@ -309,7 +308,7 @@ void myTablePlayListFinal::slot_addSong()
 
                    QFileInfo info(files[i]);
                    QString m_name=info.completeBaseName();
-                   if(!m_playList->m_list.contains(files.value(i)))
+                   if(!m_playList.m_list.contains(files.value(i)))
                    {
                        QString filePath=files.value(i);
                        player.setMedia(QUrl(filePath));
@@ -347,10 +346,8 @@ void myTablePlayListFinal::slot_addSongFolder()
         }
         dir.setFilter(QDir::Files | QDir::NoSymLinks);
         QFileInfoList list = dir.entryInfoList();
-
-
         int file_count = list.count();
-        qDebug()<<file_count;
+
         if(file_count <= 0)
         {
             return;
@@ -378,7 +375,7 @@ void myTablePlayListFinal::slot_addSongFolder()
 
                        QFileInfo info(files[i]);
                        QString m_name=info.completeBaseName();
-                       if(!m_playList->m_list.contains(files.value(i)))
+                       if(!m_playList.m_list.contains(files.value(i)))
                        {
                            QString filePath=files.value(i);
                            player.setMedia(QUrl(filePath));
@@ -400,20 +397,20 @@ void myTablePlayListFinal::slot_playSongFromSearchTable(const QStringList &namel
     for(int i=0;i<namelist.count();i++)
     {
                 QString m_name=namelist.value(i);
-                if(!m_playList->m_list.contains(urllist.value(i)))
+                if(!m_playList.m_list.contains(urllist.value(i)))
                 {
                     addToPlayList(m_name,urllist.value(i),dur.value(i));
                 }
      }
 
-    if( m_midleft0->myTablePlayListFinalVector().at(0)->m_table->isHidden())//如果第一列表隐藏
-        m_midleft0->myTablePlayListFinalVector().at(0)->m_Btntable->clicked();
+    if( m_midleft0->myTablePlayListFinalVector().at(0)->m_table.isHidden())//如果第一列表隐藏
+        m_midleft0->myTablePlayListFinalVector().at(0)->m_Btntable.clicked();
     else
         setAutoLayout();
 
     QString songurl= urllist.value(0);
     int index= songUrlList().indexOf(QUrl(songurl));
-    m_table->slot_doublick(index,0);
+    m_table.slot_doublick(index,0);
 
     m_midleft0->scrolltoCurrentPlayList();
 }
@@ -423,13 +420,13 @@ void myTablePlayListFinal::slot_addSongFromSearchTable(const QStringList &nameli
     for(int i=0;i<namelist.count();i++)
     {
                 QString m_name=namelist.value(i);
-                if(!m_playList->m_list.contains(urllist.value(i)))
+                if(!m_playList.m_list.contains(urllist.value(i)))
                 {
                     addToPlayList(m_name,urllist.value(i),dur.value(i));
                 }
      }
-   if(m_table->isHidden())//如果第一列表隐藏
-      m_Btntable->clicked();
+   if(m_table.isHidden())//如果第一列表隐藏
+      m_Btntable.clicked();
    else
        setAutoLayout();
 }

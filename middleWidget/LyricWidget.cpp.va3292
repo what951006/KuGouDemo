@@ -12,7 +12,6 @@
 LyricWidget::LyricWidget(QWidget *parent)
     : baseWidget(parent)
 {
-    m_strCurLrc="";
     m_nFontPixSize=20;
     m_normalFont.setFamily("微软雅黑");
     m_normalFont.setPixelSize(20);
@@ -45,7 +44,7 @@ void LyricWidget::slot_timer()
         m_timer.stop();
     }
 
-    GetMaskLen(m_nFontPixSize+abs(m_nOffset/10),SCROLL_TIMER_TIME);
+    GetMaskLen(m_nCurPos,m_nFontPixSize+abs(m_nOffset/10),SCROLL_TIMER_TIME);
     repaint();
 }
 void LyricWidget::paintEvent(QPaintEvent*)
@@ -130,38 +129,30 @@ void LyricWidget::DrawItem(QPainter&Painter,ItemInfo &Info)
                               Qt::AlignLeft,Info.strText);
    }
 }
-void LyricWidget::GetMaskLen(int nFontSize,int nFreq)
+void LyricWidget::GetMaskLen(qint64 pos,int nFontSize,int nFreq)
 {
     static float s_fPercent=0.0f;
     static float s_flrcMaskMiniStep=0.0f;
-    static float s_reach=0;
-    int interval=0;
-    float percent=0;
-    QString str(" ");
-    getPosInfo(interval,percent,str);
 
-  // qDebug()<<interval<<percent<<str<<m_nCurIndex;
+    int interval=0;
+    float precent=0;
+    QString str(" ");
+    getPosInfo(interval,precent,str,m_nCurIndex);
+
 
     QFont fontTemp=m_normalFont;
     fontTemp.setPixelSize(nFontSize);
     QFontMetrics metrics(fontTemp);
-    if(s_fPercent != percent)
+    if(s_fPercent != precent)
     {
-        m_nMaskLen=metrics.width(m_strCurLrc)*percent;
+        m_nMaskLen=metrics.width(GetLrcByTime(pos))*precent;
         int count = interval / nFreq;
         s_flrcMaskMiniStep =(float)metrics.width(str)/ count;
-        s_flrcMaskMiniStep+=0.5;  //加这个0.5效果更好点
-        s_fPercent=percent;
-
-
-        s_reach=m_nMaskLen+metrics.width(str);
-        qDebug()<<s_reach<<m_nMaskLen<<metrics.width(m_strCurLrc)<<s_flrcMaskMiniStep;
+        s_fPercent=precent;
     }
     else
     {
-
-        if(s_reach >m_nMaskLen)
-            m_nMaskLen+=s_flrcMaskMiniStep;
+         m_nMaskLen+=s_flrcMaskMiniStep;
     }
 
 }
@@ -203,7 +194,6 @@ void LyricWidget::positionChanged(qint64 length)
     int index = GetIndexByTime(m_nCurPos); //using binary search for the current lyric index;
     if (index != m_nCurIndex)//find a lyric // && 0==m_nOffset
     {
-        m_strCurLrc=GetLrcByIndex(index);
         m_nCurStartPos=GetPosByindex(index);
         m_nSroIndex=index-1; //变成上一行~
         m_nCurIndex=index;
@@ -213,33 +203,28 @@ void LyricWidget::positionChanged(qint64 length)
     }
     else if(0==m_nOffset)
     {
-        GetMaskLen(m_nFontPixSize+ROW_HEIGHT/10,50);
+        GetMaskLen(m_nCurPos,m_nFontPixSize+ROW_HEIGHT/10,50);
         update();
     }
+
 }
 
 
 
 //-------------------------------------original func------------------------------------------
 
-void LyricWidget::getPosInfo(int &interval, float &precent, QString &str)
+void LyricWidget::getPosInfo(int &interval, float &precent, QString &str,int index)
 {
-    if(m_word_list.size()<=m_nCurIndex)
-        return;
+    const QMap<int,QString> & word_map= m_word_list.at(index);
 
-    const QMap<int,QString> & word_map= m_word_list.at(m_nCurIndex);
+    const QMap<int ,int> & interval_map= m_interval_list.at(index);
 
-    const QMap<int ,int> & interval_map= m_interval_list.at(m_nCurIndex);
-
-    const QMap<int ,float> & percent_map=m_percent_list.at(m_nCurIndex);
-
-
+    const QMap<int ,float> & percent_map=m_percent_list.at(index);
 
     int subvalue=abs(m_nCurPos-m_nCurStartPos);
     int lt=0;
-    int rt= interval_map.keys().count();
+    int rt= m_interval_list.at(index).values().count();
     int mid=0;
-
     while (lt < rt-1)
     {
         mid = (lt+rt)/2;
@@ -251,7 +236,7 @@ void LyricWidget::getPosInfo(int &interval, float &precent, QString &str)
 
     str=word_map.values().value(lt);
     interval=interval_map.values().value(lt);
-    precent=(float)lt/interval_map.size();
+    precent=percent_map.values().value(lt);
 }
 
 void LyricWidget::clearLrc()
@@ -276,7 +261,6 @@ void LyricWidget::analyzeLrcContent(QByteArray &KlcData,const QString &filedir)
     int nDur=0;
     int nIndex=0;
 
-
     QMap<int,QString> word_map;
     QMap<int ,int> interval_map; //interval,间隔时间
     QMap<int ,float> percent_map;
@@ -288,21 +272,19 @@ void LyricWidget::analyzeLrcContent(QByteArray &KlcData,const QString &filedir)
 
     QStringList list=QString(getByt).split("\n");
     QRegExp regTemp0("^\\[\\d+,\\d+\\]");
-    QRegExp regTemp1("\\<\\d+,\\d+\\,\\d+\\>\\w*");
+    QRegExp regTemp1("\\<\\d+,\\d+\\,\\d+\\>");
     QRegExp regTemp2("\\d+");
-
     foreach (QString strLine, list)
     {
-        bool bFind=false;
         word_map.clear();
         interval_map.clear(); //interval,间隔时间
         percent_map.clear();
         strGetLine="";
         for(int pos=0;pos=regTemp0.indexIn(strLine,pos),pos>=0; pos+=regTemp0.matchedLength())
         {
-            bFind=true;
             nIndex=0;
             strTemp=regTemp0.cap(0);
+
             for(int pos2=0;pos2=regTemp2.indexIn(strTemp,pos2),pos2>=0; pos2+=regTemp2.matchedLength())
             {
                 if(0==nIndex)
@@ -320,6 +302,7 @@ void LyricWidget::analyzeLrcContent(QByteArray &KlcData,const QString &filedir)
         {
             nIndex=0;
             strTemp=regTemp1.cap(0);
+
             for(int pos2=0;pos2=regTemp2.indexIn(strTemp ,pos2),pos2>=0; pos2+=regTemp2.matchedLength())
             {
                 if(0==nIndex)
@@ -333,21 +316,18 @@ void LyricWidget::analyzeLrcContent(QByteArray &KlcData,const QString &filedir)
                 ++nIndex;
 
             }
-            strWord=strTemp.split(">").value(1);
+            strWord=strLine.mid(pos+regTemp1.matchedLength(),1);
             strGetLine+=strWord;
-
 
             interval_map.insert(nKeyTime,nDur);
             word_map.insert(nKeyTime,strWord);
             percent_map.insert(nKeyTime,(float)nKeyTime/nRowTime);
         }
-        if(bFind)
-        {
-            m_word_list<<word_map;
-            m_interval_list<<interval_map;
-            m_percent_list<<percent_map;
-            m_lineMap.insert(nPos,strGetLine);
-        }
+
+        m_word_list<<word_map;
+        m_interval_list<<interval_map;
+        m_percent_list<<percent_map;
+        m_lineMap.insert(nPos,strGetLine);
     }
 }
 

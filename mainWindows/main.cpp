@@ -35,10 +35,10 @@ int main(int argc, char *argv[])
                         "QMenu::separator{height:1px;background: rgb(209,209,209);margin:4px 0px 4px 0px;}"
                         "QPushButton:focus{padding: -1;}"
                         "QLabel:focus{padding: -1;}");
-        mainWindow w;
-        app.w=&w;
-        w.show();
-        w.setGeometry((QApplication::desktop()->width() - w.width())/2,(QApplication::desktop()->height() - w.height())/2,1008,698);//居中显示
+        mainWindow*pMain=mainWindow::InitInstance();
+        app.w=pMain;
+        pMain->show();
+        pMain->setGeometry((QApplication::desktop()->width() - pMain->width())/2,(QApplication::desktop()->height() - pMain->height())/2,1008,698);//居中显示
         return app.exec();
     }
     return 0;

@@ -31,7 +31,6 @@ skinWidget::skinWidget(QWidget *parent) : baseDialog(parent)
 
     initTopLayout();
     initBottomLayout();
-
 }
 
 void skinWidget::initTopLayout()

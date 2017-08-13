@@ -27,7 +27,7 @@ public:
     void setPauseStyle();
     void setPlayStyle();
     void setBufferStaus();
-    void setInitMainWindow(mainWindow*m){m_mainWindow=m;}
+
 
     void setCurrentSongName(const QString&);
     void setLoveState();
@@ -58,7 +58,7 @@ signals:
 public slots:
     void slot_setLoveState(bool);
 private:
-    mainWindow*m_mainWindow;
+
 };
 
 #endif // bottomWidgets_H

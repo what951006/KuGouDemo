@@ -10,8 +10,6 @@
 #include"baseWidget.h"
 #include"myPushButton.h"
 #include"topSearchTipsWidget.h"
-#include"mainwindow.h"
-class mainWindow;
 
 class TopWidgets : public baseWidget
 {
@@ -22,29 +20,26 @@ public:
     void initWidget();
     void searchFromLineEdit(const QString);
 
-    myPushButton *m_btnexit;
-    myPushButton *m_btnmini;
-    myPushButton *m_btnminiframe;
-    myPushButton *m_btnmobile;
-    myPushButton *m_btnsetting;
-    myPushButton *m_btnskin;
-    myPushButton *m_btnmessage;
-    myPushButton *m_btnplaycard;
-    myPushButton *m_btntool;
-    myPushButton *m_btngame;
+    myPushButton m_btnexit;
+    myPushButton m_btnmini;
+    myPushButton m_btnminiframe;
+    myPushButton m_btnmobile;
+    myPushButton m_btnsetting;
+    myPushButton m_btnskin;
+    myPushButton m_btnmessage;
+    myPushButton m_btnplaycard;
+    myPushButton m_btntool;
+    myPushButton m_btngame;
 
-    QLineEdit *m_lineEdit;
-    myPushButton *m_btnlog;
-    myPushButton *m_btnregister;
+    QLineEdit m_lineEdit;
+    myPushButton m_btnlog;
+    myPushButton m_btnregister;
 public slots:
     void slot_serTipsClick(QListWidgetItem*);
 
 protected:
     bool eventFilter(QObject *, QEvent *);
-    virtual void mouseMoveEvent(QMouseEvent *);
 signals:
-private:
-    mainWindow *m_mainWindow;
 };
 
 #endif // TOPWIDGETS_H

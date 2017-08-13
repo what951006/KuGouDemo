@@ -2,7 +2,13 @@
 #define FFMPEGPLAYER_H
 
 #include <QImage>
+#include <QDebug>
 #include <windows.h>
+#include <QMutex>
+#include <QTime>
+#include <QTimer>
+#define _WIN32_DCOM
+
 
 #define MAX_AUDIO_FRAME_SIZE  192000
 #define SDL_AUDIO_BUFFER_SIZE  1024
@@ -19,7 +25,6 @@ extern "C"
     # include <include/SDL2/SDL.h>
     # include <include/SDL2/SDL_thread.h>
 }
-
 #include<QThread>
 
 typedef struct PacketQueue {
@@ -49,7 +54,7 @@ typedef struct{
     PacketQueue videoq; //视频队列
 
     bool seek_req;
-    int seek_pos;
+    qint64 seek_pos;
 
     double video_clock;
     double audio_clock;
@@ -67,18 +72,16 @@ public:
 //---------------------------------
     void setMedia(const QString &url,bool isMV=false);
     void stop();
-    void pause(){SDL_PauseAudio(1);}
-    void play(){ SDL_PauseAudio(0);}
+    void pause(){SDL_PauseAudio(1);updateStatus();}
+    void play(){ SDL_PauseAudio(0);updateStatus();}
 
-    inline void updateStatus(){ if(!m_MS.acct)return;emit sig_CurrentMediaStatus(getPlayerStatus());}
-    /*zero  means pause ,one means playing*/
-    PlayerStatus getPlayerStatus() const;
+    inline void updateStatus(){ if(m_MS.fct) emit sig_CurrentMediaStatus(getPlayerStatus());}
 
     /*duration with now playing the media */
-    inline qint64 getDuration(){ if(!m_MS.acct)return 0;return m_MS.fct->duration;}
+    inline qint64 getDuration(){ if(m_MS.fct)return m_MS.fct->duration;return 0;}
 
-    /*get current media time value*/
-    inline qint64 getCurrentTime(){return m_MS.audio_clock*1000000;}
+    /*get current media time  millisecond*/
+    inline qint64 getCurrentTime(){return m_MS.audio_clock*1000;}
 
     QTimer *m_timer;
 
@@ -88,12 +91,13 @@ public:
 
     PlayerStatus getPlayerStatus();
 
-    bool IsThreadRunning(HANDLE);
     void FreeCommSpace();
     void FreeVideoAlloc();
     void FreeAudioAlloc();
-    void SetPos(int pos);
+
 protected:
+
+
     virtual void run();
 signals:
     void sig_BufferingPrecent(double);
@@ -106,7 +110,7 @@ signals:
     void sig_CurrentMediaError();
 
 public slots:
-    void slot_timerWork();
+    void slot_timerWork(){emit sig_PositionChange(getCurrentTime());}
 
     void setVol(int vol){g_nVol=vol;}
 

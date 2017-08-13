@@ -9,7 +9,6 @@
 #include<qdebug.h>
 #include<QMenu>
 #include<QDesktopWidget>
-#include<QApplication>
 
 #include"pushButtonOnTable.h"
 #include"playingWidget.h"
@@ -28,9 +27,11 @@ public:
      void init();
      void initMenu();
      void initPlayingWidget();
+/*pass the pointer*/
+     void setTableFinal(myTablePlayListFinal*f){m_finalWidget=f;}             //it must be initialized
+     void setMiddleStackWidget0(middleLeftStackWidget0*p){m_middleftStack0=p;}  //need to initialization
 
-     void setinitMyTableFinal(myTablePlayListFinal*f){m_finalWidget=f;}       //it must to be initialized
-     void setinitMiddleStackWidget0(middleLeftStackWidget0*p){m_middleftStack0=p;}  //need to initialization
+/*other functions*/
      const QString getHoverDuration(){return m_text;}
 
      void setItem(int row, int column, QTableWidgetItem *item){QTableWidget::setItem(row,column,item);emit sig_RowCountChange();}
@@ -41,7 +42,7 @@ public:
      void updatePlayingWidgetPos();
      void removeSong(int row,bool setAutoLayout=true);
 
-     playingWidget *m_playingWid;
+     playingWidget m_playingWid;
 protected:
     virtual  void resizeEvent(QResizeEvent*);
     virtual void showEvent(QShowEvent *);

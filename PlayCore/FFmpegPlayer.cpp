@@ -1,19 +1,13 @@
 #include "FFmpegPlayer.h"
-#include<QDebug>
-#include<iostream>
-#include<windows.h>
-#include <QMutex>
-#include <QMessageBox>
-#include <QFileInfo>
-#include <QTime>
-#include <QTimer>
+
+
 
 int g_nVol=100;
 
 QMutex g_Amutex;
 QMutex g_Vmutex;
 static bool g_isQuit=false; //清空了
-FFmpegPlayer *g_player=NULL;
+static FFmpegPlayer *g_player=NULL;
 
 // 包队列初始化
 void packet_queue_init(PacketQueue* q)
@@ -226,18 +220,7 @@ void audio_callback(void* userdata, Uint8* stream, int len)
      }
 }
 
-FFmpegPlayer::FFmpegPlayer(QObject *parent) : QThread(parent)
-{
-    g_player=this;
-    av_register_all();
-    avformat_network_init();
-    SDL_Init(SDL_INIT_AUDIO);
-    memset(&m_MS,0,sizeof(m_MS));
 
-    m_timer=new QTimer(0);
-    connect(m_timer,SIGNAL(timeout()),this,SLOT(slot_timerWork()));
-    m_timer->start(30);
-}
 static double synchronize_video(mediaState *MS, AVFrame *src_frame, double pts)//用于音视频同步
 {
 
@@ -293,7 +276,6 @@ int video_thread(void *arg)
     avpicture_fill((AVPicture *) pFrameRGB, out_buffer_rgb, AV_PIX_FMT_RGB32,
             pCodecCtx->width, pCodecCtx->height);
 
-    qDebug()<<"";
     while(!g_isQuit)
     {
         if (SDL_AUDIO_PAUSED == SDL_GetAudioStatus()) //判断暂停
@@ -339,7 +321,7 @@ int video_thread(void *arg)
         video_pts *= av_q2d(is->vStream->time_base);
         video_pts = synchronize_video(is, pFrame, video_pts);
 
-        if (is->seek_req)
+      /*  if (is->seek_req)
         {
             //发生了跳转 则跳过关键帧到目的时间的这几帧
            if (video_pts < is->seek_pos)
@@ -351,14 +333,10 @@ int video_thread(void *arg)
            {
                is->seek_req = 0;
            }
-        }
+        }*/
 
-        while(1)
+        while(!g_isQuit)
         {
-            if (g_isQuit)
-            {
-                break;
-            }
             audio_pts = is->audio_clock;
 
             //主要是 跳转的时候 我们把video_clock设置成0了
@@ -398,23 +376,34 @@ int video_thread(void *arg)
     return 0;
 }
 
+FFmpegPlayer::FFmpegPlayer(QObject *parent) : QThread(parent)
+{
+    g_player=this;
+    SDL_Init(SDL_INIT_AUDIO|SDL_INIT_VIDEO|SDL_INIT_EVENTS);
+    av_register_all();
+    avformat_network_init();
+    memset(&m_MS,0,sizeof(m_MS));
+
+    m_timer=new QTimer;
+    connect(m_timer,SIGNAL(timeout()),this,SLOT(slot_timerWork()));
+    m_timer->start(50);
+}
 
 void FFmpegPlayer::setMedia(const QString &url,bool isMV)
 {
-    g_isQuit=1;
     stop();
     emit sig_CurrentMediaChange(url,isMV);
+
     m_url=url;
     start(HighestPriority);
-
-
+    updateStatus();
 }
-void FFmpegPlayer::FreeCommSpace()
+inline void FFmpegPlayer::FreeCommSpace()
 {
     avformat_close_input(&m_MS.fct);
     memset(&m_MS,0,sizeof(m_MS));
 }
-void FFmpegPlayer::FreeVideoAlloc()
+inline void FFmpegPlayer::FreeVideoAlloc()
 {
     avcodec_close(m_MS.vcct);
     packet_queue_flush(&m_MS.videoq);
@@ -425,12 +414,7 @@ void FFmpegPlayer::FreeAudioAlloc()
      av_frame_free(&m_MS.wanted_frame);
      packet_queue_flush(&m_MS.audioq);
 }
-void FFmpegPlayer::slot_timerWork()
-{
-  //  if(m_MS.frame&&!m_MS.isBuffering)
-        emit sig_PositionChange(getCurrentTime());
-    updateStatus();
-}
+
 void FFmpegPlayer::seek(qint64 pos)
 {
     if(m_MS.seek_req)
@@ -441,7 +425,6 @@ void FFmpegPlayer::seek(qint64 pos)
 }
 
 
-
 void FFmpegPlayer::stop()
 {
     g_isQuit=1;
@@ -449,9 +432,11 @@ void FFmpegPlayer::stop()
     SDL_CloseAudio();//Close SDL
     g_Amutex.unlock();
 
+
     g_Vmutex.lock();
     g_Vmutex.unlock();
     FreeCommSpace();
+    updateStatus();
 }
 
 
@@ -467,6 +452,7 @@ PlayerStatus FFmpegPlayer::getPlayerStatus()
 
 void FFmpegPlayer::run()
 {
+
     g_Amutex.lock();
     g_isQuit=0;
     // 读取文件头，将格式相关信息存放在AVFormatContext结构体中
@@ -569,10 +555,8 @@ void FFmpegPlayer::run()
     m_MS.wanted_frame->channel_layout = av_get_default_channel_layout(spec.channels);
     m_MS.wanted_frame->channels = spec.channels;
 
-
     SDL_PauseAudio(0);
 /*---------------test----------------------*/
-
 
 
 /*---------------test----------------------*/
@@ -586,7 +570,7 @@ void FFmpegPlayer::run()
 
                 if (videoStream !=-1)
                     stream_index = videoStream;
-                else if (audioStream!=-1)
+                if (audioStream!=-1)
                     stream_index =audioStream;
 
 
@@ -597,22 +581,21 @@ void FFmpegPlayer::run()
                                     m_MS.fct->streams[stream_index]->time_base);
                 }
 
-                AVPacket packet; //分配一个packet
-                av_new_packet(&packet, 10);
-                strcpy((char*)packet.data,FLUSH_DATA);
-
                 SDL_PauseAudio(1);
 //block here
-                if (av_seek_frame(m_MS.fct, stream_index, m_MS.seek_pos, AVSEEK_FLAG_BACKWARD) < 0)
+                if (av_seek_frame(m_MS.fct, stream_index, m_MS.seek_pos, AVSEEK_FLAG_ANY) < 0)
                 {
                     qDebug()<<"seek error";
                 }
                 else
                 {
+                    AVPacket packet; //分配一个packet
+                    av_new_packet(&packet, 10);
+                    strcpy((char*)packet.data,FLUSH_DATA);
+
                     qDebug()<<"seek 成功";
                     if (audioStream!=-1) //audio
                     {
-
                         packet_queue_flush(&m_MS.audioq); //清除队列
                         packet_queue_put(&m_MS.audioq, &packet); //往队列中存入用来清除的包
                     }
@@ -630,8 +613,12 @@ void FFmpegPlayer::run()
 
         SDL_Delay(10);
 
+        if(m_MS.videoq.size>MAX_VIDEO_SIZE)
+            continue;
+
         if (m_MS.audioq.size > MAX_AUDIO_SIZE)
             continue; //这个才是关键！
+
         int result=av_read_frame(m_MS.fct, &packet);
        if(0==result)
        {
@@ -644,15 +631,13 @@ void FFmpegPlayer::run()
        }
        else if(result<0&& 0==m_MS.audioq.size)
        {
-           g_isQuit=1;
-           qDebug()<<"finished here";
+         //  g_isQuit=1;
            break;
        }
     }
     if(!g_isQuit) //It finished automatically when played to end of the media
         emit sig_CurrentMediaFinished();
 
-    qDebug()<<"finished?";
     FreeAudioAlloc();
     g_Amutex.unlock();
 }

@@ -3,11 +3,12 @@
 
 #include <QObject>
 #include <QWidget>
-#include<QMenu>
-#include"mySlider.h"
-#include<QPushButton>
-#include<qlabel.h>
-#include<QDebug>
+#include <QMenu>
+#include <QPushButton>
+#include <QLabel>
+#include <QDebug>
+
+#include "mySlider.h"
 
 class  volWidget :public QWidget
 {

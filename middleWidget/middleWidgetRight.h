@@ -3,14 +3,16 @@
 
 #include <QObject>
 #include <QWidget>
-#include<QStackedWidget>
-#include<QLineEdit>
-#include<QLabel>
-//#include"WebWidget.h"
-#include"MvWidget.h"
-#include"baseWidget.h"
+#include <QStackedWidget>
+#include <QLineEdit>
+#include <QLabel>
+
+#include "MvWidget.h"
+#include "baseWidget.h"
 #include "LyricWidget.h"
-class mainWindow;
+#include "myPushButton.h"
+#include "middleSearchWidget.h"
+
 class middleSearchWidget;
 class LyricLabel;
 class myPushButton;
@@ -24,15 +26,11 @@ class middleWidgetRight:public baseWidget
 public:
    explicit middleWidgetRight(QWidget*parent=0);
    void init();
-   QVector<myPushButton*>  &listButtons(){return m_listbtn;}
    void setInitMiddleWidget(middleWidgets*p){m_middlewidget=p;}
-   void setInitMainWindow(mainWindow*p);
    void setDrawLine(bool draw=true){m_isdrawline=draw;}
 
-   QStackedWidget *m_stackWid;
-//LyricLabel * m_lrcwid;
-   LyricWidget *m_lrcwid;
-   middleSearchWidget*m_searchwid;
+   LyricWidget* getLrcWidget(){return &m_lrcwid;}
+   middleSearchWidget * getSearWidget(){return &m_searchwid;}
    static QColor bgcolor;
 public slots:
    void slot_setSearchStack();
@@ -50,13 +48,14 @@ signals:
 private:
    bool m_isdrawline;
 
-   MvWidget *m_MvWid;
-   QVector<myPushButton*> m_listbtn;
+   QStackedWidget m_stackWid;
+   LyricWidget m_lrcwid;
+   middleSearchWidget m_searchwid;
+   myPushButton m_btnArray[6];
+   MvWidget m_MvWid;
+   baseWidget m_wid;
+
    middleWidgets *m_middlewidget;
-   mainWindow *m_mainWindow;
-   baseWidget*m_wid;
-
-
 /*   WebWidget *m_web0;
     WebWidget *m_web1;
     WebWidget *m_web2;

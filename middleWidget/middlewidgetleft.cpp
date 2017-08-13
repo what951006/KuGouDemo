@@ -16,7 +16,13 @@
 QColor middleWidgetLeft::color=QColor(230,230,230);
 QColor middleWidgetLeft::bgcolor=QColor(255,255,255,100);
 
-middleWidgetLeft::middleWidgetLeft(QWidget *parent) : baseWidget(parent)
+middleWidgetLeft::middleWidgetLeft(QWidget *parent)
+    : baseWidget(parent),
+      m_Swidget0(this),
+      m_Swidget1(this),
+      m_Swidget2(this),
+      m_Swidget3(this),
+      m_Swidget4(this)
 {
     m_isDrawVerticalLine=true;
     setMinimumWidth(310);
@@ -37,24 +43,20 @@ void middleWidgetLeft::initAnimation()
     m_isAnima=true;
     m_animation=new QPropertyAnimation(this,"m_x");
     m_animation->setDuration(200);
-    m_stackwid->setCurrentIndex(0);
+    m_stackwid.setCurrentIndex(0);
     connect(m_animation,SIGNAL(finished()),this,SLOT(slot_finished()));
 
     m_Widanimation=new QPropertyAnimation(this,"geometry");
-    m_Widanimation->setTargetObject(m_stackwid);
+    m_Widanimation->setTargetObject(&m_stackwid);
     m_Widanimation->setDuration(200);
 }
 
-void middleWidgetLeft::setInitMainWindow(mainWindow *p)
-{
-    m_mainWindow=p;
-    m_Swidget0->setInitMainWindow(p);
-}
+
 
 void middleWidgetLeft::setBackgroundtransparent()
 {
     color=QColor(55,55,55,55);
-    m_Swidget0->updateBGColor();
+    m_Swidget0.updateBGColor();
     setDrawVerticalLine(false);
     update();
 }
@@ -62,7 +64,7 @@ void middleWidgetLeft::setBackgroundtransparent()
 void middleWidgetLeft::setBackgroundnormal()
 {
     color=QColor(230,230,230);
-    m_Swidget0->updateBGColor();
+    m_Swidget0.updateBGColor();
     setDrawVerticalLine(true);
     update();
 }
@@ -74,23 +76,16 @@ void middleWidgetLeft::setWidgetOpacity(int value)
 void middleWidgetLeft::initLayout()
 {
     QVBoxLayout *vlyout=new QVBoxLayout;
-    m_stackwid=new QStackedWidget(this);
-    m_stackwid->setFrameShadow(QFrame::Plain);
-    m_stackwid->setFrameShape(QFrame::NoFrame);
+    m_stackwid.setFrameShadow(QFrame::Plain);
+    m_stackwid.setFrameShape(QFrame::NoFrame);
 
-    m_Swidget0=new middleLeftStackWidget0(this);
-    m_Swidget1=new middleLeftStackWidget1(this);
-    m_Swidget2=new middleLeftStackWidget2(this);
-    m_Swidget3=new middleLeftStackWidget3(this);
-    m_Swidget4=new middleLeftStackWidget4(this);
+    m_stackwid.addWidget(&m_Swidget0);
+    m_stackwid.addWidget(&m_Swidget1);
+    m_stackwid.addWidget(&m_Swidget2);
+    m_stackwid.addWidget(&m_Swidget3);
+    m_stackwid.addWidget(&m_Swidget4);
 
-    m_stackwid->addWidget(m_Swidget0);
-    m_stackwid->addWidget(m_Swidget1);
-    m_stackwid->addWidget(m_Swidget2);
-    m_stackwid->addWidget(m_Swidget3);
-    m_stackwid->addWidget(m_Swidget4);
-
-    m_stackwid->setContentsMargins(0,0,0,0);
+    m_stackwid.setContentsMargins(0,0,0,0);
 
 
     m_btn[0]=new stackButton(":/image/middlewidget/btn_music (1).png",":/image/middlewidget/btn_music (2).png",":/image/middlewidget/btn_music (3).png",this);
@@ -115,7 +110,7 @@ void middleWidgetLeft::initLayout()
     hlyout->setSpacing(0);
 
     vlyout->addLayout(hlyout);
-    vlyout->addWidget(m_stackwid);
+    vlyout->addWidget(&m_stackwid);
     vlyout->setSpacing(0);
     vlyout->setContentsMargins(0,0,0,0);
     setLayout(vlyout);
@@ -126,9 +121,9 @@ void middleWidgetLeft::initLayout()
         connect(m_btn[i],SIGNAL(pressed()),this,SLOT(slot_btn()));
     }
 
-    connect(m_stackwid,SIGNAL(currentChanged(int)),this,SLOT(slot_changeButtonSelected(int)));
+    connect(&m_stackwid,SIGNAL(currentChanged(int)),this,SLOT(slot_changeButtonSelected(int)));
 
-    m_stackwid->setCurrentIndex(0);//选中第一个stackwidget
+    m_stackwid.setCurrentIndex(0);//选中第一个stackwidget
     m_btn[0]->setselected(true); //设置
 }
 void middleWidgetLeft::slot_changeButtonSelected(int index)
@@ -153,16 +148,16 @@ void middleWidgetLeft::slot_changeButtonSelected(int index)
 
     if(index>m_preItem)
     {
-        m_Widanimation->setTargetObject(m_stackwid);
-        m_Widanimation->setStartValue(QRect(m_stackwid->width(),40,m_stackwid->width(),m_stackwid->height()));
-        m_Widanimation->setEndValue(QRect(0,40,m_stackwid->width(),m_stackwid->height()));
+        m_Widanimation->setTargetObject(&m_stackwid);
+        m_Widanimation->setStartValue(QRect(m_stackwid.width(),40,m_stackwid.width(),m_stackwid.height()));
+        m_Widanimation->setEndValue(QRect(0,40,m_stackwid.width(),m_stackwid.height()));
         m_Widanimation->start();
     }
     if(index<m_preItem)
     {
-        m_Widanimation->setTargetObject(m_stackwid);
-        m_Widanimation->setStartValue(QRect(-m_stackwid->width(),40,m_stackwid->width(),m_stackwid->height()));
-        m_Widanimation->setEndValue(QRect(0,40,m_stackwid->width(),m_stackwid->height()));
+        m_Widanimation->setTargetObject(&m_stackwid);
+        m_Widanimation->setStartValue(QRect(-m_stackwid.width(),40,m_stackwid.width(),m_stackwid.height()));
+        m_Widanimation->setEndValue(QRect(0,40,m_stackwid.width(),m_stackwid.height()));
         m_Widanimation->start();
     }
     m_preItem=index;
@@ -196,8 +191,8 @@ void middleWidgetLeft::paintEvent(QPaintEvent *)
 }
 void middleWidgetLeft::slot_btn()
 {
-    m_preindex=m_stackwid->currentIndex();
-    m_stackwid->setCurrentIndex(sender()->objectName().toInt());
+    m_preindex=m_stackwid.currentIndex();
+    m_stackwid.setCurrentIndex(sender()->objectName().toInt());
 }
 void middleWidgetLeft::resizeEvent(QResizeEvent *e)
 {

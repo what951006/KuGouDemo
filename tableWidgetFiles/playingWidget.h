@@ -27,18 +27,18 @@ public:
     void setSongName(const QString&);
     const QString songName(){return m_songName;}
 
-    playingWidgetBtn *m_btnSongName;
-    playingWidgetBtn *m_btnAuthor;
+    playingWidgetBtn m_btnSongName;
+    playingWidgetBtn m_btnAuthor;
 
-    myPushButton *m_btnCross;
-    myPushButton *m_btnLab;
+    myPushButton m_btnCross;
+    myPushButton m_btnLab;
 
-    QLabel *m_labduration;
-    myPushButton *m_btndownload;
-    myPushButton *m_btnMovie;
-    myPushButton *m_btnLove;
-    myPushButton *m_btnDel;
-    myPushButton *m_btnMore;
+    QLabel m_labduration;
+    myPushButton m_btndownload;
+    myPushButton m_btnMovie;
+    myPushButton m_btnLove;
+    myPushButton m_btnDel;
+    myPushButton m_btnMore;
 
     QTableWidgetItem *m_item;
 public slots:

@@ -3,7 +3,9 @@
 
 #include <QObject>
 #include <QWidget>
-#include"baseWidget.h"
+#include "baseWidget.h"
+#include "middlewidgetleft.h"
+#include "middleWidgetRight.h"
 
 class middleWidgetLeft;
 class middleWidgetRight;
@@ -16,13 +18,13 @@ class middleWidgets : public baseWidget
 public:
     explicit middleWidgets(QWidget *parent = 0);
     void initLayout();
-    void setInitParent(mainWindow*p);
     void setlistShowStyle();
     void setlistHideStyle();
     void setBtnShowHide(bool show=true);
-    myPushButton* getPushButton(){return m_btnhidelist;}
-    middleWidgetLeft *m_leftWid;
-    middleWidgetRight *m_rightWid;
+ //   myPushButton getPushButton(){return &m_btnhidelist;}
+    middleWidgetLeft m_leftWid;
+    middleWidgetRight m_rightWid;
+    myPushButton m_btnhidelist;
 protected:
     void mousePressEvent(QMouseEvent *){setFocus();}
     void mouseReleaseEvent(QMouseEvent *){}
@@ -33,8 +35,7 @@ signals:
 public slots:
     void slot_btnclicked();
 private:
-    mainWindow *m_mainWindow;
-    myPushButton *m_btnhidelist;
+
 };
 
 #endif // MIDDLEWIDGETS_H

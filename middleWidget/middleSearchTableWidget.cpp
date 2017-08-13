@@ -210,7 +210,7 @@ void middleSearchTableWidget::slot_tableContainerBtnClicked()
    playingWidgetBtn*btn= (playingWidgetBtn*)sender();
    if(!btn)
        return;
-   mainwid->topWidget()->searchFromLineEdit(btn->text());
+   mainWindow::GetInstance()->topWidget()->searchFromLineEdit(btn->text());
 }
 
 
@@ -250,7 +250,7 @@ void middleSearchTableWidget::slot_downloadbtnclicked()
 }
 void middleSearchTableWidget::slot_cellEnter(int row, int c)
 {
-    if(item(m_prebgItem,c)!=Q_NULLPTR&&row!=m_prebgItem)
+  /* if(item(m_prebgItem,c)!=Q_NULLPTR&&row!=m_prebgItem)
     {
         for(int i=0;i<columnCount();i++)
         item(m_prebgItem,i)->setBackgroundColor(Qt::transparent);
@@ -263,5 +263,5 @@ void middleSearchTableWidget::slot_cellEnter(int row, int c)
             this->item(row,i)->setBackgroundColor(QColor(245,245,245));
         }
          m_prebgItem=row;
-    }
+    }*/
 }

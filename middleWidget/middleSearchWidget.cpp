@@ -17,7 +17,7 @@
 #include"myTablePlayListFinal.h"
 #include"myPushButton.h"
 
-#define USE_NETCLOUD 0
+#define USE_NETCLOUD 1
 
 loadingWidget::loadingWidget(QString pixurl,int tinypixcount,QString text,QWidget *p):baseWidget(p)
 {
@@ -88,7 +88,7 @@ void middleSearchWidget::slot_addRequestSong(const QByteArray& byt)
     for(int i=0;i<arrycount;i++)//在这里完成搜索插入列表
     {
        QJsonObject obj2=arry.at(i).toObject();
-       m_songlist<<obj2.value("mp3Url").toString();//添加mp3Url
+       m_songlist<<obj2.value("mp3Url").toString().replace("m2","p2");//添加mp3Url
 
        int dur=obj2.value("duration").toInt();
        QTime total_time(0, (dur/60000)%60, (dur/1000)%60);
@@ -96,7 +96,6 @@ void middleSearchWidget::slot_addRequestSong(const QByteArray& byt)
 
        QJsonObject albumnObj=obj2.value("album").toObject();
        QString albumname= albumnObj.value("name").toString();
-
 
        QString songname=obj2.value("name").toString();
        QJsonArray arry1=obj2.value("artists").toArray();
@@ -106,10 +105,11 @@ void middleSearchWidget::slot_addRequestSong(const QByteArray& byt)
        int row= m_table->rowCount();
        m_table->insertRow(row);
        m_table->setItem(row,0,new QTableWidgetItem(""));
-       m_table->setItem(row,1,new QTableWidgetItem(author+"-"+songname));
-       m_table->setItem(row,2,new QTableWidgetItem(albumname));
-       m_table->setItem(row,3,new QTableWidgetItem(duration));
-       m_table->setItem(row,4,new QTableWidgetItem(""));
+       m_table->setItem(row,1,new QTableWidgetItem(songname));
+       m_table->setItem(row,2,new QTableWidgetItem(author));
+       m_table->setItem(row,3,new QTableWidgetItem(albumname));
+       m_table->setItem(row,4,new QTableWidgetItem(duration));
+       m_table->setItem(row,5,new QTableWidgetItem(""));
     }
 #else
     QJsonDocument doc=QJsonDocument::fromJson(byt);

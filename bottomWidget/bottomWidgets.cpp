@@ -2,6 +2,7 @@
 #include<QHBoxLayout>
 #include<QTime>
 
+#include "myTablePlayListFinal.h"
 #include"middleLeftStackWidget0.h"
 #include"mainwindow.h"
 #include"FFmpegPlayer.h"
@@ -208,8 +209,9 @@ void bottomWidgets::setPlayModeBtnStyle(PlayMode mode)
 
  void bottomWidgets::setBufferStaus()
  {
-     if(!m_labnowPlayname->Text().contains(QString("缓冲中---->> ")))
-     m_labnowPlayname->setText(QString("缓冲中---->> ")+m_labnowPlayname->Text());
+   /*  if(!m_labnowPlayname->Text().contains(QString("缓冲中---->> ")))
+     m_labnowPlayname->setText(QString("缓冲中---->> ")+m_labnowPlayname->Text());*/
+
  }
 
 void bottomWidgets::setCurrentSongName(const QString& str)
@@ -245,10 +247,10 @@ bool bottomWidgets::eventFilter(QObject *o, QEvent *e)
                 int pos = m_mainslider->minimum() + dur * ((double)ev->x() / m_mainslider->width());
                 if(pos != m_mainslider->sliderPosition())
                  {
-                    if(m_mainWindow->middleStack0()->nowPlayFinalTable())
+                    if(myTablePlayListFinal::getCurrentList())
                     {
                         m_mainslider->setValue(pos);
-                        m_mainWindow->player()->seek(m_mainslider->value()*1000000);
+                        mainWindow::GetInstance()->player()->seek(m_mainslider->value()*AV_TIME_BASE);
                     }
                  }
             }

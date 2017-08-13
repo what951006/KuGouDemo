@@ -17,27 +17,25 @@ class Widget:public QWidget
     Q_OBJECT
 public:
    explicit Widget(QWidget*parent=0);
-   void setPixmap(const QPixmap&);
-   void setShowSingerBG(bool is=true);
-   bool isShowSingerBG(){return m_isShowSingerBG;}
-   void setCurrentIndex(int);
-   inline int CurrentIndex(){return m_curindex;}
-   void clearBg();
-   const QString currentSkinPath(){return m_curPixPath;}
-   inline QPixmap getRectPix(const QRect&rect){update();return  m_curPix.copy(rect);}
-public slots:
-   void setSkin(const QString &str);
+
+    void setCurBGPic(const QString&);
+    void setShowSingerBG(bool is=true);
+    bool isShowSingerBG(){return m_isShowSingerBG;}
+    void clearBg();
+    const QString currentSkinPath(){return m_curPixPath;}
+    inline QPixmap getRectPix(const QRect&rect){update();return  m_curPix.copy(rect);}
 protected:
-    void paintEvent(QPaintEvent *e);
+    virtual void paintEvent(QPaintEvent *);
+ public slots:
+    void setSkin(const QString &str);
 private:
     QString m_curPixPath;
     QPixmap m_netPic;
     QPixmap m_skinPic;
     QPixmap m_curPix; //not the normal size
 
-    bool m_issetpix;
+    bool m_bShowSinger;
     bool m_isShowSingerBG;
-    int m_curindex;
 };
 
 class baseWindow : public AbsFrameLessAutoSize
@@ -47,13 +45,9 @@ public:
     explicit baseWindow(QWidget *parent = 0);
     Widget *m_mainwid;
 protected:
-   virtual void paintEvent(QPaintEvent *);
+    virtual void paintEvent(QPaintEvent *);
+ private:
 
-private:
-
-signals:
-
-public slots:
 };
 
 #endif // BASEWINDOW_H

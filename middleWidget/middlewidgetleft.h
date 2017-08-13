@@ -3,42 +3,34 @@
 
 #include <QObject>
 #include <QWidget>
-#include"baseWidget.h"
 #include<QStackedWidget>
 #include<QPropertyAnimation>
-#include<myPushButton.h>
 
-class mainWindow;
-class middleLeftStackWidget0;
-class middleLeftStackWidget1;
-class middleLeftStackWidget2;
-class middleLeftStackWidget3;
-class middleLeftStackWidget4;
+#include "baseWidget.h"
+#include "myPushButton.h"
+#include "middleLeftStackWidget0.h"
+#include "middleLeftStackWidget1.h"
+#include "middleLeftStackWidget2.h"
+#include "middleLeftStackWidget3.h"
+#include "middleLeftStackWidget4.h"
+
 
 
 class middleWidgetLeft : public baseWidget
 {
     Q_OBJECT
     Q_PROPERTY(int m_x READ getValue WRITE animation)
-
-
-
 public:
     explicit middleWidgetLeft(QWidget *parent = 0);
-    QStackedWidget  *m_stackwid;
-    stackButton *m_btn[5];
-    middleLeftStackWidget0 *m_Swidget0;
-    middleLeftStackWidget1 *m_Swidget1;
-    middleLeftStackWidget2 *m_Swidget2;
-    middleLeftStackWidget3 *m_Swidget3;
-    middleLeftStackWidget4 *m_Swidget4;
+
+    middleLeftStackWidget0* GetStackWid0(){return &m_Swidget0;}
+
 
     static QColor color;//92 174 219
     static QColor bgcolor;
 
     void initLayout();
     void initAnimation();
-    void setInitMainWindow(mainWindow*);
 
     int getValue(){return m_x;}
     void animation(int i){m_x=i;update();}
@@ -54,12 +46,18 @@ protected:
 private slots:
     void slot_btn();
     void setWidgetOpacity(int);
-
     void slot_changeButtonSelected(int i);//改变选中图片
- //   void slot_animation(QVariant var){m_x=var.toInt();update();}
     void slot_finished(){m_isAnima=false;}
 private:
-    mainWindow *m_mainWindow;
+
+    stackButton *m_btn[5];
+
+    QStackedWidget  m_stackwid;
+    middleLeftStackWidget0 m_Swidget0;
+    middleLeftStackWidget1 m_Swidget1;
+    middleLeftStackWidget2 m_Swidget2;
+    middleLeftStackWidget3 m_Swidget3;
+    middleLeftStackWidget4 m_Swidget4;
 
     QPixmap m_pix;
     int m_index;

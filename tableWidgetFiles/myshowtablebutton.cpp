@@ -21,7 +21,6 @@ inline QString mimeType(){return "ShowButton";}
 myShowTableButton::myShowTableButton(QWidget*parent):QPushButton(parent)
 {
     m_isdrawMove=false;
-    m_finalWid=(myTablePlayListFinal*)parent;
     setAcceptDrops(true);
     init();
     initMenu();
@@ -51,7 +50,6 @@ void myShowTableButton::initMenu()
     m_menu->addAction(act_delplayList);
     m_menu->addAction(act_reName);
     m_menu->setContentsMargins(4,10,3,10);
-
     m_menu->actionGeometry(act_reName);//一定不能删除 setEnabledMenuItem要工作必须要它 可能是一个bug// must to call this function if not the setEnabledMenuItem function cant work correctly;
 
     connect(act_emptyList,SIGNAL(triggered(bool)),this,SIGNAL(sig_emptyList()));
@@ -63,22 +61,23 @@ void myShowTableButton::initMenu()
 
 }
 
-void myShowTableButton::setFinalWidget(QWidget *p)
+void myShowTableButton::setTableFinal(myTablePlayListFinal *parent)
 {
-    if(m_finalWid==p)
+    m_finalWid=parent;
+  /*  if(m_finalWid==p)
         return;
     m_finalWid=(myTablePlayListFinal*)p;
 
     foreach (myTablePlayListFinal*f, m_finalWid->midLeft0()->myTablePlayListFinalVector()) { //断掉所有
         disconnect(this,SIGNAL(sig_emptyList()),f,SLOT(slot_emptyList()));//清空列表
         disconnect(this,SIGNAL(sig_addSong()),f,SLOT(slot_addSong()));//添加歌曲
-        disconnect(f->m_table,SIGNAL(sig_RowCountChange()),this,SLOT(slot_updateSongCount()));//歌曲列表改变信息
+        disconnect(&f->m_table,SIGNAL(sig_RowCountChange()),this,SLOT(slot_updateSongCount()));//歌曲列表改变信息
     }
 
     connect(this,SIGNAL(sig_emptyList()),m_finalWid,SLOT(slot_emptyList()));//清空列表
     connect(this,SIGNAL(sig_addSong()),m_finalWid,SLOT(slot_addSong()));//添加歌曲
-    connect(m_finalWid->m_table,SIGNAL(sig_RowCountChange()),this,SLOT(slot_updateSongCount()));//歌曲列表改变信息
-    slot_updateSongCount();
+    connect(&m_finalWid->m_table,SIGNAL(sig_RowCountChange()),this,SLOT(slot_updateSongCount()));//歌曲列表改变信息
+    slot_updateSongCount();*/
 }
 
  void myShowTableButton::setTableShowIndicator()
@@ -110,10 +109,10 @@ void myShowTableButton::setTipsStyle(bool isset)
 
 void myShowTableButton::slot_updateSongCount()
 {
-    if(m_finalWid->m_table->rowCount()==0)
-     m_playlistName->setText(m_finalWid->ShowButtonName());
+    if(m_finalWid->m_table.rowCount()==0)
+        m_playlistName->setText(m_finalWid->ShowButtonName());
     else
-    m_playlistName->setText(m_finalWid->ShowButtonName()+QString("[%1]").arg(QString::number(m_finalWid->m_table->rowCount())));
+        m_playlistName->setText(m_finalWid->ShowButtonName()+QString("[%1]").arg(QString::number(m_finalWid->m_table.rowCount())));
 }
 void myShowTableButton::slot_ReName()
 {
@@ -148,7 +147,7 @@ void myShowTableButton::mousePressEvent(QMouseEvent *e)
 
 void myShowTableButton::dragMoveEvent(QDragMoveEvent *e)
 {
-   if(e->mimeData()->hasFormat(mimeType())&&midstack0Pointer->isEnableMoveList(m_finalWid))
+   if(e->mimeData()->hasFormat(mimeType()) && midstack0Pointer->isEnableMoveList(m_finalWid))
    {
        m_isdrawMove=true;
        if(e->pos().y()<height()/2)
@@ -251,17 +250,17 @@ void myShowTableButton::paintEvent(QPaintEvent *)
         painter.setBrush(gradient);
         painter.drawRect(0,37,width(),height());
 
-        if(mainwid)
+      /*  if(mainWindow::GetInstance())
         {
-            if(mainwid->m_mainwid->CurrentIndex()==5)
+            if(mainWindow::GetInstance()->m_mainwid->CurrentIndex()==5)
                 painter.drawPixmap(0,0,width(),height()-3
-                            ,mainwid->m_mainwid->getRectPix(QRect(0,90,width(),height()-3)));
+                            ,mainWindow::GetInstance()->m_mainwid->getRectPix(QRect(0,90,width(),height()-3)));
             else
             {
                 painter.setBrush(Qt::white);
                 painter.drawRect(-1,0,width(),height()-3);
             }
-        }
+        }*/
         painter.setBrush(middleWidgetLeft::bgcolor);
         painter.drawRect(-1,0,width(),height()-3);
     }
@@ -328,21 +327,21 @@ void myShowTableButton::init()
 
 void myShowTableButton::slot_returnPressed()
 {
-  QList<myShowTableButton*> btnlist= m_finalWid->midLeft0()->m_wid->findChildren<myShowTableButton*>();
+     QVector<myTablePlayListFinal*> &plistVec= m_finalWid->m_midleft0->myTablePlayListFinalVector();
 
-  foreach(myShowTableButton*btn,btnlist)
-  {
-    QString pname= btn->m_playlistName->text().split("[").at(0);
-    if(btn!=this&&btn!=m_finalWid->m_Btntable)
-    {
-        if(pname==m_lineEdit->text())
+      foreach(myTablePlayListFinal*pListFinal,plistVec)
+      {
+        if(&pListFinal->m_Btntable != this)
         {
-            QMessageBox::warning(NULL,"warning","the same playlist name!");
-            slot_ReName();
-            return;
+            if(pListFinal->ShowButtonName()==m_lineEdit->text())
+            {
+                QMessageBox::warning(NULL,"warning","the same playlist name!");
+                slot_ReName();
+                return;
+            }
         }
-    }
-  }
+      }
+
     if(m_lineEdit->text().isEmpty())
         slot_ReName();
     else
