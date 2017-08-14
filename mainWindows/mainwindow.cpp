@@ -266,11 +266,11 @@ bool mainWindow::eventFilter(QObject *o, QEvent *e)
     {
         if(e->type()==QEvent::Enter)
         {
-           m_bottomwid.m_btnvol-> m_timer->stop();
+           m_bottomwid.m_btnvol-> m_timer.stop();
         }
         if(e->type()==QEvent::Leave)
         {
-            m_bottomwid.m_btnvol-> m_timer->start(500);
+            m_bottomwid.m_btnvol-> m_timer.start(500);
         }
     }
     if(m_bottomwid.m_btnvol==o)//music volumn button

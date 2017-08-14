@@ -36,9 +36,9 @@ private:
     int m_savevol;
     int m_isvolempty;
     int m_index;
-    QList<QPixmap> m_listnormal;
-    QList<QPixmap> m_listhover;
-    QList<QPixmap> m_listpressed;
+    QVector<QPixmap> m_listnormal;
+    QVector<QPixmap> m_listhover;
+    QVector<QPixmap> m_listpressed;
 
     QSlider *m_partnerslider;
 public slots:
@@ -52,9 +52,8 @@ class volButton2:public QPushButton
     Q_OBJECT
 public:
     volButton2(const QString& normal,const QString& hover,const QString& pressed,QWidget*parent=0);
-    ~volButton2(){delete m_timer;}
     void setPartnerSlider(QSlider *slider){m_partnerslider=slider;}
-    QTimer *m_timer;
+    QTimer m_timer;
 public slots:
 
 protected:
@@ -70,9 +69,9 @@ private:
     int m_savevol;
     int m_isvolempty;
     int m_index;
-    QList<QPixmap> m_listnormal;
-    QList<QPixmap> m_listhover;
-    QList<QPixmap> m_listpressed;
+    QVector<QPixmap> m_listnormal;
+    QVector<QPixmap> m_listhover;
+    QVector<QPixmap> m_listpressed;
 
 
 public slots:
@@ -94,12 +93,13 @@ protected:
     void leaveEvent(QEvent *);
     void paintEvent(QPaintEvent *);
 private:
-    int m_index;
-    bool m_enter;
-    bool m_pressed;
     QPixmap m_pixnormal;
     QPixmap m_pixhover;
     QPixmap m_pixselected;
+
+    int m_index;
+    bool m_enter;
+    bool m_pressed;
 };
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////
 class leftPixButton:public QPushButton

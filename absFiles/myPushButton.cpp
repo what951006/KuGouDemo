@@ -31,15 +31,17 @@ volButton::volButton(const QString& normal,const QString& hover,const QString& p
     m_savevol=100;
     setCursor(Qt::PointingHandCursor);
 
-    QPixmap pix(normal);
-    QPixmap pixhover(hover);
-    QPixmap pixpressed(pressed);
+    QPixmap pixTemp(normal);
     for(int i=0;i<5;i++)
-    m_listnormal<<pix.copy(i*(pix.width()/5),0,pix.width()/5,pix.height());
+    m_listnormal<<pixTemp.copy(i*(pixTemp.width()/5),0,pixTemp.width()/5,pixTemp.height());
+
+    pixTemp.load(hover);
     for(int i=0;i<5;i++)
-    m_listhover<<pixhover.copy(i*(pixhover.width()/5),0,pixhover.width()/5,pixhover.height());
+    m_listhover<<pixTemp.copy(i*(pixTemp.width()/5),0,pixTemp.width()/5,pixTemp.height());
+
+    pixTemp.load(pressed);
     for(int i=0;i<5;i++)
-    m_listpressed<<pixpressed.copy(i*(pixpressed.width()/5),0,pixpressed.width()/5,pixpressed.height());
+    m_listpressed<<pixTemp.copy(i*(pixTemp.width()/5),0,pixTemp.width()/5,pixTemp.height());
 
 
 }
@@ -105,13 +107,15 @@ void volButton::leaveEvent(QEvent *)
     update();
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
-stackButton::stackButton(const QString& pixnormal,const QString& pixhover,const QString& pixsel,QWidget*parent):QPushButton(parent)
+stackButton::stackButton(const QString& pixnormal,const QString& pixhover,const QString& pixsel,QWidget*parent)
+    :QPushButton(parent)
+    ,m_pixnormal(pixnormal)
+    , m_pixhover(pixhover)
+    ,m_pixselected(pixsel)
+    ,m_index(-1)
+    ,m_enter(false)
+    ,m_pressed(false)
 {
-    m_enter=false;
-    m_pressed=false;
-    m_pixnormal=QPixmap(pixnormal);
-    m_pixhover=QPixmap(pixhover);
-    m_pixselected=QPixmap(pixsel);
     setCursor(Qt::PointingHandCursor);
     setFlat(true);
 }
@@ -127,8 +131,6 @@ void stackButton::paintEvent(QPaintEvent *e)
 
     if(m_pressed)//选中
      p.drawPixmap((width()-m_pixselected.width())/2,(height()-m_pixselected.height())/2,m_pixselected);
-
-
 }
 void stackButton::setselected(bool sel)//用于控制pix显示
 {
@@ -157,13 +159,14 @@ void stackButton::leaveEvent(QEvent *e)
     update();
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-leftPixButton::leftPixButton(QString pixnormal, QString pixhover, QWidget *parent):QPushButton(parent)
-{
-    m_enter=false;
-    m_pressed=false;
-    m_pixnormal=QPixmap(pixnormal);
-    m_pixhover=QPixmap(pixhover);
-}
+leftPixButton::leftPixButton(QString pixnormal, QString pixhover, QWidget *parent)
+    :QPushButton(parent)
+    ,m_enter(false)
+    ,m_pressed(false)
+    ,m_pixnormal(pixnormal)
+    ,m_pixhover(pixhover)
+
+{}
 void leftPixButton::paintEvent(QPaintEvent *)
 {
     QPainter p(this);
@@ -196,30 +199,29 @@ void leftPixButton::leaveEvent(QEvent *)
 //////////////////////////////////////////////////////////////////////////////////////
 volButton2::volButton2(const QString& normal,const QString& hover,const QString& pressed,QWidget*parent)
     :QPushButton(parent)//5个连一串
+   , m_partnerslider(NULL)
+    , m_isenter(false)
+    , m_savevol(100)
+    , m_isvolempty(100)
+    , m_index(0)
 {
-    m_partnerslider=NULL;
-    m_isenter=false;
-    m_index=0;
-    m_isvolempty=100;
-    m_savevol=100;
     setCursor(Qt::PointingHandCursor);
 
-    QPixmap pix(normal);
-    QPixmap pixhover(hover);
-    QPixmap pixpressed(pressed);
+    QPixmap pixTemp(normal);
     for(int i=0;i<5;i++)
-    m_listnormal<<pix.copy(i*(pix.width()/5),0,pix.width()/5,pix.height());
+    m_listnormal<<pixTemp.copy(i*(pixTemp.width()/5),0,pixTemp.width()/5,pixTemp.height());
+
+    pixTemp.load(hover);
     for(int i=0;i<5;i++)
-    m_listhover<<pixhover.copy(i*(pixhover.width()/5),0,pixhover.width()/5,pixhover.height());
+    m_listhover<<pixTemp.copy(i*(pixTemp.width()/5),0,pixTemp.width()/5,pixTemp.height());
+
+    pixTemp.load(pressed);
     for(int i=0;i<5;i++)
-    m_listpressed<<pixpressed.copy(i*(pixpressed.width()/5),0,pixpressed.width()/5,pixpressed.height());
-
-    m_timer=new QTimer;
-    m_timer->setSingleShot(true);
-    connect(m_timer,SIGNAL(timeout()),this,SIGNAL(sig_hideVolWidget()));
+    m_listpressed<<pixTemp.copy(i*(pixTemp.width()/5),0,pixTemp.width()/5,pixTemp.height());
 
 
-
+    m_timer.setSingleShot(true);
+    connect(&m_timer,SIGNAL(timeout()),this,SIGNAL(sig_hideVolWidget()));
 }
 
 void volButton2::paintEvent(QPaintEvent *)
@@ -275,29 +277,28 @@ void volButton2::setButtonPixmap(int value)
 void volButton2::enterEvent(QEvent *)
 {
     m_isenter=true;
-
-    m_timer->stop();
+    m_timer.stop();
     update();
 }
 void volButton2::leaveEvent(QEvent *)
 {
     m_isenter=false;
-    m_timer->start(500);
+    m_timer.start(500);
     update();
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-playModeButton::playModeButton(QString pixnormal, QString pixhover, QString text,QWidget *parent):QPushButton(parent)
+playModeButton::playModeButton(QString pixnormal, QString pixhover, QString text,QWidget *parent)
+    :QPushButton(parent)
+    , m_enter(false)
+    , m_pressed(false)
+    ,m_mode(playInOrder)
+    ,m_pixnormal(pixnormal)
+    ,m_pixhover(pixhover)
+    ,m_text(text)
 {
-    m_mode=PlayMode::playInOrder;
     setStyleSheet("background:transparent;");
-    m_pixnormal=QPixmap(pixnormal);
-    m_pixhover=QPixmap(pixhover);
-    m_enter=false;
-    m_pressed=false;
-    m_text=text;
     setFixedSize(100,20);
     setCheckedBtn(false);
-
 }
 void playModeButton::enterEvent(QEvent *e)
 {
@@ -308,8 +309,8 @@ void playModeButton::enterEvent(QEvent *e)
 void playModeButton::mousePressEvent(QMouseEvent *e)
 {
     QPushButton::mousePressEvent(e);
-  //  m_pressed=true;
-  //  update();
+  //m_pressed=true;
+  //update();
 }
 void playModeButton::leaveEvent(QEvent *e)
 {
@@ -338,11 +339,13 @@ void playModeButton::setCheckedBtn(bool check)
     update();
 }
 //////////////////////////////////////////////////////////////////////
-playingWidgetBtn::playingWidgetBtn(QWidget *p):myPushButton(p)
+playingWidgetBtn::playingWidgetBtn(QWidget *p)
+    :myPushButton(p)
+    ,m_text("")
+    ,m_normalcolor(0,0,0)
+    ,m_hovercolor(0,0,0)
+    ,m_isenter(false)
 {
-    m_isenter=false;
-    m_normalcolor=QColor(0,0,0);
-    m_hovercolor=QColor(0,0,0);
     setCursor(Qt::ArrowCursor);
     setMouseTracking(true);
 }

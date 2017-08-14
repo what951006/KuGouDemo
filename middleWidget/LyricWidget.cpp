@@ -288,7 +288,7 @@ void LyricWidget::analyzeLrcContent(QByteArray &KlcData,const QString &filedir)
 
     QStringList list=QString(getByt).split("\n");
     QRegExp regTemp0("^\\[\\d+,\\d+\\]");
-    QRegExp regTemp1("\\<\\d+,\\d+\\,\\d+\\>\\w*");
+    QRegExp regTemp1("\\<\\d+,\\d+\\,\\d+\\>(\\w*|:|：|-)");
     QRegExp regTemp2("\\d+");
 
     foreach (QString strLine, list)
