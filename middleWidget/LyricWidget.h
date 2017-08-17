@@ -53,7 +53,7 @@ public:
 
     void clearLrc();
 
-    void getPosInfo(int &interval, float &precent, QString &str);
+    void getPosInfo(int &keyTime,int &interval, float &precent, QString &str);
 protected:
     virtual void paintEvent(QPaintEvent*event);
 

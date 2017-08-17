@@ -133,37 +133,29 @@ void LyricWidget::DrawItem(QPainter&Painter,ItemInfo &Info)
 void LyricWidget::GetMaskLen(int nFontSize,int nFreq)
 {
     static float s_fPercent=0.0f;
-    static float s_flrcMaskMiniStep=0.0f;
-    static float s_reach=0;
+    static float s_keyLen=0;
+
+    int keyTime=0;
     int interval=0;
     float percent=0;
+    float percent2=0.0;
     QString str(" ");
-    getPosInfo(interval,percent,str);
-
-  // qDebug()<<interval<<percent<<str<<m_nCurIndex;
+    getPosInfo(keyTime,interval,percent,str);
 
     QFont fontTemp=m_normalFont;
     fontTemp.setPixelSize(nFontSize);
     QFontMetrics metrics(fontTemp);
     if(s_fPercent != percent)
     {
-        m_nMaskLen=metrics.width(m_strCurLrc)*percent;
-        int count = interval / nFreq;
-        s_flrcMaskMiniStep =(float)metrics.width(str)/ count;
-        s_flrcMaskMiniStep+=0.5;  //加这个0.5效果更好点
+        s_keyLen=metrics.width(m_strCurLrc)*percent;
         s_fPercent=percent;
-
-
-        s_reach=m_nMaskLen+metrics.width(str);
-        qDebug()<<s_reach<<m_nMaskLen<<metrics.width(m_strCurLrc)<<s_flrcMaskMiniStep;
     }
-    else
+
+    if(interval!=0)
     {
-
-        if(s_reach >m_nMaskLen)
-            m_nMaskLen+=s_flrcMaskMiniStep;
+       percent2=(float)(m_nCurPos-m_nCurStartPos-keyTime)/interval;
+       m_nMaskLen=s_keyLen+metrics.width(str)*percent2;
     }
-
 }
 inline QString LyricWidget::GetLrcByIndex(int index)
 {
@@ -222,7 +214,7 @@ void LyricWidget::positionChanged(qint64 length)
 
 //-------------------------------------original func------------------------------------------
 
-void LyricWidget::getPosInfo(int &interval, float &precent, QString &str)
+void LyricWidget::getPosInfo(int &keyTime,int &interval, float &precent, QString &str)
 {
     if(m_word_list.size()<=m_nCurIndex)
         return;
@@ -232,7 +224,6 @@ void LyricWidget::getPosInfo(int &interval, float &precent, QString &str)
     const QMap<int ,int> & interval_map= m_interval_list.at(m_nCurIndex);
 
     const QMap<int ,float> & percent_map=m_percent_list.at(m_nCurIndex);
-
 
 
     int subvalue=abs(m_nCurPos-m_nCurStartPos);
@@ -249,9 +240,11 @@ void LyricWidget::getPosInfo(int &interval, float &precent, QString &str)
             lt = mid;
     }
 
-    str=word_map.values().value(lt);
+
+    keyTime=interval_map.keys().value(lt);
     interval=interval_map.values().value(lt);
     precent=(float)lt/interval_map.size();
+    str=word_map.values().value(lt);
 }
 
 void LyricWidget::clearLrc()
@@ -276,19 +269,16 @@ void LyricWidget::analyzeLrcContent(QByteArray &KlcData,const QString &filedir)
     int nDur=0;
     int nIndex=0;
 
-
     QMap<int,QString> word_map;
     QMap<int ,int> interval_map; //interval,间隔时间
     QMap<int ,float> percent_map;
-
- //   int nTemp=QTime::currentTime().msecsSinceStartOfDay();
 
     QByteArray getByt;
     KrcDecode(KlcData,getByt);//here we got lrc text
 
     QStringList list=QString(getByt).split("\n");
     QRegExp regTemp0("^\\[\\d+,\\d+\\]");
-    QRegExp regTemp1("\\<\\d+,\\d+\\,\\d+\\>(\\w*|:|：|-)");
+    QRegExp regTemp1("\\<\\d+,\\d+\\,\\d+\\>[\\w\\W\\a-zA-Z]{0,10}(\\<|\\r)");//((\\w*|\\w*)|\\W{1}|\\w*\\s)
     QRegExp regTemp2("\\d+");
 
     foreach (QString strLine, list)
@@ -316,7 +306,8 @@ void LyricWidget::analyzeLrcContent(QByteArray &KlcData,const QString &filedir)
                 ++nIndex;
             }
         }
-        for(int pos=0;pos=regTemp1.indexIn(strLine,pos),pos>=0; pos+=regTemp1.matchedLength())
+
+        for(int pos=0;pos=regTemp1.indexIn(strLine,pos),pos>=0; pos+=1)
         {
             nIndex=0;
             strTemp=regTemp1.cap(0);
@@ -331,11 +322,10 @@ void LyricWidget::analyzeLrcContent(QByteArray &KlcData,const QString &filedir)
                     nDur=regTemp2.cap(0).toInt();
                 }
                 ++nIndex;
-
             }
-            strWord=strTemp.split(">").value(1);
-            strGetLine+=strWord;
 
+            strWord=strTemp.split(">").value(1).replace("<","");
+            strGetLine+=strWord;
 
             interval_map.insert(nKeyTime,nDur);
             word_map.insert(nKeyTime,strWord);
