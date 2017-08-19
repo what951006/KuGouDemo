@@ -45,7 +45,6 @@ public:
 
     QString ShowButtonName(){return m_PlayListname;}
 
-    myMediaList *mediaList(){return &m_playList;}
 
    const QString currentAuthor(){return m_table.m_playingWid.m_btnAuthor.text();}
 
@@ -53,7 +52,6 @@ public:
 
    const QString currentSongDuration();
 
-   const QList<QUrl> &songUrlList(){return m_playList.GetList();}
 
     int currentSongDurationToInt();
 
@@ -68,6 +66,16 @@ public:
     void updateConvientButton();
 
     void updateBGcolor();
+
+////////////////////////////////playList operation
+    myMediaList *mediaList(){return &m_playList;}
+
+    int getIndexByUrl(const QString &strUrl){return m_playList.GetList().indexOf(strUrl);}
+
+    QString getUrlByIndex(int index){return m_playList.GetList().value(index);}
+
+    bool isContainUrl(const QString&strUrl){return m_playList.GetList().contains(strUrl);}
+//////////////////////////////////////
 
 
     myShowTableButton m_Btntable;

@@ -331,10 +331,11 @@ void mainWindow::slot_currentMediaChanged(const QString &media, bool isMV)//setn
 
      clearBackground();//原始背景
    // setOriginalStatus();
-
     myTablePlayListFinal*finalwid=myTablePlayListFinal::getCurrentList();
     if(media.isEmpty() || !finalwid)//如果为空
         return;
+
+
 
     foreach(myTablePlayListFinal*f,m_pLefStack0->myTablePlayListFinalVector())
     {

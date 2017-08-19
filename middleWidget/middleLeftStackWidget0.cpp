@@ -382,38 +382,35 @@ void middleLeftStackWidget0::slot_verScrBarChange(int value)
 }
 void middleLeftStackWidget0::addMusicToDefaultList(const ItemResult &result, bool bPlay)
 {
-
-    /*if(!m_defaultList.mediaList()->GetList().contains(result.strUrl))
+    if(bPlay)
     {
-        m_defaultList.addToPlayList(result.strFullName,result.strUrl,QString::number(result.ndur,);
+        if(!m_defaultList.mediaList()->GetList().contains(result.strUrl))
+        {
+            m_defaultList.addToPlayList(result.strFullName,result.strUrl,result.strDur,result.strHash);
+        }
+
+        if( m_defaultList.m_table.isHidden())//如果第一列表隐藏
+            m_defaultList.m_Btntable.clicked();
+        else
+            m_defaultList.setAutoLayout();
+
+
+        int index= m_defaultList.getIndexByUrl(result.strUrl);
+        m_defaultList.m_table.slot_doublick(index,0);
+        scrolltoCurrentPlayList();
     }
-
-
-    if( m_midleft0->myTablePlayListFinalVector().at(0)->m_table.isHidden())//如果第一列表隐藏
-        m_midleft0->myTablePlayListFinalVector().at(0)->m_Btntable.clicked();
     else
-        setAutoLayout();
-
-    QString songurl= urllist.value(0);
-    int index= songUrlList().indexOf(QUrl(songurl));
-    m_table.slot_doublick(index,0);
-
-    m_midleft0->scrolltoCurrentPlayList();
-
-
-
-    for(int i=0;i<namelist.count();i++)
     {
-                QString m_name=namelist.value(i);
-                if(!m_playList.GetList().contains(urllist.value(i)))
-                {
-                    addToPlayList(m_name,urllist.value(i),dur.value(i));
-                }
-     }
-   if(m_table.isHidden())//如果第一列表隐藏
-      m_Btntable.clicked();
-   else
-       setAutoLayout();*/
+        if(!m_defaultList.isContainUrl(result.strUrl))
+        {
+            m_defaultList.addToPlayList(result.strFullName,result.strUrl,result.strDur);
+        }
+
+       if(m_defaultList.m_table.isHidden())//如果第一列表隐藏
+          m_defaultList.m_Btntable.clicked();
+       else
+          m_defaultList.setAutoLayout();
+    }
 }
 
 

@@ -99,7 +99,7 @@ void myTablePlayListFinal::dropEvent(QDropEvent *event)
            {
                    QFileInfo info(files.value(i).toLocalFile());
                    QString m_name=info.completeBaseName();
-                   if(!m_playList.GetList().contains(files.value(i)))
+                   if(!m_playList.GetList().contains(files.value(i).toString()))
                    {
                        QString filePath=files.value(i).toLocalFile();
                        player.setMedia(QUrl(filePath));

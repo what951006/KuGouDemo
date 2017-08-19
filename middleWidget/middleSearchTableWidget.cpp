@@ -176,19 +176,10 @@ void middleSearchTableWidget::removeRow(int row)
 }
 void middleSearchTableWidget::slot_doubleClicked(QTableWidgetItem *it)
 {
-    middleSearchWidget*p=(middleSearchWidget*)parentWidget();
-
-    QStringList list_name;
-    QStringList list_dur;
-    QStringList list_url;
-
+    middleSearchWidget*parent=(middleSearchWidget*)parentWidget();
     int row= it->row();
-
-    playingWidgetBtn*btn=(playingWidgetBtn*)cellWidget(row,2);
-    list_name<<btn->text()+"-"+item(row,1)->text();
-    list_dur<<item(row,4)->text();
-
-  //  mainWindow::GetInstance()->middleStack0()->myTablePlayListFinalVector().value(0)->slot_playSongFromSearchTable(list_name,list_url,list_dur);
+    const ItemResult &result= parent->GetItemByIndex(row);
+    mainWindow::GetInstance()->middleStack0()->addMusicToDefaultList(result,1);
 }
 
 void middleSearchTableWidget::slot_itemclick(int row, int)

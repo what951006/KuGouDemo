@@ -20,9 +20,9 @@ public:
 
     QUrl mediaUrl(int index);//赋值给musicIndex;
 
-    void addPlayList(const QUrl& url,const QString&hash=""){m_list.append(url);m_hashMap.insert(url,hash);}
+    void addPlayList(const QString& url,const QString&hash=""){m_list.append(url);m_hashMap.insert(url,hash);}
 
-    const QList<QUrl> & GetList(){return m_list;}
+    const QList<QString> & GetList(){return m_list;}
 
     void setPlayMode(PlayMode);
 
@@ -38,8 +38,8 @@ signals:
 private:
     int indexMode;
     int m_musicIndex;
-    QList<QUrl> m_list;
-    QMap <QUrl,QString> m_hashMap;
+    QList<QString> m_list;
+    QMap <QString,QString> m_hashMap;
     myTablePlayListFinal *m_pFinal;
 };
 

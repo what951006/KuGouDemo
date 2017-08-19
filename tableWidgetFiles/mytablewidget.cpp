@@ -38,7 +38,7 @@ void myTableWidget::slot_btnloveclicked()
        else//则添加它 到喜爱的列表
        {
            QString songname=item(m_prebgItem,1)->text();
-           QString url=m_finalWidget->songUrlList().value(m_prebgItem).toString();
+           QString url=m_finalWidget->getUrlByIndex(m_prebgItem);
            myTablePlayListFinal*plove=m_middleftStack0->myTablePlayListFinalVector().last(); //第二个列表中
 
            plove->addToPlayList(songname,url,m_text.simplified());
@@ -152,11 +152,11 @@ void myTableWidget::slot_moveToPList()//添加到列表中
           QTableWidgetItem*it=items.at(i);
           int row= it->row();
 
-          if(!final->songUrlList().contains(m_finalWidget->songUrlList().at(row)))//url判断在不在列表中
+          if(!final->isContainUrl(m_finalWidget->getUrlByIndex(row)))//url判断在不在列表中
           {
                QString songname=item(row,1)->text();
                QString duration=item(row,2)->text();
-               QString url= m_finalWidget->songUrlList().at(row).toString();
+               QString url= m_finalWidget->getUrlByIndex(row);
                final->addToPlayList(songname,url,duration.simplified());
           }
       }
@@ -284,7 +284,7 @@ void myTableWidget::slot_playingWidgetLoveBtnClicked()  //this slot is used by p
    int index=currentSongIndex();
    if(index==-1)
        return;
-   myTablePlayListFinal*plovelist= m_middleftStack0->myTablePlayListFinalVector().last();
+   myTablePlayListFinal*plovelist= m_middleftStack0->getLoveList();
    if(plovelist==m_finalWidget)//if this table is the nowplaytable
    {
        removeSong(index);
@@ -293,9 +293,9 @@ void myTableWidget::slot_playingWidgetLoveBtnClicked()  //this slot is used by p
    }
    else//need to add or delete
    {
-       if(plovelist->songUrlList().contains(m_finalWidget->songUrlList().value(index)))//if true  then delete
+       if(plovelist->isContainUrl(m_finalWidget->getUrlByIndex(index)))//if true  then delete
        {
-            int plistindex=  plovelist->songUrlList().indexOf(m_finalWidget->songUrlList().value(index));
+            int plistindex= plovelist->getIndexByUrl(m_finalWidget->getUrlByIndex(index));
             plovelist->m_table.slot_cellEnter(-1,0);
             plovelist->m_table.removeRow(plistindex);
             emit plovelist->m_table.sig_delIndex(plistindex);
@@ -308,7 +308,7 @@ void myTableWidget::slot_playingWidgetLoveBtnClicked()  //this slot is used by p
          else          //add
        {
             QString songname=item(index,1)->text();
-            QString url=m_finalWidget->songUrlList().value(index).toString();
+            QString url=m_finalWidget->getUrlByIndex(index);
             plovelist->addToPlayList(songname,url,m_text.simplified());
 
             m_playingWid.setLoveState();
@@ -377,7 +377,7 @@ void myTableWidget::slot_doublick(int r, int c,bool isMv)
         else
             emit sig_play(r);
 
-       if(m_middleftStack0->myTablePlayListFinalVector().last()->songUrlList().contains(m_finalWidget->songUrlList().value(r)))
+       if(m_middleftStack0->getLoveList()->isContainUrl(m_finalWidget->getUrlByIndex(r)))
        {
            m_playingWid.setLoveState();
            emit sig_setLoveState(true);
@@ -573,19 +573,18 @@ void myTableWidget::slot_cellEnter(int row, int c)
             m_crossWid=new pushButtonCrossWidget(this);
             m_groupWid=new pushButtonGroupWidget(this);
             m_groupWid->setObjectName(QString::number(row));
-            if(m_middleftStack0->myTablePlayListFinalVector().last()==m_finalWidget)//如果是正在我的最爱列表  全部都是红色的
+            if(m_middleftStack0->getLoveList() == m_finalWidget)//如果是正在我的最爱列表  全部都是红色的
             {
                 m_groupWid->setLoved();
                 connect(m_groupWid->m_btnLove,SIGNAL(clicked(bool)),this,SLOT(slot_removeHoverRow()));
             }
             else
             {
-                QList<QUrl> list=m_middleftStack0->myTablePlayListFinalVector().last()->songUrlList();
-                QUrl url=m_finalWidget->songUrlList().value(row);//当前的url
+                QString url=m_finalWidget->getUrlByIndex(row);//当前的url
 
-                if(list.contains(url))//如果歌曲存在在我的喜欢列表中 就有Loveed
+                if(m_middleftStack0->getLoveList()->isContainUrl(url))//如果歌曲存在在我的喜欢列表中 就有Loveed
                 {
-                    m_loveNowRow=list.indexOf(url);
+                    m_loveNowRow=m_middleftStack0->getLoveList()->getIndexByUrl(url);
                     m_groupWid->setLoved();
                 }
                 connect(m_groupWid->m_btnLove,SIGNAL(clicked()),this,SLOT(slot_btnloveclicked()));

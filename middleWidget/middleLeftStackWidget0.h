@@ -72,6 +72,9 @@ public:
 
     myShowTableButton* convientShowTableBtn(){return &m_convientSTBtn;}
 
+    myTablePlayListFinal *getLoveList(){return &m_lovedList;}
+
+    myTablePlayListFinal *getDefaultList(){return &m_defaultList;}
 public Q_SLOTS:
     void slot_playMVIndex(int);
 
