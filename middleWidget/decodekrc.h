@@ -1,20 +1,20 @@
 #ifndef DECODEKRC_H
 #define DECODEKRC_H
 
-#include<QByteArray>
-#include"zlib.h"
-const int   Keys[16] =  {64, 71, 97, 119, 94, 50, 116, 71, 81, 54, 49, 45, 206, 210,110, 105};
+#include <QByteArray>
+#include "zlib.h"
+const static int Keys[16] =  {64, 71, 97, 119, 94, 50, 116, 71, 81, 54, 49, 45, 206, 210,110, 105};
 
-static int  ZlibGetDecodeLength(uLong  InRawLength)
+extern int  ZlibGetDecodeLength(uLong  InRawLength)
 {
     return  compressBound(InRawLength);
 }
-static int  ZlibGetDecodeLength(QByteArray  InRawData)
+extern int  ZlibGetDecodeLength(QByteArray  InRawData)
 {
     return  compressBound(InRawData.length());
 }
 
-static long  ZlibUncompress(QByteArray  &OutDecodeData, QByteArray InEncodeData,
+extern long  ZlibUncompress(QByteArray  &OutDecodeData, QByteArray InEncodeData,
                      int   * nErrorCode = NULL)
 {
     Bytef  *DecodeData = NULL; // 解压后的数据缓冲区
@@ -52,7 +52,7 @@ static long  ZlibUncompress(QByteArray  &OutDecodeData, QByteArray InEncodeData,
         *nErrorCode = nFuncRet;
     return  nOutLength;
 }
-static int  KrcDecode(QByteArray  &KrcData, QByteArray  &LrcData)
+extern int  KrcDecode(QByteArray  &KrcData, QByteArray  &LrcData)
 {
     int nRet=0;
     QByteArray DecodeData;

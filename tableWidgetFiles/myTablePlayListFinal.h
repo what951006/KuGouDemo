@@ -23,6 +23,7 @@ public:
     ~myTablePlayListFinal(){}
 /*static functions*/
     static myTablePlayListFinal* getCurrentList(){return s_pCurList;}
+
     static void setCurrentList(myTablePlayListFinal*pList){s_pCurList=pList;}
 
 /*pass the pointer*/
@@ -32,26 +33,40 @@ public:
     void setShowButtonName(QString playListName="新建列表"){ m_Btntable.m_playlistName->setText(playListName);m_PlayListname=playListName;}
 
     void setCurrentSongDuration(const QString &dur){m_table.m_playingWid.m_labduration.setText(dur);}
+
     void setPlayMode(PlayMode mode){m_playList.setPlayMode(mode);}
+
     void setCurrentSongAlbumPic(const QString &strPath);
+
     void setAutoLayout();
 
 
-   inline playingWidget *getPlayingWidget(){return &m_table.m_playingWid;}
-   inline QString ShowButtonName(){return m_PlayListname;}
-    inline myMediaList *playList(){return &m_playList;}
+    playingWidget *getPlayingWidget(){return &m_table.m_playingWid;}
+
+    QString ShowButtonName(){return m_PlayListname;}
+
+    myMediaList *mediaList(){return &m_playList;}
 
    const QString currentAuthor(){return m_table.m_playingWid.m_btnAuthor.text();}
+
    const QString currentMusicName(){return m_table.m_playingWid.songName();}
+
    const QString currentSongDuration();
 
-   const QList<QUrl> &songUrlList();
+   const QList<QUrl> &songUrlList(){return m_playList.GetList();}
+
     int currentSongDurationToInt();
+
     void stopCurrentSong();
+
     void getlistfromDateBase();
-    void addToPlayList(const QString &name,const QString &url,const QString &dur);
+
+    void addToPlayList(const QString &name,const QString &url,const QString &dur, const QString &strHash="");
+
     void updateCount(){m_Btntable.slot_updateSongCount();}
+
     void updateConvientButton();
+
     void updateBGcolor();
 
 
@@ -60,24 +75,29 @@ public:
     myMediaList m_playList;
     QString m_PlayListname;
     middleLeftStackWidget0 *m_midleft0;
-protected:
-    static myTablePlayListFinal *s_pCurList;
-
-    virtual void wheelEvent(QWheelEvent *);
-    virtual void paintEvent(QPaintEvent *);
-    virtual void dragEnterEvent(QDragEnterEvent *);
-    virtual void dropEvent(QDropEvent *);
 public slots:
     void slot_emptyList();
 
     void slot_showHideTable();
 
     void slot_addSong();
+
     void slot_addSongFolder();
 
     void slot_addSongFromSearchTable(const QStringList& name,const QStringList &url,const QStringList &dur);
 
-    void slot_playSongFromSearchTable(const QStringList &name,const QStringList &url,const QStringList &dur);
+ //   void slot_playSongFromSearchTable(const QStringList &name,const QStringList &url,const QStringList &dur);
+protected:
+    static myTablePlayListFinal *s_pCurList;
+
+    virtual void wheelEvent(QWheelEvent *);
+
+    virtual void paintEvent(QPaintEvent *);
+
+    virtual void dragEnterEvent(QDragEnterEvent *);
+
+    virtual void dropEvent(QDropEvent *);
+
 };
 
 #endif //MYTABLEPLAYLISTFINAL_H

@@ -43,7 +43,7 @@ class baseWindow : public AbsFrameLessAutoSize
     Q_OBJECT
 public:
     explicit baseWindow(QWidget *parent = 0);
-    Widget *m_mainwid;
+    Widget m_mainwid;
 protected:
     virtual void paintEvent(QPaintEvent *);
  private:

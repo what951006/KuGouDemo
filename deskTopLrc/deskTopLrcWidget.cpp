@@ -5,20 +5,16 @@
 #include<QDebug>
 #include<QHBoxLayout>
 #include<QVBoxLayout>
-
-#include"Global_ValueGather.h"
 #include"FFmpegPlayer.h"
 
 deskTopLrcWidget::deskTopLrcWidget(QWidget *parent)
     : AbsFrameLessAutoSize(parent)
 {
-    desktoplrcPointer=this;
     m_precent=0;
     m_border=8;
     setMouseTracking(true);
     setWindowFlags(Qt::FramelessWindowHint|Qt::Tool|Qt::X11BypassWindowManagerHint|Qt::WindowStaysOnTopHint); //setting windows tool bar icon invisiable
     setAttribute(Qt::WA_TranslucentBackground,true);
-
     initWidgetMISC();
 }
 

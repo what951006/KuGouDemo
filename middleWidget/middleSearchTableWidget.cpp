@@ -9,7 +9,6 @@
 #include<QRect>
 
 #include"middleSearchWidget.h"
-#include"Global_ValueGather.h"
 #include"middleLeftStackWidget0.h"
 #include"myTablePlayListFinal.h"
 #include"mainwindow.h"
@@ -173,7 +172,7 @@ void middleSearchTableWidget::removeRow(int row)
         if(wid)
         wid->deleteLater();
     }
-       QTableWidget::removeRow(row);
+    QTableWidget::removeRow(row);
 }
 void middleSearchTableWidget::slot_doubleClicked(QTableWidgetItem *it)
 {
@@ -188,8 +187,8 @@ void middleSearchTableWidget::slot_doubleClicked(QTableWidgetItem *it)
     playingWidgetBtn*btn=(playingWidgetBtn*)cellWidget(row,2);
     list_name<<btn->text()+"-"+item(row,1)->text();
     list_dur<<item(row,4)->text();
-    list_url<<p->m_songlist.value(row);
-    midstack0Pointer->myTablePlayListFinalVector().value(0)->slot_playSongFromSearchTable(list_name,list_url,list_dur);
+
+  //  mainWindow::GetInstance()->middleStack0()->myTablePlayListFinalVector().value(0)->slot_playSongFromSearchTable(list_name,list_url,list_dur);
 }
 
 void middleSearchTableWidget::slot_itemclick(int row, int)
@@ -216,7 +215,7 @@ void middleSearchTableWidget::slot_tableContainerBtnClicked()
 
 void middleSearchTableWidget::slot_playbtnclicked()
 {
-    QStringList list_name;
+  /*  QStringList list_name;
     QStringList list_dur;
     QStringList list_url;
     int index= indexAt( mapFromGlobal(QCursor::pos())).row();
@@ -225,12 +224,12 @@ void middleSearchTableWidget::slot_playbtnclicked()
     list_name<<btn->text()+"-"+item(index,1)->text();
     list_dur<<item(index,4)->text();
     list_url<<m_searchwidget->m_songlist.value(index);
-    midstack0Pointer->myTablePlayListFinalVector().value(0)->slot_playSongFromSearchTable(list_name,list_url,list_dur);
+    mainWindow::GetInstance()->middleStack0()->myTablePlayListFinalVector().value(0)->slot_playSongFromSearchTable(list_name,list_url,list_dur);*/
 }
 
 void middleSearchTableWidget::slot_addbtnclicked()
 {
-    QStringList list_name;
+   /* QStringList list_name;
     QStringList list_dur;
     QStringList list_url;
     int index= indexAt(mapFromGlobal(QCursor::pos())).row();
@@ -239,7 +238,7 @@ void middleSearchTableWidget::slot_addbtnclicked()
     list_name<<btn->text()+"-"+item(index,1)->text();
     list_dur<<item(index,4)->text();
     list_url<<m_searchwidget->m_songlist.value(index);
-    midstack0Pointer->myTablePlayListFinalVector().value(0)->slot_addSongFromSearchTable(list_name,list_url,list_dur);
+    mainWindow::GetInstance()->middleStack0()->myTablePlayListFinalVector().value(0)->slot_addSongFromSearchTable(list_name,list_url,list_dur);*/
 
     QToolTip::showText(QCursor::pos(),"已添加至播放列表");
 }

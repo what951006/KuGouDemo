@@ -8,7 +8,7 @@
 #include<QDrag>
 #include<qmath.h>
 
-#include"Global_ValueGather.h"
+
 #include"dataBase/myDataBase.h"
 #include"myTablePlayListFinal.h"
 #include"middleLeftStackWidget0.h"
@@ -147,7 +147,7 @@ void myShowTableButton::mousePressEvent(QMouseEvent *e)
 
 void myShowTableButton::dragMoveEvent(QDragMoveEvent *e)
 {
-   if(e->mimeData()->hasFormat(mimeType()) && midstack0Pointer->isEnableMoveList(m_finalWid))
+   if(e->mimeData()->hasFormat(mimeType()) && mainWindow::GetInstance()->middleStack0()->isEnableMoveList(m_finalWid))
    {
        m_isdrawMove=true;
        if(e->pos().y()<height()/2)
@@ -178,18 +178,19 @@ void myShowTableButton::dropEvent(QDropEvent *e)
 {
      m_isdrawMove=false;
      update();
-    if(e->mimeData()->hasFormat(mimeType())&&midstack0Pointer->isEnableMoveList(m_finalWid))
+     middleLeftStackWidget0*pMidStack0=mainWindow::GetInstance()->middleStack0();
+    if(e->mimeData()->hasFormat(mimeType())&&pMidStack0->isEnableMoveList(m_finalWid))
     {
        QByteArray byt= e->mimeData()->data(mimeType());
        int index= byt.toInt();
        if(m_isdrawTop)
        {
-            int targetIndex= midstack0Pointer->myTablePlayListFinalVector().indexOf(m_finalWid);
-            midstack0Pointer->setListTakeAndInsert(midstack0Pointer->myTablePlayListFinalVector().value(index),midstack0Pointer->myTablePlayListFinalVector().value(targetIndex-1));
+            int targetIndex= pMidStack0->myTablePlayListFinalVector().indexOf(m_finalWid);
+            pMidStack0->setListTakeAndInsert(pMidStack0->myTablePlayListFinalVector().value(index),pMidStack0->myTablePlayListFinalVector().value(targetIndex-1));
        }
        else
        {
-           midstack0Pointer->setListTakeAndInsert(midstack0Pointer->myTablePlayListFinalVector().value(index),m_finalWid);
+           pMidStack0->setListTakeAndInsert(pMidStack0->myTablePlayListFinalVector().value(index),m_finalWid);
        }
     }
 }
@@ -197,9 +198,9 @@ void myShowTableButton::dropEvent(QDropEvent *e)
 void myShowTableButton::mouseMoveEvent(QMouseEvent *e)
 {
     QRect re(m_presspos.x()-2,m_presspos.y()-2,m_presspos.x()+2,m_presspos.y()+2);
-    if(!re.contains(e->pos())&&midstack0Pointer->isEnableMoveList(m_finalWid))
+    if(!re.contains(e->pos())&&mainWindow::GetInstance()->middleStack0()->isEnableMoveList(m_finalWid))
     {
-        int index= midstack0Pointer->myTablePlayListFinalVector().indexOf(m_finalWid);
+        int index= mainWindow::GetInstance()->middleStack0()->myTablePlayListFinalVector().indexOf(m_finalWid);
     //! [15]
         QMimeData *mimeData=new QMimeData; //自动释放
         mimeData->setData(mimeType(), QString::number(index).toUtf8());

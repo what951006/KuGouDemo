@@ -4,7 +4,7 @@
 #include <QTime>
 
 
-#define SCROLL_TIME 150
+#define SCROLL_TIME 200
 #define SCROLL_TIMER_TIME 20
 #define ROW_HEIGHT 60
 
@@ -45,8 +45,8 @@ void LyricWidget::slot_timer()
         m_timer.stop();
     }
 
-    GetMaskLen(m_nFontPixSize+abs(m_nOffset/10),SCROLL_TIMER_TIME);
-    repaint();
+    GetMaskLen(m_nFontPixSize+abs(m_nOffset/10));
+    update();
 }
 void LyricWidget::paintEvent(QPaintEvent*)
 {
@@ -74,7 +74,6 @@ void LyricWidget::paintEvent(QPaintEvent*)
                 Info.hightLight=false;
 
             Info.Y=i*ROW_HEIGHT+m_nOffset;
-
 
             DrawItem(painter,Info);
         }
@@ -130,7 +129,7 @@ void LyricWidget::DrawItem(QPainter&Painter,ItemInfo &Info)
                               Qt::AlignLeft,Info.strText);
    }
 }
-void LyricWidget::GetMaskLen(int nFontSize,int nFreq)
+void LyricWidget::GetMaskLen(int nFontSize)
 {
     static float s_fPercent=0.0f;
     static float s_keyLen=0;
@@ -154,7 +153,8 @@ void LyricWidget::GetMaskLen(int nFontSize,int nFreq)
     if(interval!=0)
     {
        percent2=(float)(m_nCurPos-m_nCurStartPos-keyTime)/interval;
-       m_nMaskLen=s_keyLen+metrics.width(str)*percent2;
+       if(percent2<1.0)
+          m_nMaskLen=s_keyLen+metrics.width(str)*percent2;
     }
 }
 inline QString LyricWidget::GetLrcByIndex(int index)
@@ -162,7 +162,7 @@ inline QString LyricWidget::GetLrcByIndex(int index)
     return m_lineMap.values().value(index);
 }
 
-QString LyricWidget::GetLrcByTime(qint64 time)
+inline QString LyricWidget::GetLrcByTime(qint64 time)
 {
     int index=GetIndexByTime(time);
     return m_lineMap.values().value(index);
@@ -205,12 +205,10 @@ void LyricWidget::positionChanged(qint64 length)
     }
     else if(0==m_nOffset)
     {
-        GetMaskLen(m_nFontPixSize+ROW_HEIGHT/10,50);
+        GetMaskLen(m_nFontPixSize+ROW_HEIGHT/10);
         update();
     }
 }
-
-
 
 //-------------------------------------original func------------------------------------------
 
@@ -278,7 +276,7 @@ void LyricWidget::analyzeLrcContent(QByteArray &KlcData,const QString &filedir)
 
     QStringList list=QString(getByt).split("\n");
     QRegExp regTemp0("^\\[\\d+,\\d+\\]");
-    QRegExp regTemp1("\\<\\d+,\\d+\\,\\d+\\>[\\w\\W\\a-zA-Z]{0,10}(\\<|\\r)");//((\\w*|\\w*)|\\W{1}|\\w*\\s)
+    QRegExp regTemp1("\\<\\d+,\\d+\\,\\d+\\>[\\w\\W]{0,8}(\\<|\\r)");//((\\w*|\\w*)|\\W{1}|\\w*\\s)
     QRegExp regTemp2("\\d+");
 
     foreach (QString strLine, list)

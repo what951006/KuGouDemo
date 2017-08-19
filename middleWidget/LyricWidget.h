@@ -46,7 +46,7 @@ public:
     int GetIndexByTime(qint64 time);
 
 //get mask length
-    void GetMaskLen(int nFontSize,int nFreq);
+    void GetMaskLen(int nFontSize);
 
 
     void analyzeLrcContent(QByteArray&,const QString &filePath);

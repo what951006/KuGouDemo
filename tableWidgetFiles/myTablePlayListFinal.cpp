@@ -52,7 +52,7 @@ myTablePlayListFinal::myTablePlayListFinal(QWidget*parent):
     vlyout1->setSpacing(0);
     setLayout(vlyout1);
 }
-void myTablePlayListFinal::addToPlayList(const QString &name,const QString &url,const QString &dur)
+void myTablePlayListFinal::addToPlayList(const QString &name,const QString &url,const QString &dur, const QString &strHash)
 {
     int rowcount= m_table.rowCount();
     m_table.insertRow(rowcount);
@@ -61,7 +61,7 @@ void myTablePlayListFinal::addToPlayList(const QString &name,const QString &url,
     m_table.setItem(rowcount,2, new QTableWidgetItem(QString(dur+"    ")));
     m_table.item(rowcount,2)->setTextAlignment(Qt::AlignRight|Qt::AlignVCenter);
 
-    m_playList.addPlayList(url);
+    m_playList.addPlayList(url,strHash);
     myDataBase::addSong(ShowButtonName(),name,url,dur);
 }
 
@@ -99,7 +99,7 @@ void myTablePlayListFinal::dropEvent(QDropEvent *event)
            {
                    QFileInfo info(files.value(i).toLocalFile());
                    QString m_name=info.completeBaseName();
-                   if(!m_playList.m_list.contains(files.value(i)))
+                   if(!m_playList.GetList().contains(files.value(i)))
                    {
                        QString filePath=files.value(i).toLocalFile();
                        player.setMedia(QUrl(filePath));
@@ -245,11 +245,6 @@ void myTablePlayListFinal::updateConvientButton()
 }
 
 
-const QList<QUrl>& myTablePlayListFinal::songUrlList()
-{
-    return m_playList.m_list;
-}
-
 void myTablePlayListFinal::slot_showHideTable()
 {
   //  updateConvientButton();
@@ -308,7 +303,7 @@ void myTablePlayListFinal::slot_addSong()
 
                    QFileInfo info(files[i]);
                    QString m_name=info.completeBaseName();
-                   if(!m_playList.m_list.contains(files.value(i)))
+                   if(!m_playList.GetList().contains(files.value(i)))
                    {
                        QString filePath=files.value(i);
                        player.setMedia(QUrl(filePath));
@@ -375,7 +370,7 @@ void myTablePlayListFinal::slot_addSongFolder()
 
                        QFileInfo info(files[i]);
                        QString m_name=info.completeBaseName();
-                       if(!m_playList.m_list.contains(files.value(i)))
+                       if(!m_playList.GetList().contains(files.value(i)))
                        {
                            QString filePath=files.value(i);
                            player.setMedia(QUrl(filePath));
@@ -392,12 +387,12 @@ void myTablePlayListFinal::slot_addSongFolder()
                        }
             }
 }
-void myTablePlayListFinal::slot_playSongFromSearchTable(const QStringList &namelist,const QStringList &urllist,const QStringList &dur)
+/*void myTablePlayListFinal::slot_playSongFromSearchTable(const QStringList &namelist,const QStringList &urllist,const QStringList &dur)
 {
     for(int i=0;i<namelist.count();i++)
     {
                 QString m_name=namelist.value(i);
-                if(!m_playList.m_list.contains(urllist.value(i)))
+                if(!m_playList.GetList().contains(urllist.value(i)))
                 {
                     addToPlayList(m_name,urllist.value(i),dur.value(i));
                 }
@@ -413,14 +408,14 @@ void myTablePlayListFinal::slot_playSongFromSearchTable(const QStringList &namel
     m_table.slot_doublick(index,0);
 
     m_midleft0->scrolltoCurrentPlayList();
-}
+}*/
 
 void myTablePlayListFinal::slot_addSongFromSearchTable(const QStringList &namelist,const QStringList& urllist,const QStringList &dur)
 {
     for(int i=0;i<namelist.count();i++)
     {
                 QString m_name=namelist.value(i);
-                if(!m_playList.m_list.contains(urllist.value(i)))
+                if(!m_playList.GetList().contains(urllist.value(i)))
                 {
                     addToPlayList(m_name,urllist.value(i),dur.value(i));
                 }

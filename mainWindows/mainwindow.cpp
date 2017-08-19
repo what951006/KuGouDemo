@@ -1,35 +1,13 @@
 #include "mainwindow.h"
-#include<QVBoxLayout>
-#include<QApplication>
-#include<QDesktopWidget>
-#include<QSystemTrayIcon>
-#include<QDir>
-#include<QLineEdit>
-#include<QTime>
-#include<QDebug>
-#include<QSettings>
-#include<QDebug>
+#include <QVBoxLayout>
+#include <QApplication>
+#include <QDir>
+#include <QTime>
+#include <QSettings>
+#include <QDebug>
 #include <io.h>
 
-#include"myTablePlayListFinal.h"
-#include"middleLeftStackWidget0.h"
-#include"topwidgets.h"
-#include"middleWidgets.h"
-#include"bottomWidgets.h"
-#include"trayiconmenu.h"
-#include"middlewidgetleft.h"
-#include"middleWidgetRight.h"
-#include"middleSearchWidget.h"
-#include"mynetwork.h"
-#include"topSearchTipsWidget.h"
-#include"topwidgets.h"
-#include"middleWidgets.h"
-#include"bottomWidgets.h"
-#include"trayiconmenu.h"
-#include"skinWidget.h"
-#include"deskTopLrcWidget.h"
-#include"Global_ValueGather.h"
-
+#include "myTablePlayListFinal.h"
 
 mainWindow *mainWindow::s_pMainWnd=NULL;
 
@@ -40,23 +18,24 @@ mainWindow*mainWindow::InitInstance()
     return s_pMainWnd;
 }
 
-mainWindow::mainWindow(QWidget *parent):
-    baseWindow(parent),
-    m_topwid(this),
-    m_middwid(this),
-    m_bottomwid(this),
-    m_ffplayer(this),
-
-    m_volwid(this),
-    m_playModeWid(this),
-    m_sertipswid(this),
-    m_skinwid(this)
+mainWindow::mainWindow(QWidget *parent)
+    : baseWindow(parent)
+    ,m_topwid(this)
+    ,m_middwid(this)
+    ,m_bottomwid(this)
+    ,m_ffplayer(this)
+    ,m_volwid(this)
+    ,m_playModeWid(this)
+    ,m_sertipswid(this)
+    ,m_skinwid(this)
+    ,m_pLefStack0(NULL)
 {
      s_pMainWnd=this;
+     m_pLefStack0=m_middwid.m_leftWid.GetStackWid0();//init this value;
 
-     m_border=8;
+
      setMinimumSize(1008,698);
-     m_mainwid->setStyleSheet("QLabel{color:white;}"
+     m_mainwid.setStyleSheet("QLabel{color:white;}"
                               "QWidget{background:transparent;}");//"Widget{background: rgb(0,140,230);}"//border-image:url(:/image/skin/1.png)
 
 
@@ -73,21 +52,20 @@ mainWindow::mainWindow(QWidget *parent):
 
 void mainWindow::UpdateListConn()
 {
-    QVector<myTablePlayListFinal*> &vecotr=m_middwid.m_leftWid.GetStackWid0()->myTablePlayListFinalVector();
+    QVector<myTablePlayListFinal*> &vecotr=m_pLefStack0->myTablePlayListFinalVector();
     for(int i=0;i<vecotr.count();i++)
     {
-        middleLeftStackWidget0 *pStack0=m_middwid.m_leftWid.GetStackWid0();
-        disconnect(&vecotr.at(i)->m_Btntable,SIGNAL(sig_addPlayList()),pStack0,SLOT(slot_addPlayListWithRename()));//添加播放列表
-        connect(&vecotr.at(i)->m_Btntable,SIGNAL(sig_addPlayList()),pStack0,SLOT(slot_addPlayListWithRename()));
+        disconnect(&vecotr.at(i)->m_Btntable,SIGNAL(sig_addPlayList()),m_pLefStack0,SLOT(slot_addPlayListWithRename()));//添加播放列表
+        connect(&vecotr.at(i)->m_Btntable,SIGNAL(sig_addPlayList()),m_pLefStack0,SLOT(slot_addPlayListWithRename()));
 
-        disconnect(&vecotr.at(i)->m_Btntable,SIGNAL(sig_delPlayList()),pStack0,SLOT(slot_removePlayList()));//移除播放列表
-        connect(&vecotr.at(i)->m_Btntable,SIGNAL(sig_delPlayList()),pStack0,SLOT(slot_removePlayList()));
+        disconnect(&vecotr.at(i)->m_Btntable,SIGNAL(sig_delPlayList()),m_pLefStack0,SLOT(slot_removePlayList()));//移除播放列表
+        connect(&vecotr.at(i)->m_Btntable,SIGNAL(sig_delPlayList()),m_pLefStack0,SLOT(slot_removePlayList()));
 
-        disconnect(&vecotr.at(i)->m_table,SIGNAL(sig_play(int)),pStack0,SLOT(slot_playIndex(int)));//播放triggered
-        connect(&vecotr.at(i)->m_table,SIGNAL(sig_play(int)),pStack0,SLOT(slot_playIndex(int)));
+        disconnect(&vecotr.at(i)->m_table,SIGNAL(sig_play(int)),m_pLefStack0,SLOT(slot_playIndex(int)));//播放triggered
+        connect(&vecotr.at(i)->m_table,SIGNAL(sig_play(int)),m_pLefStack0,SLOT(slot_playIndex(int)));
 
-        disconnect(&vecotr.at(i)->m_table,SIGNAL(sig_playMv(int)),pStack0,SLOT(slot_playMVIndex(int)));//播放MV!!
-        connect(&vecotr.at(i)->m_table,SIGNAL(sig_playMv(int)),pStack0,SLOT(slot_playMVIndex(int)));
+        disconnect(&vecotr.at(i)->m_table,SIGNAL(sig_playMv(int)),m_pLefStack0,SLOT(slot_playMVIndex(int)));//播放MV!!
+        connect(&vecotr.at(i)->m_table,SIGNAL(sig_playMv(int)),m_pLefStack0,SLOT(slot_playMVIndex(int)));
 
        disconnect(&vecotr.at(i)->m_table.m_playingWid,SIGNAL(sig_clicked(QString)),&m_middwid.m_rightWid,SLOT(slot_search(QString)));//clickand 搜索
        connect(&vecotr.at(i)->m_table.m_playingWid,SIGNAL(sig_clicked(QString)),&m_middwid.m_rightWid,SLOT(slot_search(QString)));//搜索
@@ -139,7 +117,7 @@ void mainWindow::saveSetting()
      QSettings setting("config.ini",QSettings::IniFormat,0);
 
     setting.beginGroup("mainWindow");
-    setting.setValue("background",m_mainwid-> currentSkinPath());
+    setting.setValue("background",m_mainwid. currentSkinPath());
      setting.setValue("volume",curVol());
 
     setting.setValue("listopa",m_skinwid.m_sliderWidget->m_slider->value());
@@ -175,12 +153,12 @@ void mainWindow::clearBackground()
 {
     m_timeline.stop();
     m_picList.clear();
-    m_mainwid->clearBg();
+    m_mainwid.clearBg();
 }
 
 inline void mainWindow::setCurBGPic(const QString&strPic)
 {
-   m_mainwid->setCurBGPic(strPic);
+   m_mainwid.setCurBGPic(strPic);
 }
 void mainWindow::initWidgetMISC()
 {
@@ -208,7 +186,7 @@ void mainWindow::initWidgetMISC()
 
     m_skinwid.hide();
     connect(&m_topwid.m_btnskin,SIGNAL(clicked(bool)),&m_skinwid,SLOT(exec()));
-    connect(m_skinwid.m_skincontwid,SIGNAL(sig_setBackground(QString)),m_mainwid,SLOT(setSkin(QString)));
+    connect(m_skinwid.m_skincontwid,SIGNAL(sig_setBackground(QString)),&m_mainwid,SLOT(setSkin(QString)));
     connect(m_skinwid.m_btnAdjustWindow,SIGNAL(clicked(bool)),this,SLOT(slot_adjustWindowNormalSize()));
 
   /*  m_deskTopLrc=new deskTopLrcWidget;
@@ -223,22 +201,22 @@ void mainWindow::initNetwork()
     m_net.moveToThread(thread);
     thread->start();
 
+    qRegisterMetaType<ItemResult>("ItemResult");
+    qRegisterMetaType<SearchStatus>("SearchStatus");
     connect(&m_net,SIGNAL(sig_setBgpix(QStringList,QString)),this,SLOT(slot_setBgPix(QStringList,QString)));
     connect(this,SIGNAL(sig_requestBgPic(QString)),&m_net,SLOT(requestBgPic(QString)));              //request net to search background
     connect(this,SIGNAL(sig_requestAlbum(QString,QString)),&m_net,SLOT(requestalbum(QString,QString)));   //request net to search Album picture
     connect(this,SIGNAL(sig_requestLrc(QString,qint64,QString)),&m_net,SLOT(requestlrc(QString,qint64,QString)));   //request net to search lyrics
     connect(&m_net,SIGNAL(dolrcworkfinished(QByteArray,QString)),this,SLOT(slot_replyLrc(QByteArray,QString)));
-    connect(&m_net,SIGNAL(setpic(QString,QString)),m_midstack0,SLOT(slot_setlabelpic(QString,QString)));
+    connect(&m_net,SIGNAL(setpic(QString,QString)),m_pLefStack0,SLOT(slot_setlabelpic(QString,QString)));
 
     connect(&m_middwid.m_rightWid,SIGNAL(sig_requestSong(QString)),&m_net,SLOT(requestSong(QString)));           //request net to search song
     connect(m_middwid.m_rightWid.getSearWidget(),SIGNAL(sig_requestSongNextPage()),&m_net,SLOT(requestSongNextPage()));
 
-    connect(&m_net,SIGNAL(sig_reqSongNextPagefinished(QByteArray)),m_middwid.m_rightWid.getSearWidget(),SLOT(slot_addRequestSong(QByteArray)));
-    connect(&m_net,SIGNAL(sig_reqSongfinished(QByteArray)),m_middwid.m_rightWid.getSearWidget(),SLOT(slot_requestSong(QByteArray)));
-
+    connect(&m_net,SIGNAL(sig_reqSongStatus(ItemResult,SearchStatus)),m_middwid.m_rightWid.getSearWidget(),SLOT(slot_requestSong(ItemResult,SearchStatus)));
 
     connect(this,SIGNAL(sig_requestMv(QString)),&m_net,SLOT(requestMv(QString)));
-    connect(&m_net,SIGNAL(sig_requestMvfinished(QString)),m_midstack0,SLOT(slot_showMvWidget(QString)));
+    connect(&m_net,SIGNAL(sig_requestMvfinished(QString)),m_pLefStack0,SLOT(slot_showMvWidget(QString)));
 
 }
 
@@ -291,7 +269,7 @@ void mainWindow::slot_setPlayMode(PlayMode mode)
 {
     pMode=mode;
     m_bottomwid.setPlayModeBtnStyle(PlayMode(mode));
-    foreach(myTablePlayListFinal*fin,m_midstack0->myTablePlayListFinalVector())//every single playlist
+    foreach(myTablePlayListFinal*fin,m_pLefStack0->myTablePlayListFinalVector())//every single playlist
         fin->setPlayMode(mode);
 }
 
@@ -324,15 +302,15 @@ void mainWindow::initConnection()
     connect(&m_ffplayer,SIGNAL(sig_PositionChange(qint64)),m_middwid.m_rightWid.getLrcWidget(), SLOT(positionChanged(qint64)));
     connect(m_middwid.m_rightWid.getLrcWidget(), SIGNAL(changeToPosition(qint64)), &m_ffplayer,SLOT(seek(qint64)));
     connect(&m_ffplayer,SIGNAL(sig_CurrentMediaStatus(PlayerStatus)),this,SLOT(slot_playerStatusChanged(PlayerStatus)));
-    connect(&m_ffplayer,SIGNAL(sig_CurrentMediaFinished()),m_midstack0,SLOT(slot_endOfMedia()));
+    connect(&m_ffplayer,SIGNAL(sig_CurrentMediaFinished()),m_pLefStack0,SLOT(slot_endOfMedia()));
     connect(&m_ffplayer,SIGNAL(sig_CurImageChange(QImage)),&m_middwid.m_rightWid,SLOT(slot_imageMV(QImage)));
 
-    connect(m_bottomwid.m_btnnext,SIGNAL(clicked(bool)),m_midstack0,SLOT(slot_btnnextSong()));
-    connect(m_bottomwid.m_btnprevious,SIGNAL(clicked(bool)),m_midstack0,SLOT(slot_btnpreSong()));
+    connect(m_bottomwid.m_btnnext,SIGNAL(clicked(bool)),m_pLefStack0,SLOT(slot_btnnextSong()));
+    connect(m_bottomwid.m_btnprevious,SIGNAL(clicked(bool)),m_pLefStack0,SLOT(slot_btnpreSong()));
     connect(m_bottomwid.m_btnPlay,SIGNAL(clicked(bool)),this,SLOT(slot_setPlayerPlayOrPause()));
 
-    connect(m_traymenu.m_wid6->m_backward_button,SIGNAL(clicked(bool)),m_midstack0,SLOT(slot_btnpreSong()));
-    connect(m_traymenu.m_wid6->m_forward_button,SIGNAL(clicked(bool)),m_midstack0,SLOT(slot_btnnextSong()));
+    connect(m_traymenu.m_wid6->m_backward_button,SIGNAL(clicked(bool)),m_pLefStack0,SLOT(slot_btnpreSong()));
+    connect(m_traymenu.m_wid6->m_forward_button,SIGNAL(clicked(bool)),m_pLefStack0,SLOT(slot_btnnextSong()));
     connect(m_traymenu.m_wid6->m_play_button,SIGNAL(clicked(bool)),this,SLOT(slot_setPlayerPlayOrPause()));
 
     connect(m_volwid.m_slider,SIGNAL(valueChanged(int)),&m_ffplayer,SLOT(setVol(int)));
@@ -358,7 +336,7 @@ void mainWindow::slot_currentMediaChanged(const QString &media, bool isMV)//setn
     if(media.isEmpty() || !finalwid)//如果为空
         return;
 
-    foreach(myTablePlayListFinal*f,m_midstack0->myTablePlayListFinalVector())
+    foreach(myTablePlayListFinal*f,m_pLefStack0->myTablePlayListFinalVector())
     {
         disconnect(&f->m_table,SIGNAL(sig_setLoveState(bool)),&m_bottomwid,SLOT(slot_setLoveState(bool)));
         disconnect(m_bottomwid.m_btnfavorite,SIGNAL(clicked(bool)),&f->getPlayingWidget()->m_btnLove,SLOT(click()));
@@ -506,9 +484,7 @@ void mainWindow::initLayout()
     vlyout->addWidget(&m_bottomwid);
     vlyout->setSpacing(0);
     vlyout->setContentsMargins(0,0,0,0);
-    m_mainwid->setLayout(vlyout);
-//
-    m_midstack0=m_middwid.m_leftWid.GetStackWid0();//init this value;
+    m_mainwid.setLayout(vlyout);
 }
 void mainWindow::initTrayMenu()
 {
@@ -569,7 +545,7 @@ void mainWindow::mouseDoubleClickEvent(QMouseEvent *e)
 
 void mainWindow::slot_currentMediaError()
 {
-   m_midstack0->slot_endOfMedia();
+   m_pLefStack0->slot_endOfMedia();
 }
 
 void mainWindow::slot_setPlayerPlayOrPause()

@@ -10,7 +10,6 @@
 #include"mainwindow.h"
 #include"middleWidgets.h"
 
-#include"Global_ValueGather.h"
 QColor middleWidgetRight::bgcolor= QColor(230,230,230);//初始化
 
 middleWidgetRight::middleWidgetRight(QWidget*parent)
@@ -141,7 +140,7 @@ void middleWidgetRight::slot_setSearchStack()//搜索界面
 void middleWidgetRight::slot_search(const QString& text)
 {
     m_searchwid.setSearchName(text.simplified());
-    m_searchwid.m_checkbox->setCheckState(Qt::Unchecked);
+    m_searchwid.setChecked(false);
     m_searchwid.setFocus();
     m_searchwid.showLoadingWidget();
     m_searchwid.setRequestisFinished(false); // request the song   we give the bool variable a false value
@@ -149,10 +148,9 @@ void middleWidgetRight::slot_search(const QString& text)
     for(int i=0;i<6;i++)//do not select
     {
         m_btnArray[i].setStyleSheet("QPushButton{color:rgb(68,68,68);font-size:17px;font-family:黑体;}"
-                                         "QPushButton:hover{color:rgb(40,143,231);}");
+                                    "QPushButton:hover{color:rgb(40,143,231);}");
     }
     m_stackWid.setCurrentIndex(6);//the last
-
     emit sig_requestSong(text.simplified());
 }
 

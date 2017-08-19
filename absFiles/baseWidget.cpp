@@ -4,7 +4,6 @@
 
 #include"AbsFrameLessAutoSize.h"
 #include"mainwindow.h"
-#include"Global_ValueGather.h"
 
 baseWidget::baseWidget(QWidget *parent) : QWidget(parent)
 {

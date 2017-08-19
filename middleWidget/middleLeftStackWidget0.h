@@ -8,19 +8,16 @@
 #include <QDebug>
 #include <QThread>
 
-#include"myshowtablebutton.h"
-#include"baseWidget.h"
 
-class mainWindow;
-class myTablePlayListFinal;
-class myTableWidget;
-class AddLoveListTips;
-class myDateBase;
-class playingWidget;
-class myMediaPlayCore;
-class myMediaList;
-class middleConvientTwoButton;
-class middleListSearch;
+#include "baseWidget.h"
+#include "myshowtablebutton.h"
+#include "middleconvienttwobutton.h"
+#include "mainWindowContentWidget.h"
+#include "mynetwork.h"
+#include "myTablePlayListFinal.h"
+
+
+
 
 
 class myScrollArea:public QScrollArea
@@ -40,49 +37,79 @@ public:
    explicit middleLeftStackWidget0(QWidget *parent);
     ~middleLeftStackWidget0(){}
     void init();
+
     void initAddTips();
+
     void initConvientWidget();
+
     void initConnection();
+
     void updateBGColor();
+
     bool isEnableMoveList(myTablePlayListFinal*list);
 
-    void showAddtips();
-    void showRemovetips();
+    void showAddtips(){m_addTips.showAddTips();}
+
+    void showRemovetips(){m_addTips.showRemoveTips();}
 
     void setAutoLayout();
+
     void setOriginalStatus();
-     void setSwapList( myTablePlayListFinal*begin, myTablePlayListFinal*after);
+
+    void setSwapList( myTablePlayListFinal*begin, myTablePlayListFinal*after);
+
     void setListTakeAndInsert( myTablePlayListFinal*start, myTablePlayListFinal*after); //add to butt of myTablePlayListFinal*after
 
-    inline middleListSearch* middleListSearchs(){return m_searchwid;}
-    inline QVector<myTablePlayListFinal*> & myTablePlayListFinalVector(){return m_Vector;}
-    inline myShowTableButton* convientShowTableBtn(){return m_convientSTBtn;}
+    void addMusicToDefaultList(const ItemResult& ,bool bPlay);
 
-    baseWidget *m_wid;
+
+
+    baseWidget *GetWidget(){return &m_wid;}
+
+    middleListSearch* middleListSearchs(){return &m_searchwid;}
+
+    QVector<myTablePlayListFinal*> & myTablePlayListFinalVector(){return m_Vector;}
+
+    myShowTableButton* convientShowTableBtn(){return &m_convientSTBtn;}
+
 public Q_SLOTS:
     void slot_playMVIndex(int);
+
     void slot_showMvWidget(const QString&);
+
     void slot_searchSong(const QString&);
+
     void scrolltoCurrentPlayList();
+
     void slot_verScrBarChange(int);
+
     void slot_setlabelpic(const QString&strPath,const QString &songname);
+
     void slot_removePlayList();
+
     void addPlayList(const QString&);
+
     void slot_addPlayListWithRename();
+
     void slot_playIndex(int index);
+
     void slot_endOfMedia();
+
     void slot_btnnextSong();
+
     void slot_btnpreSong();
 protected:
     virtual void resizeEvent(QResizeEvent *);
 private:
-    myShowTableButton* m_convientSTBtn;
+    baseWidget m_wid;
+    myShowTableButton m_convientSTBtn;
     QVector<myTablePlayListFinal*> m_Vector;
-    myTablePlayListFinal *m_table;
-    middleListSearch *m_searchwid;
-    middleConvientTwoButton *m_convtwowid;
-    AddLoveListTips *m_addTips;
+    middleListSearch m_searchwid;
+    middleConvientTwoButton m_convtwowid;
+    AddLoveListTips m_addTips;
     QVBoxLayout *vlyout1;
+    myTablePlayListFinal m_defaultList;
+    myTablePlayListFinal m_lovedList;
 };
 
 #endif // MIDDLELEFTSTACKWIDGET0_H

@@ -24,9 +24,7 @@ bool QSingleApplication::isRunning() {
     if(socket) {
          socket->waitForReadyRead(2*TIME_OUT);
          delete socket;
-
          // 其他处理，如：读取启动参数
-
          _activateWindow();
      }
  }

@@ -21,11 +21,17 @@
 #include"middleconvienttwobutton.h"
 #include"middleWidgets.h"
 #include"FFmpegPlayer.h"
-#include"Global_ValueGather.h"
 
-middleLeftStackWidget0::middleLeftStackWidget0(QWidget*parent):myScrollArea(parent)
+middleLeftStackWidget0::middleLeftStackWidget0(QWidget*parent)
+    :myScrollArea(parent)
+    ,m_wid(this)
+    ,m_convientSTBtn(this)
+    ,m_searchwid(this)
+    ,m_convtwowid(this)
+    ,m_addTips(this)
+    ,m_defaultList(this)
+    ,m_lovedList(this)
 {
-    midstack0Pointer=this;
     setMinimumWidth(310);
     setMaximumWidth(380);
 
@@ -47,25 +53,24 @@ void middleLeftStackWidget0::slot_setlabelpic(const QString&strpath,const QStrin
 
 void middleLeftStackWidget0::initAddTips()
 {
-     m_addTips=new AddLoveListTips(this);
-     m_addTips->hide();
+    m_addTips.hide();
 }
 
 void middleLeftStackWidget0::initConvientWidget()
 {
-    m_convtwowid=new middleConvientTwoButton(this);
-    m_convtwowid->hide();
-    connect(m_convtwowid->m_btnlocate,SIGNAL(clicked(bool)),this,SLOT(scrolltoCurrentPlayList()));
 
-    m_searchwid=new middleListSearch(this);
-    m_searchwid->hide();
-    connect(m_convtwowid->m_btnsearch,SIGNAL(clicked(bool)),m_searchwid,SLOT(show()));
-    connect(m_searchwid->m_lineEdit,SIGNAL(textChanged(QString)),this,SLOT(slot_searchSong(QString)));
+    m_convtwowid.hide();
+    connect(m_convtwowid.m_btnlocate,SIGNAL(clicked(bool)),this,SLOT(scrolltoCurrentPlayList()));
 
-    m_convientSTBtn=new myShowTableButton(this);
-    connect(m_convientSTBtn,SIGNAL(clicked(bool)),m_convientSTBtn,SLOT(hide()));
-    m_convientSTBtn->setTipsStyle(true);
-    m_convientSTBtn->hide();
+
+    m_searchwid.hide();
+    connect(m_convtwowid.m_btnsearch,SIGNAL(clicked(bool)),&m_searchwid,SLOT(show()));
+    connect(m_searchwid.m_lineEdit,SIGNAL(textChanged(QString)),this,SLOT(slot_searchSong(QString)));
+
+
+    connect(&m_convientSTBtn,SIGNAL(clicked(bool)),&m_convientSTBtn,SLOT(hide()));
+    m_convientSTBtn.setTipsStyle(true);
+    m_convientSTBtn.hide();
 }
 
 void middleLeftStackWidget0::initConnection()
@@ -98,17 +103,6 @@ void middleLeftStackWidget0::scrolltoCurrentPlayList()
     }
 }
 
-void middleLeftStackWidget0::showAddtips()
-{
-    m_addTips->showAddTips();
-}
-
-void middleLeftStackWidget0::showRemovetips()
-{
-    m_addTips->showRemoveTips();
-}
-
-
 
 void middleLeftStackWidget0::slot_endOfMedia()//下一曲
 {
@@ -116,14 +110,13 @@ void middleLeftStackWidget0::slot_endOfMedia()//下一曲
     if(!pPlayList)
         return;
 
-    int index= pPlayList->playList()->nextMediaIndex();
+    int index= pPlayList->mediaList()->nextMediaIndex();
     pPlayList->m_table.slot_doublick(index,0);
 }
 void middleLeftStackWidget0::slot_playIndex(int index)//设置播放的index所有的歌曲都是通过这个方法来播放的
 {
     myTablePlayListFinal*pPlayList= myTablePlayListFinal::getCurrentList();
-
-    QUrl url= pPlayList->playList()->mediaUrl(index);
+    QUrl url= pPlayList->mediaList()->mediaUrl(index);
     if(!url.isEmpty())
     {
         mainWindow::GetInstance()->player()->setMedia(url.toString());
@@ -135,48 +128,42 @@ void middleLeftStackWidget0::init()
 {
     setMouseTracking(true);
     setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
-    m_wid=new baseWidget(this);
-    setWidget(m_wid);
+
+    setWidget(&m_wid);
     QGridLayout *glyout=new QGridLayout;
-    glyout->addWidget(m_wid);
+    glyout->addWidget(&m_wid);
     glyout->setContentsMargins(0,0,0,0);
     setLayout(glyout);
 
     vlyout1=new QVBoxLayout;
-    myTablePlayListFinal *table0=new myTablePlayListFinal(this);
-    table0->setMiddleStackWidget0(this);
-    table0->setShowButtonName("默认列表");
-    table0->getlistfromDateBase();//添加歌曲
-    table0->m_table.show();
-    table0->m_Btntable.setEnabledMenuItem();
+    m_defaultList.setMiddleStackWidget0(this);
+    m_defaultList.setShowButtonName("默认列表");
+    m_defaultList.getlistfromDateBase();//添加歌曲
+    m_defaultList.m_table.show();
+    m_defaultList.m_Btntable.setEnabledMenuItem();
 
-    myTablePlayListFinal *table1=new myTablePlayListFinal(this);
-    table1->setMiddleStackWidget0(this);
-    table1->setShowButtonName("我的最爱");
-    table1->getlistfromDateBase();
-    table1->m_table.hide();
-    table1->m_Btntable.setEnabledMenuItem();
+    m_lovedList.setMiddleStackWidget0(this);
+    m_lovedList.setShowButtonName("我的最爱");
+    m_lovedList.getlistfromDateBase();
+    m_lovedList.m_table.hide();
+    m_lovedList.m_Btntable.setEnabledMenuItem();
 
-    m_Vector<<table0<<table1;
-    vlyout1->addWidget(table0);
-    vlyout1->addWidget(table1);
+    m_Vector<<&m_defaultList<<&m_lovedList;
+    vlyout1->addWidget(&m_defaultList);
+    vlyout1->addWidget(&m_lovedList);
 
 
     vlyout1->addSpacerItem(new QSpacerItem(0,0,QSizePolicy::Expanding,QSizePolicy::Expanding));
     vlyout1->setContentsMargins(0,0,0,0);
     vlyout1->setSpacing(0);
-    m_wid->setLayout(vlyout1);
+    m_wid.setLayout(vlyout1);
 
     QStringList list=myDataBase::loadPlayList();
     for(int i=0;i<list.count();i++)//加载播放列表
     {
         addPlayList(list.value(i));
     }
-
-    myDataBase::connectListinfo();
-    myDataBase::connectSongInfo();
     setAutoLayout();
-
     setOriginalStatus();
 }
 
@@ -187,7 +174,7 @@ void middleLeftStackWidget0::setAutoLayout()
   {
       height+= p->height();
   }
-  m_wid->setMinimumHeight(height);
+  m_wid.setMinimumHeight(height);
 }
 void middleLeftStackWidget0::slot_addPlayListWithRename()//新建一个表
 {
@@ -221,7 +208,7 @@ void middleLeftStackWidget0::slot_addPlayListWithRename()//新建一个表
 
 void middleLeftStackWidget0::addPlayList(const QString &plname)//添加一个列表
 {
-    m_table=new myTablePlayListFinal(this);
+    myTablePlayListFinal *m_table=new myTablePlayListFinal(this);
     m_table->setMiddleStackWidget0(this);//pass the pointer
     m_table->m_table.hide();
     vlyout1->insertWidget(vlyout1->count()-2,m_table);
@@ -251,7 +238,7 @@ void middleLeftStackWidget0::slot_btnnextSong()//下一曲
     myTablePlayListFinal*pPlayList= myTablePlayListFinal::getCurrentList();
     if(!pPlayList)
         return;
-    int index= pPlayList->playList()->nextMediaIndex();
+    int index= pPlayList->mediaList()->nextMediaIndex();
     pPlayList->m_table.slot_doublick(index,0);
 }
 
@@ -260,24 +247,25 @@ void middleLeftStackWidget0::slot_btnpreSong()//上一曲
     myTablePlayListFinal*pPlayList= myTablePlayListFinal::getCurrentList();
     if(!pPlayList)
         return;
-    int index= pPlayList->playList()->preMediaIndex();
+    int index= pPlayList->mediaList()->preMediaIndex();
     pPlayList->m_table.slot_doublick(index,0);
 }
 
 void middleLeftStackWidget0::resizeEvent(QResizeEvent *e)
 {
     myScrollArea::resizeEvent(e);
-    m_addTips->setGeometry(0,height()-m_addTips->height(),width(),m_addTips->height());
-    m_convtwowid->setGeometry(width()*7/10,height()*8/10,m_convtwowid->width(),m_convtwowid->height());
-    m_searchwid->setGeometry(0,height()-m_searchwid->height(),width(),m_searchwid->height());
-    m_convientSTBtn->setGeometry(0,0,width(),40);
+    m_addTips.setGeometry(0,height()-m_addTips.height(),width(),m_addTips.height());
+    m_convtwowid.setGeometry(width()*7/10,height()*8/10,m_convtwowid.width(),m_convtwowid.height());
+    m_searchwid.setGeometry(0,height()-m_searchwid.height(),width(),m_searchwid.height());
+    m_convientSTBtn.setGeometry(0,0,width(),40);
 }
 
 void middleLeftStackWidget0::setOriginalStatus()
 {
     myTablePlayListFinal::setCurrentList(NULL);
-    foreach (myTablePlayListFinal*f, m_Vector) {
-          f->m_table.m_playingWid.setCurrentSongItem(NULL);
+    foreach (myTablePlayListFinal*f, m_Vector)
+    {
+        f->m_table.m_playingWid.setCurrentSongItem(NULL);
     }
 }
 
@@ -288,7 +276,7 @@ void middleLeftStackWidget0::updateBGColor()
 
 bool middleLeftStackWidget0::isEnableMoveList(myTablePlayListFinal *list)
 {
-    if(list==m_Vector.first()||list==m_Vector.last())
+    if(list == m_Vector.first()||list==m_Vector.last())
         return 0;
     return 1;
 }
@@ -344,7 +332,7 @@ void middleLeftStackWidget0::slot_playMVIndex(int index)
     myTablePlayListFinal*pPlayList= myTablePlayListFinal::getCurrentList();
     if(!pPlayList)
         return;
-    pPlayList->playList()->setCurIndex(index); //用于MV播放完了~知道自己的位置
+    pPlayList->mediaList()->setCurIndex(index); //用于MV播放完了~知道自己的位置
 }
 
 void middleLeftStackWidget0::slot_showMvWidget(const QString & url)
@@ -385,13 +373,50 @@ void middleLeftStackWidget0::slot_searchSong(const QString &words)
 void middleLeftStackWidget0::slot_verScrBarChange(int value)
 {
     if(value!=0)
-        m_convtwowid->show();
+        m_convtwowid.show();
     myTablePlayListFinal*final=NULL;
     foreach (myTablePlayListFinal*f,m_Vector) {
        if(!f->m_table.isHidden())
         final=f;
     }
 }
+void middleLeftStackWidget0::addMusicToDefaultList(const ItemResult &result, bool bPlay)
+{
+
+    /*if(!m_defaultList.mediaList()->GetList().contains(result.strUrl))
+    {
+        m_defaultList.addToPlayList(result.strFullName,result.strUrl,QString::number(result.ndur,);
+    }
+
+
+    if( m_midleft0->myTablePlayListFinalVector().at(0)->m_table.isHidden())//如果第一列表隐藏
+        m_midleft0->myTablePlayListFinalVector().at(0)->m_Btntable.clicked();
+    else
+        setAutoLayout();
+
+    QString songurl= urllist.value(0);
+    int index= songUrlList().indexOf(QUrl(songurl));
+    m_table.slot_doublick(index,0);
+
+    m_midleft0->scrolltoCurrentPlayList();
+
+
+
+    for(int i=0;i<namelist.count();i++)
+    {
+                QString m_name=namelist.value(i);
+                if(!m_playList.GetList().contains(urllist.value(i)))
+                {
+                    addToPlayList(m_name,urllist.value(i),dur.value(i));
+                }
+     }
+   if(m_table.isHidden())//如果第一列表隐藏
+      m_Btntable.clicked();
+   else
+       setAutoLayout();*/
+}
+
+
 /////////////////////////////////////////////////////////////////////////////////////
 myScrollArea::myScrollArea(QWidget *parent):QScrollArea(parent)
 {

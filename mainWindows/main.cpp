@@ -1,26 +1,22 @@
 #include <QApplication>
-#include"mainwindow.h"
-#include<QDir>
-#include<QDebug>
-#include<QDesktopWidget>
-#include"singleApplication/qsingleapplication.h"
+#include <QDir>
+#include <QDebug>
+#include <QDesktopWidget>
+
+#include "singleApplication/qsingleapplication.h"
+#include "mainwindow.h"
+#include "dataBase/myDataBase.h"
+
 #undef main
 int main(int argc, char *argv[])
 {
     QSingleApplication app(argc, argv);
+    //connect database
+    myDataBase::connectListinfo();
+    myDataBase::connectSongInfo();
+
     if(!app.isRunning())
     {
-        #if 0//因为 qss文件加载了不显示，不知道原因 只能一个一个设置了
-            QDir dir(QApplication::applicationDirPath()+"/qss");
-            if(!dir.exists())
-            {
-                dir.mkdir(QApplication::applicationDirPath()+"/qss");
-                QFile *file=new QFile(QApplication::applicationDirPath()+"/qss/topWidget.qss");
-                file->copy(":/qss/topWidget.qss",QApplication::applicationDirPath()+"/qss/topWidget.qss");
-                delete file;
-                file=NULL;
-            }
-        #endif
         QDir dir;
         dir.mkpath("D:/ExcellentMusic");
         dir.mkpath("D:/ExcellentLrc");
@@ -35,6 +31,7 @@ int main(int argc, char *argv[])
                         "QMenu::separator{height:1px;background: rgb(209,209,209);margin:4px 0px 4px 0px;}"
                         "QPushButton:focus{padding: -1;}"
                         "QLabel:focus{padding: -1;}");
+
         mainWindow*pMain=mainWindow::InitInstance();
         app.w=pMain;
         pMain->show();

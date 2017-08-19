@@ -6,11 +6,18 @@
 #include<QEventLoop>
 #include<QDebug>
 
+//play method
+//http://m.kugou.com/app/i/getSongInfo.php?cmd=playInfo&hash=
+//http://www.kugou.com/yy/index.php?r=play/getdata&hash
+//4C285C68EBEFAD7D8602D2D14D48F725
+//AFF3B6219C15D030F957B82FF50AA91E
+
 #define USE_NETCLOUD 1
 
 #define BG_URL "http://artistpicserver.kuwo.cn/pic.web?type=big_artist_pic&pictype=url&content=list&&id=0&from=pc&json=1&version=1&width=1920&height=1080&name=%1"
 #define SONG_URL "http://itwusun.com/search/wy/%1?&f=json&size=50&p=%2&sign=itwusun"
 
+#define URL_KGPLAY "http://m.kugou.com/app/i/getSongInfo.php?cmd=playInfo&hash=%1"
 #define KGLrcPart0 "http://songsearch.kugou.com/song_search_v2?keyword=%1&page=1&pagesize=40&filter=0&bitrate=0&isfuzzy=0&inputtype=2&platform=PcFilter&userid=312986171&clientver=8100&iscorrection=3"
 #define KGLrcPart1 "http://lyrics.kugou.com/search?ver=1&man=no&client=pc&keyword=%1&duration=%2&hash=%3"//&hash=9c6fd9b90800f7a37f6821c07bc0f906 9C6FD9B90800F7A37F6821C07BC0F906 b3c9045aa086236dc78a59357bdf73ac
 #define KGLrcPart2 "http://lyrics.kugou.com/download?ver=1&client=pc&id=%1&accesskey=%2&fmt=krc"
@@ -188,9 +195,9 @@ void MyNetWork::requestalbum(const QString &name,const QString &savelocal)
 
 
 ///////////////////////////////////////////////////////////////////////////////////////
-void MyNetWork::requestSong(const QString &str)//请求歌曲
+void MyNetWork::requestSong(const QString &strReq)//请求歌曲
 {
-    QString songname=str;
+    /*QString songname=str;
     QByteArray byt=songname.replace("&"," ").toUtf8().toPercentEncoding();
     QNetworkRequest requestsong;
     QNetworkAccessManager mangersong;
@@ -236,8 +243,78 @@ void MyNetWork::requestSong(const QString &str)//请求歌曲
    reply1->deleteLater();
 
    m_pageindex=1;
-   m_songname=str;
+   m_songname=str;*/
+/**
+  @brief:kuGou API search，hash
+*/
+
+    ItemResult Item={0};
+     emit sig_reqSongStatus(Item,SearchStatus::Started);
+
+    QString strTemp(KGLrcPart0);
+    strTemp=strTemp.arg(strReq);
+
+    QNetworkRequest request;
+    QNetworkAccessManager manger;
+    request.setUrl(strTemp);
+    QNetworkReply *reply=manger.get(request);
+
+    QEventLoop loop;
+    connect(&manger,SIGNAL(finished(QNetworkReply*)),&loop,SLOT(quit()));
+    loop.exec();
+
+    if(reply->error() == QNetworkReply::NoError)
+    {
+        QByteArray bytTemp= reply->readAll();
+        reply->deleteLater();
+        QJsonDocument doc0=QJsonDocument::fromJson(bytTemp);
+        QJsonObject objTemp=doc0.object();
+        objTemp= objTemp.value("data").toObject();
+        QJsonArray array0= objTemp.value("lists").toArray();
+        for(int i=0;i<array0.size();++i)
+        {
+            objTemp= array0.at(i).toObject();
+
+            Item.strFullName=objTemp.value("FileName").toString();
+            Item.strHash= objTemp.value("FileHash").toString();
+            Item.strMusicName= objTemp.value("SongName").toString();
+            Item.strSinger=objTemp.value("SingerName").toString();
+            Item.strAlbum=objTemp.value("AlbumName").toString();
+            int ndur=objTemp.value("Duration").toInt();
+            QTime time(0, ndur/60, ndur%60);
+            Item.strDur= time.toString("mm:ss");
+
+            strTemp=URL_KGPLAY;
+            strTemp=strTemp.arg(Item.strHash);
+            request.setUrl(strTemp);
+
+            QNetworkReply *reply=manger.get(request);
+            loop.exec();
+            if(reply->error()==QNetworkReply::NoError)
+            {
+                 bytTemp= reply->readAll();
+                 QJsonDocument doc0=QJsonDocument::fromJson(bytTemp);
+                 objTemp=doc0.object();
+                 Item.strUrl="";
+                 Item.strUrl= objTemp.value("url").toString();
+                 emit sig_reqSongStatus(Item,SearchStatus::Searching);
+            }
+            reply->deleteLater();
+        }
+    }
+    emit sig_reqSongStatus(Item,SearchStatus::Finished);
+    reply->deleteLater();
+
+/* QJsonDocument doc0=QJsonDocument::fromJson(byt0);
+    QJsonObject obj0=doc0.object();
+    QJsonObject obj01= obj0.value("data").toObject();
+    QJsonArray array0= obj01.value("lists").toArray();
+    QJsonObject obj02= array0.at(0).toObject();
+    QString hash= obj02.value("FileHash").toString();*/
+
 }
+
+
 
 void MyNetWork::requestSongNextPage()
 {
@@ -284,12 +361,10 @@ void MyNetWork::requestlrc(const QString &lrcname,qint64 nTotalTime,const QStrin
     QString strTemp(KGLrcPart0);
     strTemp=strTemp.arg(songname);
 
-
     QNetworkRequest requestlrc0;
     QNetworkAccessManager mangerlrc0;
     requestlrc0.setUrl(strTemp);
     QNetworkReply *reply0=mangerlrc0.get(requestlrc0);
-
 
     QEventLoop loop0;
     connect(&mangerlrc0,SIGNAL(finished(QNetworkReply*)),&loop0,SLOT(quit()));

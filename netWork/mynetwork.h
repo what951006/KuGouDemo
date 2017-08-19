@@ -8,6 +8,18 @@
 #include<Qimage>
 #include<QPixmap>
 
+struct ItemResult
+{
+   QString strFullName;
+   QString strUrl;
+   QString strMusicName;
+   QString strSinger;
+   QString strAlbum;
+   QString strHash;
+   QString strDur;
+};
+enum SearchStatus{Started=0x00,Searching,Finished};
+
 
 class MyNetWork : public QObject
 {
@@ -19,7 +31,7 @@ public:
     const QImage &BgWhiteChange(QImage& image , int brightness);
 signals:
     void sig_requestMvfinished(const QString&);
-    void sig_reqSongfinished(const QByteArray&);
+    void sig_reqSongStatus(const ItemResult&,SearchStatus);
     void sig_reqSongNextPagefinished(const QByteArray&);
 
     void dolrcworkfinished(const QByteArray&,const QString&);

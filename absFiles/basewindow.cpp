@@ -4,20 +4,20 @@
 #include<QDebug>
 #include<QLineEdit>
 
-#include"Global_ValueGather.h"
-baseWindow::baseWindow(QWidget *parent) : AbsFrameLessAutoSize(parent)
+baseWindow::baseWindow(QWidget *parent)
+    : AbsFrameLessAutoSize(parent)
+    , m_mainwid(this)
 {
-
+    m_border=8;
     setMinimumSize(550,440);
     setWindowFlags(Qt::FramelessWindowHint);
     setAttribute(Qt::WA_TranslucentBackground,true);
 
     setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
-    m_mainwid=new Widget(this);
-    backgroundPointer=m_mainwid; //globalvalue
-    m_mainwid->setAutoFillBackground(true);
+
+    m_mainwid.setAutoFillBackground(true);
     QGridLayout *lyout=new QGridLayout;
-    lyout->addWidget(m_mainwid);
+    lyout->addWidget(&m_mainwid);
     lyout->setContentsMargins(4,4,4,4);
     setLayout(lyout);
 }
@@ -80,8 +80,6 @@ void Widget::setSkin(const QString &skin)
 void Widget::paintEvent(QPaintEvent *)
 {
     QPainter painter(this);
-
-//[draw background]
     if(!m_bShowSinger)
     {
         float d =(float)m_skinPic.height()/m_skinPic.width();
@@ -103,11 +101,9 @@ void Widget::paintEvent(QPaintEvent *)
         if(h<height())//如果图片高度小于窗口高度
         {
              painter.drawPixmap(0,0,w,height(),m_netPic);
-          //   m_curPix=m_netPic.scaled(w,height());
              return;
         }
         painter.drawPixmap(0,0,width(),h,m_netPic);
-       // m_curPix=m_netPic.scaled(width(),h);
     }
 }
 

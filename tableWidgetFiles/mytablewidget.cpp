@@ -427,7 +427,7 @@ void myTableWidget::setAutoLayoutSize()
                 minheight+=(btnheight);
             }
         }
-      m_middleftStack0->m_wid->setMinimumHeight(minheight);
+      m_middleftStack0->GetWidget()->setMinimumHeight(minheight);
     //////////////////////////////////////////
 
 }
