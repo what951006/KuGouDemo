@@ -452,7 +452,6 @@ PlayerStatus FFmpegPlayer::getPlayerStatus()
 
 void FFmpegPlayer::run()
 {
-
     g_Amutex.lock();
     g_isQuit=0;
     // 读取文件头，将格式相关信息存放在AVFormatContext结构体中
@@ -557,7 +556,7 @@ void FFmpegPlayer::run()
 
     SDL_PauseAudio(0);
 /*---------------test----------------------*/
-
+    updateStatus();
 
 /*---------------test----------------------*/
     AVPacket packet;

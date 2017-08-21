@@ -27,7 +27,7 @@ class mainWindow:public baseWindow
     Q_OBJECT
 public:
     ~mainWindow();
- //get Instance
+//get Instance
    static mainWindow *GetInstance(){return s_pMainWnd;}
 
 //initialize Instance

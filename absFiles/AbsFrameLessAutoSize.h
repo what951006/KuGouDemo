@@ -20,7 +20,7 @@ class AbsFrameLessAutoSize : public QWidget
     Q_OBJECT
 public:
     AbsFrameLessAutoSize(QWidget *parent = 0);
-    ~AbsFrameLessAutoSize(){}
+    virtual~AbsFrameLessAutoSize(){}
     inline void setBorder(int border);
     void mouseMoveRect(const QPoint &p);
 protected:

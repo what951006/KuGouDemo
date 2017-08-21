@@ -499,7 +499,9 @@ void mainWindow::initTrayMenu()
 void mainWindow::slot_quitApp()
 {
     saveSetting();
-    qApp->quit();
+    m_system_tray.hide();
+    close();
+
 }
 void mainWindow::slot_iconIsActived(QSystemTrayIcon::ActivationReason reason)
 {
@@ -526,12 +528,14 @@ void mainWindow::closeEvent(QCloseEvent *event)
       event->ignore();
     }
     else
-    event->accept();
+    {
+      event->accept();
+    }
 }
 mainWindow::~mainWindow()
 {
     m_ffplayer.stop();
-    m_system_tray.setVisible(false);
+
 }
 void mainWindow::mouseDoubleClickEvent(QMouseEvent *e)
 {

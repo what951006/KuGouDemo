@@ -68,8 +68,9 @@ int myMediaList::preMediaIndex()//上一曲
 }
 void myMediaList::slot_removeSong(int index)
 {
-    m_list.removeAt(index);
 
+    m_hashMap.remove(m_list.value(index));
+    m_list.removeAt(index);
     int PlayWidindex=m_pFinal->m_table.m_playingWid.currentSongIndex();
     if(PlayWidindex>=index)
     {

@@ -4,8 +4,8 @@
 #include <QTime>
 
 
-#define SCROLL_TIME 200
-#define SCROLL_TIMER_TIME 20
+#define SCROLL_TIME 300
+#define SCROLL_TIMER_TIME 30
 #define ROW_HEIGHT 60
 
 
@@ -38,7 +38,7 @@ LyricWidget::~LyricWidget()
 void LyricWidget::slot_timer()
 {
     m_nOffset-= ROW_HEIGHT/(SCROLL_TIME/SCROLL_TIMER_TIME);//how many pix will be added per times
-    if(abs(m_nOffset)>=ROW_HEIGHT)
+    if(abs(m_nOffset) >= ROW_HEIGHT)
     {
         m_nOffset=0;
         m_nSroIndex=m_nCurIndex;
@@ -153,12 +153,13 @@ void LyricWidget::GetMaskLen(int nFontSize)
 
     if(interval!=0)
     {
-       percent2=fabs((float)(m_nCurPos-m_nCurStartPos-keyTime)/interval);
+       percent2=(float)(m_nCurPos-m_nCurStartPos-keyTime)/interval;
        s_curLen=s_keyLen+metrics.width(strKeyWord)*percent2;
-       if(s_curLen >= m_nMaskLen)
+       if(percent2<=1.0f && s_curLen >= m_nMaskLen)
            m_nMaskLen=s_curLen;
     }
 }
+
 inline QString LyricWidget::GetLrcByIndex(int index)
 {
     return m_lineMap.values().value(index);
@@ -169,6 +170,7 @@ inline QString LyricWidget::GetLrcByTime(qint64 time)
     int index=GetIndexByTime(time);
     return m_lineMap.values().value(index);
 }
+
 int LyricWidget::GetIndexByTime(qint64 time)
 {
     //binary search
@@ -186,6 +188,7 @@ int LyricWidget::GetIndexByTime(qint64 time)
     }
     return lt;
 }
+
 inline qint64 LyricWidget::GetPosByindex(int index)
 {
     return m_lineMap.keys().value(index);
