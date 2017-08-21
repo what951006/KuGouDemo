@@ -23,6 +23,8 @@ middleWidgetLeft::middleWidgetLeft(QWidget *parent)
       m_Swidget2(this),
       m_Swidget3(this),
       m_Swidget4(this)
+    ,m_animation(this,"m_x")
+    ,m_Widanimation(this,"geometry")
 {
     m_isDrawVerticalLine=true;
     setMinimumWidth(310);
@@ -41,14 +43,14 @@ void middleWidgetLeft::initAnimation()
     m_preItem=0;
     m_x=0;
     m_isAnima=true;
-    m_animation=new QPropertyAnimation(this,"m_x");
-    m_animation->setDuration(200);
-    m_stackwid.setCurrentIndex(0);
-    connect(m_animation,SIGNAL(finished()),this,SLOT(slot_finished()));
 
-    m_Widanimation=new QPropertyAnimation(this,"geometry");
-    m_Widanimation->setTargetObject(&m_stackwid);
-    m_Widanimation->setDuration(200);
+    m_animation.setDuration(200);
+    m_stackwid.setCurrentIndex(0);
+    connect(&m_animation,SIGNAL(finished()),this,SLOT(slot_finished()));
+
+
+    m_Widanimation.setTargetObject(&m_stackwid);
+    m_Widanimation.setDuration(200);
 }
 
 
@@ -130,9 +132,9 @@ void middleWidgetLeft::slot_changeButtonSelected(int index)
 {
     m_isAnima=true;
     m_index=index;
-    m_animation->setStartValue(m_preindex*m_btn[0]->width());
-    m_animation->setEndValue(index*m_btn[0]->width());
-    m_animation->start();
+    m_animation.setStartValue(m_preindex*m_btn[0]->width());
+    m_animation.setEndValue(index*m_btn[0]->width());
+    m_animation.start();
 
     for(int i=0;i<5;i++)
     {
@@ -148,17 +150,17 @@ void middleWidgetLeft::slot_changeButtonSelected(int index)
 
     if(index>m_preItem)
     {
-        m_Widanimation->setTargetObject(&m_stackwid);
-        m_Widanimation->setStartValue(QRect(m_stackwid.width(),40,m_stackwid.width(),m_stackwid.height()));
-        m_Widanimation->setEndValue(QRect(0,40,m_stackwid.width(),m_stackwid.height()));
-        m_Widanimation->start();
+        m_Widanimation.setTargetObject(&m_stackwid);
+        m_Widanimation.setStartValue(QRect(m_stackwid.width(),40,m_stackwid.width(),m_stackwid.height()));
+        m_Widanimation.setEndValue(QRect(0,40,m_stackwid.width(),m_stackwid.height()));
+        m_Widanimation.start();
     }
     if(index<m_preItem)
     {
-        m_Widanimation->setTargetObject(&m_stackwid);
-        m_Widanimation->setStartValue(QRect(-m_stackwid.width(),40,m_stackwid.width(),m_stackwid.height()));
-        m_Widanimation->setEndValue(QRect(0,40,m_stackwid.width(),m_stackwid.height()));
-        m_Widanimation->start();
+        m_Widanimation.setTargetObject(&m_stackwid);
+        m_Widanimation.setStartValue(QRect(-m_stackwid.width(),40,m_stackwid.width(),m_stackwid.height()));
+        m_Widanimation.setEndValue(QRect(0,40,m_stackwid.width(),m_stackwid.height()));
+        m_Widanimation.start();
     }
     m_preItem=index;
 }

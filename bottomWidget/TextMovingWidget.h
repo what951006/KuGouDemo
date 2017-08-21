@@ -21,7 +21,7 @@ protected:
 private slots:
     void slot_UpdateTextGeometry();
 private:
-    QTimer *_timer;
+    QTimer _timer;
     QString _text;
     int m_direction; //zero means left ,one means right;
     int m_x;

@@ -12,7 +12,7 @@ class middleLeftStackWidget2:public baseWidget
 public:
    explicit middleLeftStackWidget2(QWidget *parent);
     void initLayout();
-    buttonStackedWidget *m_Wid;
+    buttonStackedWidget m_Wid;
 };
 
 #endif // MIDDLELEFTSTACKWIDGET2_H

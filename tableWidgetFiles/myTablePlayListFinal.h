@@ -30,7 +30,7 @@ public:
     void setMiddleStackWidget0(middleLeftStackWidget0*p){m_midleft0=p;m_table.setMiddleStackWidget0(p);}
 
 /*other functions*/
-    void setShowButtonName(QString playListName="新建列表"){ m_Btntable.m_playlistName->setText(playListName);m_PlayListname=playListName;}
+    void setShowButtonName(QString strListName="新建列表"){m_Btntable.setListName(strListName);}
 
     void setCurrentSongDuration(const QString &dur){m_table.m_playingWid.m_labduration.setText(dur);}
 
@@ -39,19 +39,18 @@ public:
     void setCurrentSongAlbumPic(const QString &strPath);
 
     void setAutoLayout();
-
+//////////////////////////////[0]playing widget operation
 
     playingWidget *getPlayingWidget(){return &m_table.m_playingWid;}
 
-    QString ShowButtonName(){return m_PlayListname;}
+    QString ShowButtonName(){return m_Btntable.getListName();}
 
-
-   const QString currentAuthor(){return m_table.m_playingWid.m_btnAuthor.text();}
+   const QString currentAuthor(){return m_table.m_playingWid.m_btnAuthor.text().simplified();}
 
    const QString currentMusicName(){return m_table.m_playingWid.songName();}
 
    const QString currentSongDuration();
-
+///////////////////////////[1]
 
     int currentSongDurationToInt();
 
@@ -59,7 +58,7 @@ public:
 
     void getlistfromDateBase();
 
-    void addToPlayList(const QString &name,const QString &url,const QString &dur, const QString &strHash="");
+    void addToPlayList(const QString &name,const QString &url,const QString &dur, const QString &strHash="",bool bAddtoDB=true);
 
     void updateCount(){m_Btntable.slot_updateSongCount();}
 
@@ -67,7 +66,7 @@ public:
 
     void updateBGcolor();
 
-////////////////////////////////playList operation
+////////////////////////////////[2]playList operation
     myMediaList *mediaList(){return &m_playList;}
 
     int getIndexByUrl(const QString &strUrl){return m_playList.GetList().indexOf(strUrl);}
@@ -75,8 +74,9 @@ public:
     QString getUrlByIndex(int index){return m_playList.GetList().value(index);}
 
     bool isContainUrl(const QString&strUrl){return m_playList.GetList().contains(strUrl);}
-//////////////////////////////////////
 
+    QString getHashByUrl(const QString &strUrl){return m_playList.GetHashMap().value(strUrl);}
+//////////////////////////////////////[3]
 
     myShowTableButton m_Btntable;
     myTableWidget m_table;

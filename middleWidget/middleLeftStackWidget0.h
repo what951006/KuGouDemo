@@ -62,7 +62,7 @@ public:
 
     void addMusicToDefaultList(const ItemResult& ,bool bPlay);
 
-
+    void addMusicToList(const ItemResult&result,myTablePlayListFinal*);
 
     baseWidget *GetWidget(){return &m_wid;}
 
@@ -80,7 +80,7 @@ public Q_SLOTS:
 
     void slot_showMvWidget(const QString&);
 
-    void slot_searchSong(const QString&);
+    void slot_localSearch(const QString&);
 
     void scrolltoCurrentPlayList();
 
@@ -110,7 +110,7 @@ private:
     middleListSearch m_searchwid;
     middleConvientTwoButton m_convtwowid;
     AddLoveListTips m_addTips;
-    QVBoxLayout *vlyout1;
+    QVBoxLayout m_vlyout;
     myTablePlayListFinal m_defaultList;
     myTablePlayListFinal m_lovedList;
 };

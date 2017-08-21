@@ -121,7 +121,7 @@ signals:
 
      void sig_requestBgPic(const QString&);
 
-     void sig_requestLrc(const QString &,qint64,const QString&);
+     void sig_requestLrc(const QString & keywords,qint64 nDur,const QString& strLocation,const QString&strHash);
 
      void sig_requestAlbum(const QString&,const QString&);
 private:

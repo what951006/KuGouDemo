@@ -10,9 +10,10 @@ class baseDialog : public QDialog
     Q_OBJECT
 public:
    explicit baseDialog(QWidget*p=0);
+
    explicit baseDialog(QWidget *p,bool isDrawCentralWidget);
 
-    Widget *m_mainwid;
+    Widget m_mainwid;
 protected:
     void paintEvent(QPaintEvent*);
     virtual void mousePressEvent(QMouseEvent *event);

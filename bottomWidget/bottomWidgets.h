@@ -19,37 +19,40 @@ class bottomWidgets : public baseWidget
     Q_OBJECT
 public:
     explicit bottomWidgets(QWidget *parent = 0);
+
     void init();
-    void setRandomStyle();
-    void setInOrderStyle();
-    void setOneCycleStyle();
+
     void setPlayModeBtnStyle(PlayMode);
+
     void setPauseStyle();
+
     void setPlayStyle();
+
     void setBufferStaus();
 
+    void setCurrentSongName(const QString&str){ m_labnowPlayname.setText(str);}
 
-    void setCurrentSongName(const QString&);
-    void setLoveState();
-    void setUnLoveState();
+    void setPositon(const QString&strPos){m_labposition.setText(strPos);}
 
-    myPushButton *m_btnnext;
-    myPushButton *m_btnprevious;
-    myPushButton *m_btnPlay;
-    mySlider *m_mainslider;
-    QLabel *m_labposition;
-    TextMovingWidget *m_labnowPlayname;
+    void setSliderRange(int min,int max){m_mainslider.setRange(min,max);}
 
-    myPushButton *m_btnplaylist;
-    myPushButton *m_btnlrc;
-    myPushButton *m_btnequalizer;
+    void setSliderValue(int value){m_mainslider.setValue(value);}
 
-    volButton2 *m_btnvol;
+    myPushButton m_btnplaymode;
+    myPushButton m_btnmore;
+    myPushButton m_btndownload;
+    myPushButton m_btnfavorite;
+    myPushButton m_btnnext;
+    myPushButton m_btnprevious;
+    myPushButton m_btnPlay;
+    mySlider m_mainslider;
+    myPushButton m_btnplaylist;
+    myPushButton m_btnlrc;
+    myPushButton m_btnequalizer;
 
-    myPushButton *m_btnplaymode;
-    myPushButton *m_btnmore;
-    myPushButton *m_btndownload;
-    myPushButton *m_btnfavorite;
+    volButton2 m_btnvol;
+    QLabel m_labposition;
+    TextMovingWidget m_labnowPlayname;
 protected:
     bool eventFilter(QObject *, QEvent *);
     virtual void mouseMoveEvent(QMouseEvent *);

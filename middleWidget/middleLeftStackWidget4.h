@@ -10,7 +10,7 @@ class middleLeftStackWidget4:public baseWidget
     Q_OBJECT
 public:
    explicit middleLeftStackWidget4(QWidget *parent);
-    buttonStackedWidget *m_wid;
+    buttonStackedWidget m_wid;
     void init();
 };
 

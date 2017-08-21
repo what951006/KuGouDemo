@@ -15,16 +15,21 @@ class playingWidget:public baseWidget
     friend class myTableWidget;
 public:
     explicit playingWidget(QWidget *parent = 0);
-    void init();
-    void setLoveState();
-    void setUnloveState();
-    bool isLoved(){return m_islove;}
-    int currentSongIndex();
-    void setCurrentSongItem(QTableWidgetItem*);
 
+    void init();
+
+    void setLoveState(bool bLoved=true);
+
+    bool isLoved(){return m_islove;}
+
+    int currentSongIndex(){return!m_item?-1:m_item->row();}
+
+    void setCurrentSongItem(QTableWidgetItem* it){m_item=it;}
 
     void setOriginalState();
+
     void setSongName(const QString&);
+
     const QString songName(){return m_songName;}
 
     playingWidgetBtn m_btnSongName;

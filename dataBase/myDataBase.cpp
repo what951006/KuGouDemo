@@ -47,15 +47,12 @@ namespace myDataBase{
              datebase = QSqlDatabase::addDatabase("QSQLITE");
     datebase.setDatabaseName("SongDateBase.db");
     datebase.open();
-    datebase.exec(QString("create table if not exists songinfo(playlistname TEXT,id INT ,songname TEXT,songurl TEXT,duration TEXT)"));
+    datebase.exec(QString("create table if not exists songinfo(playlistname TEXT,id INT ,songname TEXT,songurl TEXT,duration TEXT,hash TEXT)"));
  }
 
- QVector<QStringList> readListSongInfo(const QString&  listname)
+void readListSongInfo(myTablePlayListFinal*pTable,const QString&  listname)
  {
-    QStringList list1;
-    QStringList list2;
-    QStringList list3;
-
+    QString strName,strDur,strUrl,strHash;
     QSqlQuery sql_query;
     QString select_sql=QString("select * from songinfo where playlistname=? order by id");
     sql_query.prepare(select_sql);
@@ -69,19 +66,14 @@ namespace myDataBase{
     {
         while(sql_query.next())
         {
-            QString songname = sql_query.value("songname").toString();
-            QString songurl = sql_query.value("songurl").toString();
-            QString songdur=sql_query.value("duration").toString();
+            strName = sql_query.value("songname").toString();
+            strDur=sql_query.value("duration").toString();
+            strUrl = sql_query.value("songurl").toString();
+            strHash=sql_query.value("hash").toString();
 
-            list1<<songname;
-            list2<<songurl;
-            list3<<songdur;
+            pTable->addToPlayList(strName,strUrl,strDur,strHash,false);
         }
     }
-
-    QVector<QStringList> vec;
-    vec<<list1<<list2<<list3;
-    return vec;
  }
 
  void renameList(const QString&  oldname, const QString&  newname)
@@ -120,7 +112,7 @@ namespace myDataBase{
      query.exec(QString("delete from songinfo where playlistname='%1'").arg(listname));
  }
 
- void addSong(const QString&  listname, const QString&  songname, const QString&  url, const QString&  duration)
+ void addSong(const QString&  listname, const QString&  songname, const QString&  url, const QString&  duration,const QString &strHash)
  {
      QSqlQuery query;
      query.prepare(QString("select * from songinfo where playlistname=? and id=(select max(id) from songinfo where playlistname=?)"));
@@ -135,13 +127,14 @@ namespace myDataBase{
           index++;
       }
 
-      query.prepare(QString("INSERT INTO songinfo(playlistname,id,songname,songurl,duration)"
-                            "VALUES (:playlistname,:id,:songname,:songurl,:duration)"));
+      query.prepare(QString("INSERT INTO songinfo(playlistname,id,songname,songurl,duration,hash)"
+                            "VALUES (:playlistname,:id,:songname,:songurl,:duration,:hash)"));
       query.bindValue(":playlistname", listname);
       query.bindValue(":id", index);
       query.bindValue(":songname", songname);
       query.bindValue(":songurl", url);
       query.bindValue(":duration", duration);
+      query.bindValue(":hash",strHash);
       query.exec();
  }
 
@@ -153,7 +146,6 @@ namespace myDataBase{
     QSqlQuery query;
     query.exec(QString("delete from songinfo where playlistname= '%1' and id= %2").arg(listname).arg(index));
     query.exec(QString("update songinfo set id = id-1 where playlistname = '%1' and id > %2").arg(listname).arg(index));
-
  }
 
  void addPlayList(const QString&  plistname)//时实添加就Okay了

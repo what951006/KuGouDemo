@@ -13,12 +13,12 @@ public:
     myTableAddWidget(QWidget*parent=0);
     void init();
 
-    myPushButton *m_add;
-    myPushButton *m_addFolder;
+    myPushButton m_add;
+    myPushButton m_addFolder;
 
 private:
-    myPushButton *m_labadd;
-    myPushButton *m_labaddFolder;
+    myPushButton m_labadd;
+    myPushButton m_labaddFolder;
 
 };
 

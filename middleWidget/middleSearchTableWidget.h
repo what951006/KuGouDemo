@@ -15,16 +15,12 @@ class tableCellWidget:public baseWidget
     Q_OBJECT
 public:
    explicit tableCellWidget(QWidget*p=0);
-    ~tableCellWidget()
-    {
-        m_btntableplay->deleteLater();
-        m_btntableadd->deleteLater();
-        m_btntabledownload->deleteLater();
-    }
+    ~tableCellWidget(){}
+
    void init();
-   myPushButton *m_btntableplay;
-   myPushButton *m_btntableadd;
-   myPushButton *m_btntabledownload;
+   myPushButton m_btntableplay;
+   myPushButton m_btntableadd;
+   myPushButton m_btntabledownload;
 };
 
 class middleSearchTableWidget:public QTableWidget

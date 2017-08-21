@@ -18,7 +18,12 @@
 #include"mainwindow.h"
 inline QString mimeType(){return "ShowButton";}
 
-myShowTableButton::myShowTableButton(QWidget*parent):QPushButton(parent)
+myShowTableButton::myShowTableButton(QWidget*parent)
+    :QPushButton(parent)
+    ,m_indicator(this)
+    ,m_btnmenu(this)
+    ,m_lineEdit(this)
+    ,m_playlistName("新建列表[]",this)
 {
     m_isdrawMove=false;
     setAcceptDrops(true);
@@ -28,29 +33,28 @@ myShowTableButton::myShowTableButton(QWidget*parent):QPushButton(parent)
 }
 void myShowTableButton::initMenu()
 {
-    m_menu=new QMenu;
-    QAction *act_addplaylist=new QAction("新建列表",m_menu);
-    QAction *act_addsong=new QAction("添加歌曲",m_menu);
-    QAction *act_delplayList=new QAction("删除列表",m_menu);
-    QAction *act_reName=new QAction("重命名",m_menu);
-    QAction* act_emptyList=new QAction("清空列表",m_menu);
+    QAction *act_addplaylist=new QAction("新建列表");
+    QAction *act_addsong=new QAction("添加歌曲");
+    QAction *act_delplayList=new QAction("删除列表");
+    QAction *act_reName=new QAction("重命名");
+    QAction* act_emptyList=new QAction("清空列表");
 
-    m_menu->addAction(act_addplaylist);
-    m_menu->addSeparator();
-    m_menu->addAction(act_addsong);
-    m_menu->addAction(new QAction("稍后播",m_menu));
-    m_menu->addAction(new QAction("添加到播放列表",m_menu));
-    m_menu->addAction(new QAction("全部发送到移动设备",m_menu));
-    m_menu->addAction(new QAction("下载本列表全部歌曲",m_menu));
-    m_menu->addAction(new QAction("排序",m_menu));
-    m_menu->addAction(new QAction("匹配MV",m_menu));
-    m_menu->addAction(new QAction("收藏整个列表",m_menu));
-    m_menu->addSeparator();
-    m_menu->addAction(act_emptyList);
-    m_menu->addAction(act_delplayList);
-    m_menu->addAction(act_reName);
-    m_menu->setContentsMargins(4,10,3,10);
-    m_menu->actionGeometry(act_reName);//一定不能删除 setEnabledMenuItem要工作必须要它 可能是一个bug// must to call this function if not the setEnabledMenuItem function cant work correctly;
+    m_menu.addAction(act_addplaylist);
+    m_menu.addSeparator();
+    m_menu.addAction(act_addsong);
+    m_menu.addAction(new QAction("稍后播"));
+    m_menu.addAction(new QAction("添加到播放列表"));
+    m_menu.addAction(new QAction("全部发送到移动设备"));
+    m_menu.addAction(new QAction("下载本列表全部歌曲"));
+    m_menu.addAction(new QAction("排序"));
+    m_menu.addAction(new QAction("匹配MV"));
+    m_menu.addAction(new QAction("收藏整个列表"));
+    m_menu.addSeparator();
+    m_menu.addAction(act_emptyList);
+    m_menu.addAction(act_delplayList);
+    m_menu.addAction(act_reName);
+    m_menu.setContentsMargins(4,10,3,10);
+    m_menu.actionGeometry(act_reName);//一定不能删除 setEnabledMenuItem要工作必须要它 可能是一个bug// must to call this function if not the setEnabledMenuItem function cant work correctly;
 
     connect(act_emptyList,SIGNAL(triggered(bool)),this,SIGNAL(sig_emptyList()));
     connect(act_reName,SIGNAL(triggered(bool)),this,SLOT(slot_ReName()));
@@ -80,24 +84,28 @@ void myShowTableButton::setTableFinal(myTablePlayListFinal *parent)
     slot_updateSongCount();*/
 }
 
- void myShowTableButton::setTableShowIndicator()
+ void myShowTableButton::setTableShowIndicator(bool bShow)
 {
-   m_indicator->setStyleSheet("QLabel{border-image:url(:/image/middlewidget/indicator_down (1).png);}"
-                              "QLabel:hover{border-image:url(:/image/middlewidget/indicator_down (2).png);}"
-                              "QLabel:pressed{border-image:url(:/image/middlewidget/indicator_down (1).png);}");
+     if(bShow)
+     {
+         m_indicator.setStyleSheet("QLabel{border-image:url(:/image/middlewidget/indicator_down (1).png);}"
+                                    "QLabel:hover{border-image:url(:/image/middlewidget/indicator_down (2).png);}"
+                                    "QLabel:pressed{border-image:url(:/image/middlewidget/indicator_down (1).png);}");
+     }
+     else
+     {
+         m_indicator.setStyleSheet("QLabel{border-image:url(:/image/middlewidget/indicator_top (1).png);}"
+                                    "QLabel:hover{border-image:url(:/image/middlewidget/indicator_top (2).png);}"
+                                    "QLabel:pressed{border-image:url(:/image/middlewidget/indicator_top (1).png);}");
+     }
+
 }
 
- void myShowTableButton::setTableHideIndicator()
-{
-    m_indicator->setStyleSheet("QLabel{border-image:url(:/image/middlewidget/indicator_top (1).png);}"
-                               "QLabel:hover{border-image:url(:/image/middlewidget/indicator_top (2).png);}"
-                               "QLabel:pressed{border-image:url(:/image/middlewidget/indicator_top (1).png);}");
-}
 
  void myShowTableButton::setEnabledMenuItem(bool isSetting)
 {
-    m_menu->actionAt(QPoint(5,309))->setEnabled(isSetting);//del
-    m_menu->actionAt(QPoint(5,337))->setEnabled(isSetting);//rename
+    m_menu.actionAt(QPoint(5,309))->setEnabled(isSetting);//del
+    m_menu.actionAt(QPoint(5,337))->setEnabled(isSetting);//rename
 }
 
 void myShowTableButton::setTipsStyle(bool isset)
@@ -110,18 +118,18 @@ void myShowTableButton::setTipsStyle(bool isset)
 void myShowTableButton::slot_updateSongCount()
 {
     if(m_finalWid->m_table.rowCount()==0)
-        m_playlistName->setText(m_finalWid->ShowButtonName());
+        m_playlistName.setText(m_finalWid->ShowButtonName());
     else
-        m_playlistName->setText(m_finalWid->ShowButtonName()+QString("[%1]").arg(QString::number(m_finalWid->m_table.rowCount())));
+        m_playlistName.setText(m_finalWid->ShowButtonName()+=QString("[%1]").arg(QString::number(m_finalWid->m_table.rowCount())));
 }
 void myShowTableButton::slot_ReName()
 {
-    m_lineEdit->show();
-    m_lineEdit->setFocus();
-    m_lineEdit->raise();
-    m_playlistName->hide();
-    m_lineEdit->setText(m_playlistName->text().split("[").at(0));
-    m_lineEdit->selectAll();
+    m_lineEdit.show();
+    m_lineEdit.setFocus();
+    m_lineEdit.raise();
+    m_playlistName.hide();
+    m_lineEdit.setText(m_playlistName.text().split("[").at(0));
+    m_lineEdit.selectAll();
 }
 void myShowTableButton::slot_reNameDB(const QString &newName)
 {
@@ -224,7 +232,7 @@ void myShowTableButton::mouseMoveEvent(QMouseEvent *e)
 
 bool myShowTableButton::eventFilter(QObject *o, QEvent *e)
 {
-    if(o==m_lineEdit)
+    if(o==&m_lineEdit)
     {
         if(e->type()==QEvent::FocusOut)//
         {
@@ -283,47 +291,45 @@ void myShowTableButton::init()
 {
     m_isTipsStyle=false;
     setCursor(Qt::PointingHandCursor);
-    this->setAcceptDrops(true);
+    setAcceptDrops(true);
 
-
-    m_lineEdit=new QLineEdit(this);
-    m_lineEdit->setGeometry(16,5,250,30);
-    m_lineEdit->setContextMenuPolicy(Qt::NoContextMenu);
-    m_lineEdit->setStyleSheet("QLineEdit{border:4px solid rgb(40,80,150);}");
-    m_lineEdit->installEventFilter(this);
-    m_lineEdit->raise();
-    m_lineEdit->hide();
+    m_lineEdit.setGeometry(16,5,250,30);
+    m_lineEdit.setContextMenuPolicy(Qt::NoContextMenu);
+    m_lineEdit.setStyleSheet("QLineEdit{border:4px solid rgb(40,80,150);}");
+    m_lineEdit.installEventFilter(this);
+    m_lineEdit.raise();
+    m_lineEdit.hide();
 
     QHBoxLayout *lyout=new QHBoxLayout;
 
-    m_btnmenu=new myPushButton(this);
-    m_indicator=new QLabel(this);
-    m_playlistName=new QLabel("新建列表[]",this);
-    m_playlistName->setStyleSheet("color:rgb(38,38,38);font: 14px 黑体;");
 
 
-    m_indicator->setFixedSize(16,16);
-    m_btnmenu->setFixedSize(16,16);
 
-    m_indicator->setStyleSheet("QLabel{border-image:url(:/image/middlewidget/indicator_top (1).png);}"
+    m_playlistName.setStyleSheet("color:rgb(38,38,38);font: 14px 黑体;");
+
+
+    m_indicator.setFixedSize(16,16);
+    m_btnmenu.setFixedSize(16,16);
+
+    m_indicator.setStyleSheet("QLabel{border-image:url(:/image/middlewidget/indicator_top (1).png);}"
                                "QLabel:hover{border-image:url(:/image/middlewidget/indicator_top (2).png);}"
                                "QLabel:pressed{border-image:url(:/image/middlewidget/indicator_top (1).png);}");
 
-    m_btnmenu->setStyleSheet("QPushButton{border-image:url(:/image/middlewidget/indicator_menu (1).png);}"
+    m_btnmenu.setStyleSheet("QPushButton{border-image:url(:/image/middlewidget/indicator_menu (1).png);}"
                              "QPushButton:hover{border-image:url(:/image/middlewidget/indicator_menu (2).png);}"
                              "QPushButton:pressed{border-image:url(:/image/middlewidget/indicator_menu (3).png);}");
 
-    lyout->addWidget(m_indicator,0,Qt::AlignVCenter);
-    lyout->addWidget(m_playlistName,0,Qt::AlignVCenter);
+    lyout->addWidget(&m_indicator,0,Qt::AlignVCenter);
+    lyout->addWidget(&m_playlistName,0,Qt::AlignVCenter);
     lyout->addSpacerItem(new QSpacerItem(20,20,QSizePolicy::Expanding,QSizePolicy::Fixed));
-    lyout->addWidget(m_btnmenu,0,Qt::AlignVCenter);
+    lyout->addWidget(&m_btnmenu,0,Qt::AlignVCenter);
     lyout->addSpacing(14);
     lyout->setContentsMargins(0,0,0,0);
     lyout->setSpacing(2);
     setLayout(lyout);
 
-    connect(m_lineEdit,SIGNAL(returnPressed()),this,SLOT(setFocus()));
-    connect(m_btnmenu,SIGNAL(clicked(bool)),this,SLOT(slot_menuRequest()));
+    connect(&m_lineEdit,SIGNAL(returnPressed()),this,SLOT(setFocus()));
+    connect(&m_btnmenu,SIGNAL(clicked(bool)),this,SLOT(slot_menuRequest()));
 }
 
 void myShowTableButton::slot_returnPressed()
@@ -334,7 +340,7 @@ void myShowTableButton::slot_returnPressed()
       {
         if(&pListFinal->m_Btntable != this)
         {
-            if(pListFinal->ShowButtonName()==m_lineEdit->text())
+            if(pListFinal->ShowButtonName()==m_lineEdit.text())
             {
                 QMessageBox::warning(NULL,"warning","the same playlist name!");
                 slot_ReName();
@@ -343,16 +349,16 @@ void myShowTableButton::slot_returnPressed()
         }
       }
 
-    if(m_lineEdit->text().isEmpty())
+    if(m_lineEdit.text().isEmpty())
         slot_ReName();
     else
     {
-        emit sig_reName(m_lineEdit->text()); //要先发送消息
+        emit sig_reName(m_lineEdit.text()); //要先发送消息
 
-        m_finalWid->setShowButtonName(m_lineEdit->text());
+        m_finalWid->setShowButtonName(m_lineEdit.text());
         m_finalWid->updateCount();
-        m_playlistName->show();
-        m_lineEdit->hide();
+        m_playlistName.show();
+        m_lineEdit.hide();
         slot_updateSongCount();
     }
 }
@@ -361,7 +367,7 @@ void myShowTableButton::mouseReleaseEvent(QMouseEvent*e)
 {
     if(e->button()==Qt::RightButton)
     {
-         m_menu->exec(QCursor::pos());
+         m_menu.exec(QCursor::pos());
     }
     QPushButton::mouseReleaseEvent(e);
 }

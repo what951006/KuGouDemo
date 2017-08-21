@@ -58,16 +58,11 @@ void middleLeftStackWidget0::initAddTips()
 
 void middleLeftStackWidget0::initConvientWidget()
 {
-
     m_convtwowid.hide();
-    connect(m_convtwowid.m_btnlocate,SIGNAL(clicked(bool)),this,SLOT(scrolltoCurrentPlayList()));
-
-
+    connect(&m_convtwowid.m_btnlocate,SIGNAL(clicked(bool)),this,SLOT(scrolltoCurrentPlayList()));
     m_searchwid.hide();
-    connect(m_convtwowid.m_btnsearch,SIGNAL(clicked(bool)),&m_searchwid,SLOT(show()));
-    connect(m_searchwid.m_lineEdit,SIGNAL(textChanged(QString)),this,SLOT(slot_searchSong(QString)));
-
-
+    connect(&m_convtwowid.m_btnsearch,SIGNAL(clicked(bool)),&m_searchwid,SLOT(show()));
+    connect(&m_searchwid.m_lineEdit,SIGNAL(textChanged(QString)),this,SLOT(slot_localSearch(QString)));
     connect(&m_convientSTBtn,SIGNAL(clicked(bool)),&m_convientSTBtn,SLOT(hide()));
     m_convientSTBtn.setTipsStyle(true);
     m_convientSTBtn.hide();
@@ -82,7 +77,7 @@ void middleLeftStackWidget0::scrolltoCurrentPlayList()
     myTablePlayListFinal*pPlayList= myTablePlayListFinal::getCurrentList();
     if(!pPlayList)
         return;
-   int pindex= vlyout1->indexOf(pPlayList);
+   int pindex= m_vlyout.indexOf(pPlayList);
 
     if(!pPlayList->m_table.isHidden()&&pPlayList->m_table.rowCount()!=0)//if it is visiable
     {
@@ -135,7 +130,6 @@ void middleLeftStackWidget0::init()
     glyout->setContentsMargins(0,0,0,0);
     setLayout(glyout);
 
-    vlyout1=new QVBoxLayout;
     m_defaultList.setMiddleStackWidget0(this);
     m_defaultList.setShowButtonName("默认列表");
     m_defaultList.getlistfromDateBase();//添加歌曲
@@ -149,14 +143,14 @@ void middleLeftStackWidget0::init()
     m_lovedList.m_Btntable.setEnabledMenuItem();
 
     m_Vector<<&m_defaultList<<&m_lovedList;
-    vlyout1->addWidget(&m_defaultList);
-    vlyout1->addWidget(&m_lovedList);
+    m_vlyout.addWidget(&m_defaultList);
+    m_vlyout.addWidget(&m_lovedList);
 
 
-    vlyout1->addSpacerItem(new QSpacerItem(0,0,QSizePolicy::Expanding,QSizePolicy::Expanding));
-    vlyout1->setContentsMargins(0,0,0,0);
-    vlyout1->setSpacing(0);
-    m_wid.setLayout(vlyout1);
+    m_vlyout.addSpacerItem(new QSpacerItem(0,0,QSizePolicy::Expanding,QSizePolicy::Expanding));
+    m_vlyout.setContentsMargins(0,0,0,0);
+    m_vlyout.setSpacing(0);
+    m_wid.setLayout(&m_vlyout);
 
     QStringList list=myDataBase::loadPlayList();
     for(int i=0;i<list.count();i++)//加载播放列表
@@ -197,7 +191,7 @@ void middleLeftStackWidget0::slot_addPlayListWithRename()//新建一个表
     myDataBase::addPlayList(table->ShowButtonName());  //db
 
     table->m_table.hide();
-    vlyout1->insertWidget(vlyout1->count()-2,table);
+    m_vlyout.insertWidget(m_vlyout.count()-2,table);
     m_Vector.insert(m_Vector.count()-1,table);
     table->m_Btntable.click();
     if(mainWindow::GetInstance())
@@ -211,7 +205,7 @@ void middleLeftStackWidget0::addPlayList(const QString &plname)//添加一个列
     myTablePlayListFinal *m_table=new myTablePlayListFinal(this);
     m_table->setMiddleStackWidget0(this);//pass the pointer
     m_table->m_table.hide();
-    vlyout1->insertWidget(vlyout1->count()-2,m_table);
+    m_vlyout.insertWidget(m_vlyout.count()-2,m_table);
     m_Vector.insert(m_Vector.count()-1,m_table);
     m_table->setShowButtonName(plname);
     m_table->getlistfromDateBase(); //根据目标名 添加歌曲
@@ -222,7 +216,7 @@ void middleLeftStackWidget0::addPlayList(const QString &plname)//添加一个列
 void middleLeftStackWidget0::slot_removePlayList()//移除播放列表
 {
    myTablePlayListFinal* f= (myTablePlayListFinal*)sender()->parent();
-   vlyout1->removeWidget(f);
+   m_vlyout.removeWidget(f);
    if(f == myTablePlayListFinal::getCurrentList())//如果遇到正在播放
    {
        f->stopCurrentSong();
@@ -293,13 +287,13 @@ void middleLeftStackWidget0::setSwapList( myTablePlayListFinal *begin,  myTableP
     m_Vector.replace(afterindex,begin);
     m_Vector.replace(beginindex,after);
 /**/
-    int loindex= vlyout1->indexOf(begin);
-    vlyout1->removeWidget(begin);
-    int loindex2=vlyout1->indexOf(after);
-    vlyout1->removeWidget(after);
+    int loindex= m_vlyout.indexOf(begin);
+    m_vlyout.removeWidget(begin);
+    int loindex2=m_vlyout.indexOf(after);
+    m_vlyout.removeWidget(after);
 
-    vlyout1->insertWidget(loindex2,begin);
-    vlyout1->insertWidget(loindex,after);
+    m_vlyout.insertWidget(loindex2,begin);
+    m_vlyout.insertWidget(loindex,after);
 /**/
     myDataBase::swapList(begin->ShowButtonName(),beginindex,after->ShowButtonName(),afterindex);
 }
@@ -315,9 +309,9 @@ void middleLeftStackWidget0::setListTakeAndInsert(myTablePlayListFinal *from, my
     /*
      * vector was successfully to be inserted
     */
-    vlyout1->removeWidget(from);
-    int afterindex2=vlyout1->indexOf(after);
-    vlyout1->insertWidget(afterindex2+1,from);
+    m_vlyout.removeWidget(from);
+    int afterindex2=m_vlyout.indexOf(after);
+    m_vlyout.insertWidget(afterindex2+1,from);
     /*
      * Layout was successfully to be changed
     */
@@ -340,7 +334,7 @@ void middleLeftStackWidget0::slot_showMvWidget(const QString & url)
     mainWindow::GetInstance()->player()->setMedia(url,true);
 }
 
-void middleLeftStackWidget0::slot_searchSong(const QString &words)
+void middleLeftStackWidget0::slot_localSearch(const QString &words)
 {
 
     foreach(myTablePlayListFinal*f,m_Vector)
@@ -411,6 +405,18 @@ void middleLeftStackWidget0::addMusicToDefaultList(const ItemResult &result, boo
        else
           m_defaultList.setAutoLayout();
     }
+}
+
+void middleLeftStackWidget0::addMusicToList(const ItemResult&result, myTablePlayListFinal *finalTable)
+{
+    if(!finalTable->isContainUrl(result.strUrl))
+    {
+        finalTable->addToPlayList(result.strFullName,result.strUrl,result.strDur);
+    }
+   if(finalTable->m_table.isHidden())//如果第一列表隐藏
+      finalTable->m_Btntable.clicked();
+   else
+      finalTable->setAutoLayout();
 }
 
 

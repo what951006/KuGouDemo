@@ -9,7 +9,7 @@ class pushButtonCrossWidget : public QWidget
     Q_OBJECT
 public:
     explicit pushButtonCrossWidget(QWidget *parent = 0);
-    myPushButton *m_btn;
+    myPushButton m_btn;
 signals:
 
 public slots:
@@ -20,10 +20,10 @@ class pushButtonGroupWidget : public QWidget
     Q_OBJECT
 public:
     explicit pushButtonGroupWidget(QWidget *parent = 0);
-    myPushButton *m_btnMovie;
-    myPushButton *m_btnLove;
-    myPushButton *m_btnDel;
-    myPushButton *m_btnMore;
+    myPushButton m_btnMovie;
+    myPushButton m_btnLove;
+    myPushButton m_btnDel;
+    myPushButton m_btnMore;
     void setLoved();
     bool isLoved(){return m_islove;}
 signals:

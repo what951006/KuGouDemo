@@ -2,18 +2,17 @@
 #define SKINWIDGET_H
 
 #include <QObject>
-#include<QSignalMapper>
-#include<QDebug>
+#include <QSignalMapper>
+#include <QDebug>
 
-#include"basewindow.h"
-#include"baseWidget.h"
-#include"baseDialog.h"
-#include"myPushButton.h"
-#include"skinWidgetSliderWidget.h"
+#include "basewindow.h"
+#include "baseWidget.h"
+#include "baseDialog.h"
+#include "myPushButton.h"
+#include "skinWidgetSliderWidget.h"
+#include "middleLeftStackWidget0.h"
+
 class skinWidget;
-
-
-
 class skinWidgetContentItem:public baseWidget
 {
     Q_OBJECT
@@ -73,14 +72,15 @@ class skinWidget : public baseDialog
 public:
     explicit skinWidget(QWidget *parent = 0);
     void initTopLayout();
-    QSignalMapper *signalMapper(){return m_skincontwid->signalMapper();}
+    QSignalMapper *signalMapper(){return m_skincontwid.signalMapper();}
     void setdefaultSkin();
     void initBottomLayout();
 
-    myPushButton *m_btnAdjustWindow;
-    myPushButton *m_btnOpacity;
-    skinContentWidget* m_skincontwid;
-    skinWidgetSliderWidget *m_sliderWidget;
+    myScrollArea scrollArea;
+    myPushButton m_btnAdjustWindow;
+    myPushButton m_btnOpacity;
+    skinContentWidget m_skincontwid;
+    skinWidgetSliderWidget m_sliderWidget;
 
 public slots:
     void slot_openPersonalBG();
@@ -89,6 +89,7 @@ public slots:
 signals:
 
 public slots:
+
 };
 
 #endif // SKINWIDGET_H

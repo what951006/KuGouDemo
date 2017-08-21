@@ -10,9 +10,9 @@ class skinWidgetSliderWidget : public baseWidget
 {
 public:
    explicit skinWidgetSliderWidget(QWidget*p=0);
-    mySlider *m_slider;
+    mySlider m_slider;
 protected:
-    void focusOutEvent(QFocusEvent *){if(!hasFocus()&&!m_slider->hasFocus())hide();}
+    void focusOutEvent(QFocusEvent *){if(!hasFocus()&&!m_slider.hasFocus())hide();}
     void paintEvent(QPaintEvent *);
     void leaveEvent(QEvent *);
 private:

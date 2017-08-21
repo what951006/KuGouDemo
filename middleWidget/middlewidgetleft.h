@@ -66,8 +66,8 @@ private:
     bool m_isAnima;
     int m_x;
     int m_preItem;
-    QPropertyAnimation *m_animation;
-    QPropertyAnimation *m_Widanimation;
+    QPropertyAnimation m_animation;
+    QPropertyAnimation m_Widanimation;
 
 };
 

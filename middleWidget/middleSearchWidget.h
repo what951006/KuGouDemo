@@ -53,7 +53,7 @@ public:
 
 
     //perhaps a Bug happend here!!if index is greater than count
-    const ItemResult& GetItemByIndex(int index){m_songlist.at(index);}
+    const ItemResult& GetItemByIndex(int index){return m_songlist.at(index);}
 
     QString GetHashByIndex(int index){return m_hashmap.value(index);}
 protected:

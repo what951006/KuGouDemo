@@ -15,7 +15,7 @@ class  volWidget :public QWidget
     Q_OBJECT
 public:
     volWidget(QWidget*parent);
-    mySlider *m_slider_vol;
+    mySlider m_slider_vol;
 protected:
 
 private:
@@ -26,10 +26,10 @@ class  playWidget :public QWidget
     Q_OBJECT
 public:
     playWidget(QWidget*parent);
-    QPushButton *m_play_button;
-    QPushButton *m_backward_button;
-    QPushButton *m_forward_button;
-    QLabel*music_name_label;
+    QPushButton m_play_button;
+    QPushButton m_backward_button;
+    QPushButton m_forward_button;
+    QLabel music_name_label;
 private:
 
 };
@@ -51,8 +51,8 @@ public:
     void setCurrentSongName(QString);
     void setPauseStyle();
     void setPlayStyle();
-    volWidget  *m_volWid;
-    playWidget *m_wid6;
+    volWidget  m_volWid;
+    playWidget m_wid6;
 
 signals:
     void sig_OpenDeskTopLrc();

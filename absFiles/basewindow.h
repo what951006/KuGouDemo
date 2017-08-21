@@ -19,10 +19,15 @@ public:
    explicit Widget(QWidget*parent=0);
 
     void setCurBGPic(const QString&);
+
     void setShowSingerBG(bool is=true);
+
     bool isShowSingerBG(){return m_isShowSingerBG;}
+
     void clearBg();
+
     const QString currentSkinPath(){return m_curPixPath;}
+
     inline QPixmap getRectPix(const QRect&rect){update();return  m_curPix.copy(rect);}
 protected:
     virtual void paintEvent(QPaintEvent *);

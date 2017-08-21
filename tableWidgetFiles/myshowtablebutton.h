@@ -24,15 +24,18 @@ public:
 
     void setTableFinal(myTablePlayListFinal*p);
 
-    void setTableShowIndicator();
-    void setTableHideIndicator();
+    void setTableShowIndicator(bool bShow=true);
+
     void setEnabledMenuItem(bool isSetting=false); //menu!!
+
     void setTipsStyle(bool isset=true);
 
-    QLabel *m_playlistName;
+    void setListName(const QString&strText){m_playlistName.setText(strText);}
+
+    QString getListName(){return m_playlistName.text().split("[").value(0);}
 public slots:
     void slot_updateSongCount();
-    void slot_menuRequest(){m_menu->exec(QCursor::pos());}
+    void slot_menuRequest(){m_menu.exec(QCursor::pos());}
     void slot_returnPressed();
     void slot_ReName();
     void slot_reNameDB(const QString&);
@@ -55,13 +58,13 @@ protected:
     virtual bool eventFilter(QObject *, QEvent *);
     virtual void paintEvent(QPaintEvent *);
 private:
-    QLabel *m_indicator;
-    QMenu *m_menu;
-    myPushButton *m_btnmenu;
-    QLineEdit *m_lineEdit;
-    bool m_isTipsStyle;
+    QLabel m_indicator;
+    QMenu  m_menu;
+    myPushButton m_btnmenu;
+    QLineEdit m_lineEdit;
     myTablePlayListFinal *m_finalWid;
-
+    QLabel m_playlistName;
+    bool m_isTipsStyle;
     bool m_isdrawTop;
     bool m_isdrawMove;
     QPoint m_presspos;

@@ -21,7 +21,7 @@ public:
     void setlistShowStyle();
     void setlistHideStyle();
     void setBtnShowHide(bool show=true);
- //   myPushButton getPushButton(){return &m_btnhidelist;}
+
     middleWidgetLeft m_leftWid;
     middleWidgetRight m_rightWid;
     myPushButton m_btnhidelist;

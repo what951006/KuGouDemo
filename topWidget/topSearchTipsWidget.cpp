@@ -5,9 +5,10 @@
 #include<QEventLoop>
 #include<QLineEdit>
 #include<QDebug>
-topSearchTipsWidget::topSearchTipsWidget(QWidget*p):QListWidget(p)
+topSearchTipsWidget::topSearchTipsWidget(QWidget*p)
+    :QListWidget(p)
+    ,m_manger(this)
 {
-    m_manger=new QNetworkAccessManager(this);
 
     setMouseTracking(true);
     setStyleSheet("QListWidget{background:white;border:1px solid rgb(214,214,214);}"
@@ -67,7 +68,7 @@ void topSearchTipsWidget::slot_textchanged(QString str)
     int count=this->count();
     for(int i=0;i<count;i++)
     {
-       QListWidgetItem *item= this->takeItem(i);
+       QListWidgetItem *item= this->takeItem(0);
        delete item;
     }
     QNetworkRequest request;
@@ -79,7 +80,7 @@ void topSearchTipsWidget::slot_textchanged(QString str)
     request.setRawHeader("Content-Type","application/x-www-form-urlencoded");
     request.setRawHeader("Accept-Encoding","deflate");
     request.setRawHeader("Cookie","qqmusic_fromtag=3; qqmusic_miniversion=57; qqmusic_version=12;");
-    QNetworkReply *reply= m_manger->get(request);
+    QNetworkReply *reply= m_manger.get(request);
     QEventLoop loop;
     connect(reply,SIGNAL(finished()),&loop,SLOT(quit()));
     loop.exec();
@@ -88,16 +89,16 @@ void topSearchTipsWidget::slot_textchanged(QString str)
     {
         QByteArray byt=reply->readAll();
         QJsonDocument doc=QJsonDocument::fromJson(byt);
-        QJsonObject obj= doc.object();
-        QJsonObject obj1= obj.value("data").toObject();
-        QJsonObject obj2= obj1.value("song").toObject();
-        QJsonArray arry=obj2.value("itemlist").toArray();
-        for(int i=0;i<arry.count();i++)
+        QJsonObject objTemp= doc.object();
+        objTemp= objTemp.value("data").toObject();
+        objTemp= objTemp.value("song").toObject();
+        QJsonArray arrayTemp=objTemp.value("itemlist").toArray();
+        for(int i=0;i<arrayTemp.count();i++)
         {
-            QJsonObject obj3=arry.at(i).toObject();
-            QString songname=  obj3.value("name").toString();
-            QString songsinger=obj3.value("singer").toString();
-            this->addItem(new QListWidgetItem(songsinger+"-"+songname));
+            objTemp=arrayTemp.at(i).toObject();
+            QString songname=objTemp.value("name").toString();
+            QString songsinger=objTemp.value("singer").toString();
+            addItem(new QListWidgetItem(songsinger+"-"+songname));
         }
     }
     reply->deleteLater();

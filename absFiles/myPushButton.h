@@ -53,6 +53,10 @@ class volButton2:public QPushButton
 public:
     volButton2(const QString& normal,const QString& hover,const QString& pressed,QWidget*parent=0);
     void setPartnerSlider(QSlider *slider){m_partnerslider=slider;}
+
+    void startTimer(int interval){m_timer.start(interval);}
+
+    void stopTimer(){m_timer.stop();}
     QTimer m_timer;
 public slots:
 

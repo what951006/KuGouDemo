@@ -14,7 +14,7 @@
 
 #define USE_NETCLOUD 1
 
-#define BG_URL "http://artistpicserver.kuwo.cn/pic.web?type=big_artist_pic&pictype=url&content=list&&id=0&from=pc&json=1&version=1&width=1920&height=1080&name=%1"
+#define BG_URL "http://artistpicserver.kuwo.cn/pic.web?type=big_artist_pic&pictype=url&content=list&id=0&name=%1&from=pc&json=1&version=1&width=1920&height=1080"
 #define SONG_URL "http://itwusun.com/search/wy/%1?&f=json&size=50&p=%2&sign=itwusun"
 
 #define URL_KGPLAY "http://m.kugou.com/app/i/getSongInfo.php?cmd=playInfo&hash=%1"
@@ -351,97 +351,96 @@ void MyNetWork::requestSongNextPage()
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void MyNetWork::requestlrc(const QString &lrcname,qint64 nTotalTime,const QString &lrcloaction)//请求歌词
+void MyNetWork::requestlrc(const QString &lrcname,qint64 nTotalTime,const QString &lrcloaction,const QString &strHash)//请求歌词
 {
-    if(0==nTotalTime)
-        return;
+    QByteArray arrayTemp;
+    QString accesskey;
+    QString strID;
+    QString strHash2=strHash;
+    QString strTemp(KGLrcPart0);
     QString songname=lrcname;
     songname.replace("&"," ");
+    QNetworkRequest request;
+    QNetworkAccessManager manger;
+    QJsonDocument jsonDoc;
+    QJsonObject jsonObj;
+    QJsonArray jsonArray;
+    QEventLoop loop;
+    QNetworkReply *reply;
 
-    QString strTemp(KGLrcPart0);
-    strTemp=strTemp.arg(songname);
+    connect(&manger,SIGNAL(finished(QNetworkReply*)),&loop,SLOT(quit()));
 
-    QNetworkRequest requestlrc0;
-    QNetworkAccessManager mangerlrc0;
-    requestlrc0.setUrl(strTemp);
-    QNetworkReply *reply0=mangerlrc0.get(requestlrc0);
-
-    QEventLoop loop0;
-    connect(&mangerlrc0,SIGNAL(finished(QNetworkReply*)),&loop0,SLOT(quit()));
-    loop0.exec();
-
-    if(reply0->error()!=QNetworkReply::NoError)
-    {
-        reply0->deleteLater();
+    if(0==nTotalTime)
         return;
-    }
-    QByteArray byt0= reply0->readAll();
-    QJsonDocument doc0=QJsonDocument::fromJson(byt0);
-    QJsonObject obj0=doc0.object();
-    QJsonObject obj01= obj0.value("data").toObject();
-    QJsonArray array0= obj01.value("lists").toArray();
-    QJsonObject obj02= array0.at(0).toObject();
-    QString hash= obj02.value("FileHash").toString();
-
-
-    strTemp=KGLrcPart1;
-    QNetworkRequest requestlrc1;
-    QNetworkAccessManager mangerlrc1;
-    requestlrc1.setUrl(strTemp.arg(songname).arg(nTotalTime).arg(hash));
-    QNetworkReply *reply1= mangerlrc1.get(requestlrc1);
-///loop1
-    QEventLoop loop1;
-    connect(&mangerlrc1,SIGNAL(finished(QNetworkReply*)),&loop1,SLOT(quit()));
-    loop1.exec();
-////
-    if(reply1->error()!=QNetworkReply::NoError)
+    if(strHash.isEmpty())
     {
-        reply0->deleteLater();
-        reply1->deleteLater();
-        return;
+
+        strTemp=strTemp.arg(songname);
+        request.setUrl(strTemp);
+        reply=manger.get(request);
+
+        loop.exec();
+
+        if(reply->error() == QNetworkReply::NoError)
+        {
+            arrayTemp= reply->readAll();
+            jsonDoc=QJsonDocument::fromJson(arrayTemp);
+            jsonObj=jsonDoc.object();
+            jsonObj = jsonObj.value("data").toObject();
+            jsonArray = jsonObj.value("lists").toArray();
+            jsonObj= jsonArray.at(0).toObject();
+            strHash2= jsonObj.value("FileHash").toString();
+        }
+        reply->deleteLater();
     }
-    QByteArray byt=reply1->readAll();
-    QJsonDocument doc=QJsonDocument::fromJson(byt);
-    QJsonObject obj=doc.object();
-    QJsonArray arry=obj.value("candidates").toArray();
-    QJsonObject obj1= arry.at(0).toObject();
-    QString accesskey= obj1.value("accesskey").toString();
-    QString id=obj1.value("id").toString();
+        strTemp=KGLrcPart1;
+        request.setUrl(strTemp.arg(songname).arg(nTotalTime).arg(strHash2));
+        reply= manger.get(request);
+    ///loop1
+        loop.exec();
+    ////
+        if(reply->error() == QNetworkReply::NoError)
+        {
+            arrayTemp=reply->readAll();
+            jsonDoc=QJsonDocument::fromJson(arrayTemp);
+            jsonObj=jsonDoc.object();
+            jsonArray=jsonObj.value("candidates").toArray();
+            jsonObj= jsonArray.at(0).toObject();
+            accesskey= jsonObj.value("accesskey").toString();
+            strID=jsonObj.value("id").toString();
+        }
+        reply->deleteLater();
 
 
-    strTemp=KGLrcPart2;
-    QNetworkRequest requestlrc2;
-    QNetworkAccessManager mangerlrc2;
-    requestlrc2.setUrl(strTemp.arg(id).arg(accesskey));
-    QNetworkReply *reply2= mangerlrc2.get(requestlrc2);
-///loop2
-    QEventLoop loop2;
-    connect(&mangerlrc2,SIGNAL(finished(QNetworkReply*)),&loop2,SLOT(quit()));
-    loop2.exec();
-///
-    if(reply2->error()==QNetworkReply::NoError)
-    {
-            QByteArray byt=reply2->readAll();
-            QJsonDocument doc=QJsonDocument::fromJson(byt);
-            QJsonObject obj=doc.object();
-            QByteArray utf8byt=obj.value("content").toString().toUtf8();
-            QByteArray bytfrom64=QByteArray::fromBase64(utf8byt);
-            if(bytfrom64.size()!=0)
-            {
-                emit dolrcworkfinished(bytfrom64,lrcname);//发送做完的信号
-                ////////////////////////////用于保存
-                QFile file(lrcloaction);
-                file.resize(0);
-                if(file.open(QIODevice::WriteOnly))//如果打开失败
+        strTemp=KGLrcPart2;
+        request.setUrl(strTemp.arg(strID).arg(accesskey));
+        reply= manger.get(request);
+    ///loop2
+        loop.exec();
+    ///
+        if(reply->error()==QNetworkReply::NoError)
+        {
+                arrayTemp=reply->readAll();
+                jsonDoc=QJsonDocument::fromJson(arrayTemp);
+                jsonObj=jsonDoc.object();
+                arrayTemp="";
+                arrayTemp=jsonObj.value("content").toString().toUtf8();
+                arrayTemp=QByteArray::fromBase64(arrayTemp);
+
+                if(arrayTemp.size()!=0)
                 {
-                    file.write(bytfrom64); //write the kugou source krc
-                    file.close();
+                    emit dolrcworkfinished(arrayTemp,lrcname);//发送做完的信号
+                    ////////////////////////////用于保存
+                    QFile file(lrcloaction);
+                    file.resize(0);
+                    if(file.open(QIODevice::WriteOnly))//如果打开失败
+                    {
+                        file.write(arrayTemp); //write the kugou source krc
+                        file.close();
+                    }
                 }
-            }
-    }
-    reply0->deleteLater();
-    reply1->deleteLater();
-    reply2->deleteLater();
+        }
+        reply->deleteLater();
 }
 
 const QImage &MyNetWork::BgWhiteChange(QImage &image , int brightness)

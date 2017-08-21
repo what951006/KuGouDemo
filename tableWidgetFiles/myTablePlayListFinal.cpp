@@ -19,7 +19,7 @@
 #include"mainwindow.h"
 #include"middlewidgetleft.h"
 
-static QColor  BGcolor=QColor(230,230,230);
+static QColor BGcolor=QColor(230,230,230);
 myTablePlayListFinal * myTablePlayListFinal::s_pCurList=NULL;
 
 myTablePlayListFinal::myTablePlayListFinal(QWidget*parent):
@@ -52,7 +52,7 @@ myTablePlayListFinal::myTablePlayListFinal(QWidget*parent):
     vlyout1->setSpacing(0);
     setLayout(vlyout1);
 }
-void myTablePlayListFinal::addToPlayList(const QString &name,const QString &url,const QString &dur, const QString &strHash)
+void myTablePlayListFinal::addToPlayList(const QString &name,const QString &url,const QString &dur, const QString &strHash,bool bAddtoDB)
 {
     int rowcount= m_table.rowCount();
     m_table.insertRow(rowcount);
@@ -62,7 +62,8 @@ void myTablePlayListFinal::addToPlayList(const QString &name,const QString &url,
     m_table.item(rowcount,2)->setTextAlignment(Qt::AlignRight|Qt::AlignVCenter);
 
     m_playList.addPlayList(url,strHash);
-    myDataBase::addSong(ShowButtonName(),name,url,dur);
+    if(bAddtoDB)
+       myDataBase::addSong(ShowButtonName(),name,url,dur,strHash);
 }
 
 void myTablePlayListFinal::wheelEvent(QWheelEvent *e)
@@ -137,7 +138,7 @@ void myTablePlayListFinal::slot_emptyList()//清空列表
 
     myDataBase::emptyList(ShowButtonName());
 
-   if(s_pCurList == this)//如果正在播放的
+   if(this == getCurrentList())//如果正在播放的
      {
         stopCurrentSong();
      }
@@ -147,8 +148,10 @@ void myTablePlayListFinal::slot_emptyList()//清空列表
         m_table.slot_cellEnter(-1,0);
         emit m_table.sig_delIndex(row);
         m_table.removeRow(row);
-        i++;
+        ++i;
     }
+
+    m_playList.clearMediaList();
     setAutoLayout();
 }
 
@@ -267,25 +270,11 @@ void myTablePlayListFinal::slot_showHideTable()
                }
            }
     }
-
 }
 
 void myTablePlayListFinal::getlistfromDateBase()//从数据库中获取列表
 {
-   QVector<QStringList> vec= myDataBase::readListSongInfo(ShowButtonName());
-   QStringList listname=vec.at(0);
-   QStringList listurl=vec.at(1);
-   QStringList listduration=vec.at(2);
-   for(int i=0;i<listname.count();i++)
-   {
-        m_table.insertRow(i);
-        m_table.setItem(i,0,new QTableWidgetItem(""));
-        m_table.setItem(i,1,new QTableWidgetItem(listname.value(i)));
-        m_table.setItem(i,2,new QTableWidgetItem(listduration.value(i)+"    "));
-        m_table.item(i,2)->setTextAlignment(Qt::AlignRight|Qt::AlignVCenter);
-
-        m_playList.addPlayList(listurl.value(i));
-   }
+   myDataBase::readListSongInfo(this,ShowButtonName());
    m_Btntable. slot_updateSongCount();
 }
 

@@ -2,14 +2,14 @@
 #define MYDATABASE_H
 
 #include <QObject>
-
+#include "myTablePlayListFinal.h"
 
 namespace myDataBase {
     void connectListinfo();
     void connectSongInfo();
    /*insert
    */
-    void addSong(const QString& listname,const QString&  songname,const QString&  url,const QString&  duration); //添加歌曲
+    void addSong(const QString& listname,const QString&  songname,const QString&  url,const QString&  duration,const QString&strHash=""); //添加歌曲
     void addPlayList(const QString&  plistName);         //添加列表
    /*delete
    */
@@ -23,7 +23,7 @@ namespace myDataBase {
     void takeAndInsert(const QString&from,const QString &to);
    /*select
    */
-    QVector<QStringList> readListSongInfo(const QString&  listinfo);   //获取歌曲
+    void readListSongInfo(myTablePlayListFinal*,const QString&  listinfo);   //获取歌曲
     QStringList loadPlayList();// 加载列表
 }
 

@@ -17,12 +17,13 @@ public:
  /*pass pointer*/
     void setTableFinal(myTablePlayListFinal *pParent){m_pFinal=pParent;}
 
-
     QUrl mediaUrl(int index);//赋值给musicIndex;
 
     void addPlayList(const QString& url,const QString&hash=""){m_list.append(url);m_hashMap.insert(url,hash);}
 
     const QList<QString> & GetList(){return m_list;}
+
+    const QMap <QString,QString>& GetHashMap(){return m_hashMap;}
 
     void setPlayMode(PlayMode);
 
@@ -31,6 +32,8 @@ public:
     int nextMediaIndex();
 
     int preMediaIndex();
+
+    void clearMediaList(){m_list.clear();m_hashMap.clear();}
 
 public Q_SLOTS:
     void slot_removeSong(int index);

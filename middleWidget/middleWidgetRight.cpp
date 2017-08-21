@@ -167,7 +167,6 @@ void middleWidgetRight::resizeEvent(QResizeEvent *e)
         int getwidth= m_middlewidget->width()-m_middlewidget->m_leftWid.width();
         m_wid.setGeometry(m_middlewidget->m_leftWid.width(),0,getwidth,m_wid.height());
     }
-
 }
 void middleWidgetRight::slot_curStackChange(int index)
 {

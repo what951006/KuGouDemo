@@ -1,6 +1,5 @@
 #include "skinWidget.h"
-#include"myPushButton.h"
-#include"middleLeftStackWidget0.h"
+
 
 #include<QFileDialog>
 #include<QFontMetrics>
@@ -12,14 +11,20 @@
 #include<QScrollArea>
 #include<QLabel>
 #include<QDebug>
-skinWidget::skinWidget(QWidget *parent) : baseDialog(parent)
+skinWidget::skinWidget(QWidget *parent)
+    : baseDialog(parent)
+    ,scrollArea(this)
+    ,m_skincontwid(this)
+    ,m_btnOpacity("",this)
+    ,m_btnAdjustWindow("恢复窗口默认状态",this)
+    ,m_sliderWidget(this)
 {
-    this->setStyleSheet("QLabel{color:rgb(154,154,154);}"
+    setStyleSheet("QLabel{color:rgb(154,154,154);}"
                         "QPushButton{color: rgb(154,154,154);border:1px solid rgb(197,197,197);}"
                         "QPushButton:hover{border:1px solid rgb(100,176,250); color: rgb(100,176,250);}");
     setFixedSize(570,450);
-    myPushButton *m_btn=new myPushButton(m_mainwid);
-    QLabel *label=new QLabel("主题皮肤与窗口调整",m_mainwid);
+    myPushButton *m_btn=new myPushButton(&m_mainwid);
+    QLabel *label=new QLabel("主题皮肤与窗口调整",&m_mainwid);
     m_btn->setGeometry(540,5,20,20);
     label->setGeometry(5,5,200,20);
     label->setStyleSheet("QLabel{font-size: 14px;color: white;}");
@@ -35,41 +40,42 @@ skinWidget::skinWidget(QWidget *parent) : baseDialog(parent)
 
 void skinWidget::initTopLayout()
 {
-    myScrollArea *scrollArea=new myScrollArea(m_mainwid);
-    scrollArea->verticalScrollBar()->setStyleSheet("QScrollBar{background:white; width:12px; padding-right: 4px;}"
+    scrollArea.setParent(&m_mainwid);
+    scrollArea.verticalScrollBar()->setStyleSheet("QScrollBar{background:white; width:12px; padding-right: 4px;}"
                                       "QScrollBar::handle{background:rgb(217,217,217);border-radius:4px;}"
                                       "QScrollBar::handle:hover{background: rgb(191,191,191);}"
                                       "QScrollBar::add-line:vertical{border:1px rgb(230,230,230);height: 1px;}"
                                       "QScrollBar::sub-line:vertical{border:1px rgb(230,230,230);height: 1px;}"
                                       "QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {background:transparent;}");
 
-    scrollArea->setGeometry(0,30,564,350);
-    QWidget *contentwidget=new QWidget(scrollArea);
-    scrollArea->setWidget(contentwidget);
-    contentwidget->setGeometry(0,0,scrollArea->width(),scrollArea->height());
+    scrollArea.setGeometry(0,30,564,350);
+    QWidget *contentwidget=new QWidget(&scrollArea);
+    scrollArea.setWidget(contentwidget);
+    contentwidget->setGeometry(0,0,scrollArea.width(),scrollArea.height());
 
     contentwidget->setStyleSheet("QWidget{background: white;}");
 
-    m_skincontwid = new skinContentWidget(contentwidget);
-    m_skincontwid->setSkinWidget(this);
+    m_skincontwid.setParent(contentwidget);
+    m_skincontwid.setSkinWidget(this);
 
     QLabel *label2=new QLabel("皮肤",contentwidget);
     label2->setFixedSize(100,24);
 
-    m_btnAdjustWindow=new myPushButton("恢复窗口默认状态",contentwidget);
-    m_btnAdjustWindow->setStyleSheet("QPushButton{border:NULL; color: rgb(134,134,134);}"
+
+    m_btnAdjustWindow.setParent(contentwidget);
+    m_btnAdjustWindow.setStyleSheet("QPushButton{border:NULL; color: rgb(134,134,134);}"
                           "QPushButton::hover{ text-decoration: underline; color: rgb(100,176,250);}");
 
     QHBoxLayout *hlyout=new QHBoxLayout;
     hlyout->addWidget(label2);
     hlyout->addStretch(10);
-    hlyout->addWidget(m_btnAdjustWindow);
+    hlyout->addWidget(&m_btnAdjustWindow);
     hlyout->setContentsMargins(20,0,20,0);
 
 
     QVBoxLayout *lyout=new QVBoxLayout;
     lyout->addLayout(hlyout);
-    lyout->addWidget(m_skincontwid);
+    lyout->addWidget(&m_skincontwid);
     lyout->setSpacing(4);
     lyout->setContentsMargins(0,0,0,0);
     contentwidget->setLayout(lyout);
@@ -77,33 +83,34 @@ void skinWidget::initTopLayout()
 
 void skinWidget::setdefaultSkin()
 {
-    m_skincontwid->setDefaultSkin();
+    m_skincontwid.setDefaultSkin();
 }
 
 void skinWidget::initBottomLayout()
 {
-    QWidget* bottomwid=new QWidget(m_mainwid);
+    QWidget* bottomwid=new QWidget(&m_mainwid);
     bottomwid->setStyleSheet("QWidget{background:white}");
     bottomwid->setGeometry(0,380,564,100);
 
     QLabel *label=new QLabel("列表透明",bottomwid);
     label->setGeometry(20,25,60,20);
 
-    m_btnOpacity=new myPushButton("",bottomwid);
-    m_btnOpacity->setGeometry(80,24,73,24);
 
-    m_sliderWidget=new skinWidgetSliderWidget(m_mainwid);
-    m_sliderWidget->hide();
-    m_sliderWidget->setGeometry(80,254,72,150);
+    m_btnOpacity.setParent(bottomwid);
+    m_btnOpacity.setGeometry(80,24,73,24);
+
+    m_sliderWidget.setParent(&m_mainwid);
+    m_sliderWidget.hide();
+    m_sliderWidget.setGeometry(80,254,72,150);
 
     myPushButton *btnpersonal=new myPushButton("个性化壁纸",bottomwid);
     btnpersonal->setGeometry(470,24,73,24);
 
     connect(btnpersonal,SIGNAL(clicked(bool)),this,SLOT(slot_openPersonalBG()));
 
-    connect(m_sliderWidget->m_slider,SIGNAL(valueChanged(int)),this,SLOT(slot_setOpacityText(int)));
-    connect(m_btnOpacity,SIGNAL(clicked(bool)),m_sliderWidget,SLOT(show()));
-    connect(m_btnOpacity,SIGNAL(clicked(bool)),m_sliderWidget,SLOT(setFocus()));
+    connect(&m_sliderWidget.m_slider,SIGNAL(valueChanged(int)),this,SLOT(slot_setOpacityText(int)));
+    connect(&m_btnOpacity,SIGNAL(clicked(bool)),&m_sliderWidget,SLOT(show()));
+    connect(&m_btnOpacity,SIGNAL(clicked(bool)),&m_sliderWidget,SLOT(setFocus()));
 }
 
 void skinWidget::slot_openPersonalBG()
@@ -116,13 +123,13 @@ void skinWidget::slot_openPersonalBG()
        QFile file(filename);
        file.copy(filename,QApplication::applicationDirPath()+"/skin/"+info.fileName());
    }
-   m_skincontwid->UpdateSkin();
+   m_skincontwid.UpdateSkin();
 }
 
 void skinWidget::slot_setOpacityText(int opa)
 {
-   int value=  100*opa/255;
-   m_btnOpacity->setText(QString::number(value)+"%");
+   int value= 100*opa/255;
+   m_btnOpacity.setText(QString::number(value)+="%");
 }
 ////////////////////////////////////////////////////////////////////////////widget
 
@@ -140,7 +147,7 @@ skinContentWidget::skinContentWidget(QWidget *p):baseWidget(p)
 void skinContentWidget::setSkinWidget(skinWidget *p)
 {
     m_skinWid=p;
-    connect(m_sigmap,SIGNAL(mapped(QString)),m_skinWid->m_mainwid,SLOT(setSkin(QString)));
+    connect(m_sigmap,SIGNAL(mapped(QString)),&m_skinWid->m_mainwid,SLOT(setSkin(QString)));
 }
 
 void skinContentWidget::addSkin(skinWidgetContentItem *widitem)

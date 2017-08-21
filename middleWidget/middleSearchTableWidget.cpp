@@ -14,36 +14,37 @@
 #include"mainwindow.h"
 #include"topwidgets.h"
 
-tableCellWidget::tableCellWidget(QWidget *p):baseWidget(p)
+tableCellWidget::tableCellWidget(QWidget *p)
+    :baseWidget(p)
+    ,m_btntableplay(this)
+    ,m_btntableadd(this)
+    ,m_btntabledownload(this)
 {
     init();
 }
 void tableCellWidget::init()
 {
     QHBoxLayout *hlyout=new QHBoxLayout;
-    m_btntableplay=new myPushButton(this);
-    m_btntableadd=new myPushButton(this);
-    m_btntabledownload=new myPushButton(this);
 
-    m_btntableplay->setStyleSheet("QPushButton{border-image:url(:/image/middlewidget/btn_searchplay (1).png)}"
+    m_btntableplay.setStyleSheet("QPushButton{border-image:url(:/image/middlewidget/btn_searchplay (1).png)}"
                                   "QPushButton:hover{border-image:url(:/image/middlewidget/btn_searchplay (2).png)}"
                                   "QPushButton:pressed{border-image:url(:/image/middlewidget/btn_searchplay (3).png)}"
                                   "QPushButton:enable{border-image:url(:/image/middlewidget/btn_searchplay (4).png)}");
-    m_btntableadd->setStyleSheet("QPushButton{border-image:url(:/image/middlewidget/btn_searchadd (1).png)}"
+    m_btntableadd.setStyleSheet("QPushButton{border-image:url(:/image/middlewidget/btn_searchadd (1).png)}"
                              "QPushButton:hover{border-image:url(:/image/middlewidget/btn_searchadd (2).png)}"
                              "QPushButton:pressed{border-image:url(:/image/middlewidget/btn_searchadd (3).png)}"
                              "QPushButton:enable{border-image:url(:/image/middlewidget/btn_searchadd (4).png)}");
-    m_btntabledownload->setStyleSheet("QPushButton{border:NULL;background-image:url(:/image/middlewidget/btn_downloadmini (1).png);}"
+    m_btntabledownload.setStyleSheet("QPushButton{border:NULL;background-image:url(:/image/middlewidget/btn_downloadmini (1).png);}"
                                       "QPushButton:hover{border:NULL;background-image:url(:/image/middlewidget/btn_downloadmini (2).png);}"
                                       "QPushButton:pressed{border:NULL;background-image:url(:/image/middlewidget/btn_downloadmini (3).png);}");
 
-    m_btntableplay->setFixedSize(16,16);
-    m_btntableadd->setFixedSize(16,16);
-    m_btntabledownload->setFixedSize(16,16);
+    m_btntableplay.setFixedSize(16,16);
+    m_btntableadd.setFixedSize(16,16);
+    m_btntabledownload.setFixedSize(16,16);
 
-    hlyout->addWidget(m_btntableplay);
-    hlyout->addWidget(m_btntableadd);
-    hlyout->addWidget(m_btntabledownload);
+    hlyout->addWidget(&m_btntableplay);
+    hlyout->addWidget(&m_btntableadd);
+    hlyout->addWidget(&m_btntabledownload);
     hlyout->setContentsMargins(0,0,0,0);
     setLayout(hlyout);
 }
@@ -149,9 +150,9 @@ void middleSearchTableWidget::setItem(int row, int column, QTableWidgetItem *ite
             {
                  item->setTextAlignment(Qt::AlignHCenter|Qt::AlignVCenter);
                  tableCellWidget *cellwid=new tableCellWidget(this);
-                 connect(cellwid->m_btntableplay,SIGNAL(clicked(bool)),this,SLOT(slot_playbtnclicked()));
-                 connect(cellwid->m_btntableadd,SIGNAL(clicked(bool)),this,SLOT(slot_addbtnclicked()));
-                 connect(cellwid->m_btntabledownload,SIGNAL(clicked(bool)),this,SLOT(slot_downloadbtnclicked()));
+                 connect(&cellwid->m_btntableplay,SIGNAL(clicked(bool)),this,SLOT(slot_playbtnclicked()));
+                 connect(&cellwid->m_btntableadd,SIGNAL(clicked(bool)),this,SLOT(slot_addbtnclicked()));
+                 connect(&cellwid->m_btntabledownload,SIGNAL(clicked(bool)),this,SLOT(slot_downloadbtnclicked()));
                  setCellWidget(row,5,cellwid);
                  break;
              }
@@ -199,38 +200,25 @@ void middleSearchTableWidget::slot_tableContainerBtnClicked()
 {
    playingWidgetBtn*btn= (playingWidgetBtn*)sender();
    if(!btn)
-       return;
+     return;
    mainWindow::GetInstance()->topWidget()->searchFromLineEdit(btn->text());
 }
 
 
 void middleSearchTableWidget::slot_playbtnclicked()
 {
-  /*  QStringList list_name;
-    QStringList list_dur;
-    QStringList list_url;
-    int index= indexAt( mapFromGlobal(QCursor::pos())).row();
-
-    playingWidgetBtn*btn=(playingWidgetBtn*)cellWidget(index,2);
-    list_name<<btn->text()+"-"+item(index,1)->text();
-    list_dur<<item(index,4)->text();
-    list_url<<m_searchwidget->m_songlist.value(index);
-    mainWindow::GetInstance()->middleStack0()->myTablePlayListFinalVector().value(0)->slot_playSongFromSearchTable(list_name,list_url,list_dur);*/
+    middleSearchWidget*parent=(middleSearchWidget*)parentWidget();
+    int index= indexAt(mapFromGlobal(QCursor::pos())).row();
+    const ItemResult &result= parent->GetItemByIndex(index);
+    mainWindow::GetInstance()->middleStack0()->addMusicToDefaultList(result,1);
 }
 
 void middleSearchTableWidget::slot_addbtnclicked()
 {
-   /* QStringList list_name;
-    QStringList list_dur;
-    QStringList list_url;
     int index= indexAt(mapFromGlobal(QCursor::pos())).row();
-
-    playingWidgetBtn*btn=(playingWidgetBtn*)cellWidget(index,2);
-    list_name<<btn->text()+"-"+item(index,1)->text();
-    list_dur<<item(index,4)->text();
-    list_url<<m_searchwidget->m_songlist.value(index);
-    mainWindow::GetInstance()->middleStack0()->myTablePlayListFinalVector().value(0)->slot_addSongFromSearchTable(list_name,list_url,list_dur);*/
-
+    middleSearchWidget*parent=(middleSearchWidget*)parentWidget();
+    const ItemResult &result= parent->GetItemByIndex(index);
+    mainWindow::GetInstance()->middleStack0()->addMusicToDefaultList(result,0);
     QToolTip::showText(QCursor::pos(),"已添加至播放列表");
 }
 

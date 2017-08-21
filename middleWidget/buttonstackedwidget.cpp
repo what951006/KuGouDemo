@@ -1,7 +1,9 @@
 #include "buttonstackedwidget.h"
 #include<QPainter>
 #include<QDebug>
-buttonStackedWidget::buttonStackedWidget(QWidget*parent):baseWidget(parent)
+buttonStackedWidget::buttonStackedWidget(QWidget*parent)
+    :baseWidget(parent)
+    ,m_stackwid(this)
 {
     init();
 }
@@ -14,13 +16,11 @@ void buttonStackedWidget::paintEvent(QPaintEvent *)
 
 void buttonStackedWidget::init()
 {
-    m_hlyout=new QHBoxLayout;
-    m_hlyout->setSpacing(0);
-    m_hlyout->setContentsMargins(0,0,0,0);
-    m_vlyout=new QVBoxLayout;
-    m_stackwid=new QStackedWidget(this);
-    m_stackwid->setCurrentIndex(0);
-    connect(m_stackwid,SIGNAL(currentChanged(int)),this,SLOT(curWidIndexChange(int)));
+    m_hlyout.setSpacing(0);
+    m_hlyout.setContentsMargins(0,0,0,0);
+
+    m_stackwid.setCurrentIndex(0);
+    connect(&m_stackwid,SIGNAL(currentChanged(int)),this,SLOT(curWidIndexChange(int)));
 }
 
 void buttonStackedWidget::curWidIndexChange(int index)
@@ -45,9 +45,7 @@ void buttonStackedWidget::addPushButton(const QString& name)//先删除再添加
     m_btn->setText(name);
     m_btn->setStyleSheet("color:rgb(68,68,68);font-size:14px;");
     m_btnList<<m_btn;//添加进容器
-    m_hlyout->addWidget(m_btn);
-    delete &m_btn;
-    m_btn=NULL;
+    m_hlyout.addWidget(m_btn);
 }
 void buttonStackedWidget::showLayout()
 {
@@ -57,13 +55,13 @@ void buttonStackedWidget::showLayout()
         connect(m_btnList.at(i),SIGNAL(clicked()),this,SLOT(buttonClicked()));
     }
 
-    m_vlyout->addLayout(m_hlyout);
-    m_vlyout->addWidget(m_stackwid);
-    m_vlyout->setSpacing(0);
-    m_vlyout->setContentsMargins(0,0,0,0);
-    setLayout(m_vlyout);
+    m_vlyout.addLayout(&m_hlyout);
+    m_vlyout.addWidget(&m_stackwid);
+    m_vlyout.setSpacing(0);
+    m_vlyout.setContentsMargins(0,0,0,0);
+    setLayout(&m_vlyout);
 }
 void buttonStackedWidget::buttonClicked()
 {
-    m_stackwid->setCurrentIndex(sender()->objectName().toInt());
+    m_stackwid.setCurrentIndex(sender()->objectName().toInt());
 }

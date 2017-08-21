@@ -278,60 +278,39 @@ void middleSearchWidget::slot_checkBoxClicked()
 
 void middleSearchWidget::slot_menuWork()
 {
- /* int index=sender()->objectName().toInt();
-  QStringList list_name;
-  QStringList list_dur;
-  QStringList list_url;
-
-  int count=m_table.rowCount();
-  for(int i=0;i<count;i++)
-  {
-      QCheckBox* box= (QCheckBox*)m_table.cellWidget(i,0);
-      playingWidgetBtn *btn=NULL;
-          if(box->checkState()==Qt::Checked)//如果选中项
-          {
-              btn=(playingWidgetBtn*)m_table.cellWidget(i,2);
-              list_name<<btn->text()+"-"+m_table.item(i,1)->text();
-
-              list_dur<<m_table.item(i,4)->text();
-
-         //     list_url<<m_songlist.value(i);
-          }
-  }
-  if(list_name.count()==0)
-  {
-      QMessageBox::information(NULL,"提示","请选择一首歌曲");
-      return;
-  }
-   mainWindow::GetInstance()->middleStack0() ->myTablePlayListFinalVector().value(index)->slot_addSongFromSearchTable(list_name,list_url,list_dur);*/
-
+    int index= sender()->objectName().toInt();
+    myTablePlayListFinal *pFinalTable= mainWindow::GetInstance()->middleStack0()->myTablePlayListFinalVector().at(index);
+    int count=m_table.rowCount();
+    bool bFind=false;
+    for(int i=0;i<count;i++)
+    {
+         QCheckBox* box= (QCheckBox*)m_table.cellWidget(i,0);
+         if(box->checkState()==Qt::Checked)//如果选中项
+         {
+             bFind=true;
+             const ItemResult &result= GetItemByIndex(i);
+             mainWindow::GetInstance()->middleStack0()->addMusicToList(result,pFinalTable);
+         }
+    }
+    if(!bFind)
+        QMessageBox::information(NULL,"提示","请选择一首歌曲");
 }
 void middleSearchWidget::slot_btnplayclicked()//obviously,playbutton
 {
-    QStringList list_name;
-    QStringList list_dur;
-    QStringList list_url;
-
     int count=m_table.rowCount();
+    bool bPlay=true;
     for(int i=0;i<count;i++)
     {
-        QCheckBox* box= (QCheckBox*)m_table.cellWidget(i,0);
-        playingWidgetBtn *btn=NULL;
+         QCheckBox* box= (QCheckBox*)m_table.cellWidget(i,0);
          if(box->checkState()==Qt::Checked)//如果选中项
-            {
-                btn=(playingWidgetBtn*)m_table.cellWidget(i,2);
-                list_name<<btn->text()+"-"+m_table.item(i,1)->text();
-
-                list_dur<<m_table.item(i,4)->text();
-
-            //    list_url<<m_songlist.value(i);
-            }
+         {
+             const ItemResult &result= GetItemByIndex(i);
+             mainWindow::GetInstance()->middleStack0()->addMusicToDefaultList(result,bPlay);
+             bPlay=false;
+         }
     }
-    if(list_name.count()!=0)
-      //  mainWindow::GetInstance()->middleStack0()->myTablePlayListFinalVector().value(0)->slot_playSongFromSearchTable(list_name,list_url,list_dur);
-        ;
-    else
-        QMessageBox::information(NULL,"提示","请选择一首歌曲");
+    if(bPlay)
+       QMessageBox::information(NULL,"提示","请选择一首歌曲");
 }
 void middleSearchWidget::slot_btnaddclicked()
 {

@@ -21,9 +21,9 @@ public:
    void setCurrentMode(PlayMode);
 
    QVector<playModeButton*> m_vector;
-   playModeButton *m_btnOrder;
-   playModeButton *m_btnRandom;
-   playModeButton *m_btnOneCircle;
+   playModeButton m_btnOrder;
+   playModeButton m_btnRandom;
+   playModeButton m_btnOneCircle;
 private slots:
    void slot_setCurrentMode();
 signals:
@@ -64,9 +64,9 @@ public:
 public slots:
     void slot_timerWork();
 private:
-    myPushButton *m_closebtn;
-    QLabel*m_tipslab;
-    QTimer *m_timer;
+    myPushButton m_closebtn;
+    QLabel m_tipslab;
+    QTimer m_timer;
 protected:
     void showEvent(QShowEvent*);
 

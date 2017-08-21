@@ -5,9 +5,9 @@
 #include <QDebug>
 #include <windows.h>
 #include <QMutex>
+#include <QThread>
 #include <QTime>
 #include <QTimer>
-#define _WIN32_DCOM
 
 
 #define MAX_AUDIO_FRAME_SIZE  192000
@@ -25,7 +25,7 @@ extern "C"
     # include <include/SDL2/SDL.h>
     # include <include/SDL2/SDL_thread.h>
 }
-#include<QThread>
+
 
 typedef struct PacketQueue {
     AVPacketList *first_pkt, *last_pkt;
@@ -71,8 +71,11 @@ public:
     ~FFmpegPlayer(){}
 //---------------------------------
     void setMedia(const QString &url,bool isMV=false);
+
     void stop();
+
     void pause(){SDL_PauseAudio(1);updateStatus();}
+
     void play(){ SDL_PauseAudio(0);updateStatus();}
 
     inline void updateStatus(){ if(m_MS.fct) emit sig_CurrentMediaStatus(getPlayerStatus());}
@@ -83,21 +86,14 @@ public:
     /*get current media time  millisecond*/
     inline qint64 getCurrentTime(){return m_MS.audio_clock*1000;}
 
-    QTimer *m_timer;
-
 //----------------------------------
-
-
 
     PlayerStatus getPlayerStatus();
 
     void FreeCommSpace();
     void FreeVideoAlloc();
     void FreeAudioAlloc();
-
 protected:
-
-
     virtual void run();
 signals:
     void sig_BufferingPrecent(double);
@@ -117,7 +113,10 @@ public slots:
     void seek(qint64 );
 private:
     QString m_url;
+
     mediaState m_MS;
+
+    QTimer m_timer;
 };
 
 #endif // FFMPEGPLAYER_H

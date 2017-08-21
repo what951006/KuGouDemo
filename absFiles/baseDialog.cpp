@@ -1,7 +1,9 @@
 #include "baseDialog.h"
 #include<QGridLayout>
 
-baseDialog::baseDialog(QWidget *parent) : QDialog(parent)
+baseDialog::baseDialog(QWidget *parent)
+    : QDialog(parent)
+    ,m_mainwid(this)
 {
     m_MousePressed=false;
     setMinimumSize(550,440);
@@ -9,11 +11,11 @@ baseDialog::baseDialog(QWidget *parent) : QDialog(parent)
     setAttribute(Qt::WA_TranslucentBackground,true);
 
     setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
-    m_mainwid=new Widget(this);
-    m_mainwid->setAutoFillBackground(true);
+
+    m_mainwid.setAutoFillBackground(true);
 
     QGridLayout *lyout=new QGridLayout;
-    lyout->addWidget(m_mainwid);
+    lyout->addWidget(&m_mainwid);
     lyout->setContentsMargins(4,4,4,4);
     setLayout(lyout);
 }
@@ -26,8 +28,6 @@ baseDialog::baseDialog(QWidget *p, bool) : QDialog(p)
     setAttribute(Qt::WA_TranslucentBackground,true);
 
     setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
-
-    m_mainwid=NULL;
 }
 
 void baseDialog::paintEvent(QPaintEvent *e)

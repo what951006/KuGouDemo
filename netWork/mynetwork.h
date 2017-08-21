@@ -42,7 +42,7 @@ public slots:
     void requestalbum(const QString &name,const QString &savelocal);
     void requestSong(const QString&);
     void requestSongNextPage();
-    void requestlrc(const QString &,qint64 totaltime,const QString &saveloaction);
+    void requestlrc(const QString &name,qint64 totaltime,const QString &saveloaction,const QString &strHash="");
     void requestBgPic(const QString &author);
 private:
 

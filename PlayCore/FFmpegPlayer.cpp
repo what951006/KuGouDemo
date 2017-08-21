@@ -384,9 +384,9 @@ FFmpegPlayer::FFmpegPlayer(QObject *parent) : QThread(parent)
     avformat_network_init();
     memset(&m_MS,0,sizeof(m_MS));
 
-    m_timer=new QTimer;
-    connect(m_timer,SIGNAL(timeout()),this,SLOT(slot_timerWork()));
-    m_timer->start(50);
+
+    connect(&m_timer,SIGNAL(timeout()),this,SLOT(slot_timerWork()));
+    m_timer.start(40);
 }
 
 void FFmpegPlayer::setMedia(const QString &url,bool isMV)
@@ -563,7 +563,6 @@ void FFmpegPlayer::run()
     AVPacket packet;
     while (!g_isQuit) //这里有一个顺序！先判断再 读 再写入
     {
-
         if (m_MS.seek_req)
         {
                 int stream_index = -1;
@@ -610,7 +609,6 @@ void FFmpegPlayer::run()
                 SDL_PauseAudio(0);
                 m_MS.seek_req = 0;
         }
-
         SDL_Delay(10);
 
         if(m_MS.videoq.size>MAX_VIDEO_SIZE)
@@ -629,10 +627,10 @@ void FFmpegPlayer::run()
             else
                 av_free_packet(&packet);
        }
-       else if(result<0&& 0==m_MS.audioq.size)
+       else
        {
-         //  g_isQuit=1;
-           break;
+           if((int)(getCurrentTime()*0.001) >= (int)(getDuration()*0.000001))//播放到尾端
+               break;
        }
     }
     if(!g_isQuit) //It finished automatically when played to end of the media

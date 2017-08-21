@@ -23,7 +23,7 @@ protected:
 
 private:
     int prerow;
-    QNetworkAccessManager *m_manger;
+    QNetworkAccessManager m_manger;
 };
 
 #endif // TOPSEARCHTIPSWIDGET_H

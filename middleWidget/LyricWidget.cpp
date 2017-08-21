@@ -17,7 +17,7 @@ LyricWidget::LyricWidget(QWidget *parent)
     m_normalFont.setFamily("微软雅黑");
     m_normalFont.setPixelSize(20);
 
-    m_nCurIndex=0;
+    m_nCurIndex=-1;
     m_nCurStartPos=0;
     m_nCurPos=0;
     m_nSroIndex=0;
@@ -44,20 +44,17 @@ void LyricWidget::slot_timer()
         m_nSroIndex=m_nCurIndex;
         m_timer.stop();
     }
-
     GetMaskLen(m_nFontPixSize+abs(m_nOffset/10));
-    update();
+    repaint();
 }
 void LyricWidget::paintEvent(QPaintEvent*)
 {
     static ItemInfo Info={0};
-
     QPainter painter(this);
     int nRowCount=height()/ROW_HEIGHT;
 
     for(int i=0;i<nRowCount;++i)
     {
-
         Info.index=(m_nSroIndex-nRowCount/2)+i;
         if(Info.index>=0)
         {
@@ -131,15 +128,19 @@ void LyricWidget::DrawItem(QPainter&Painter,ItemInfo &Info)
 }
 void LyricWidget::GetMaskLen(int nFontSize)
 {
+    if(m_nCurPos<m_nCurStartPos)//prevent the firt line automatically scrolling
+        return;
+
     static float s_fPercent=0.0f;
-    static float s_keyLen=0;
+    static float s_keyLen=0.0f;
+    static float s_curLen=0.0f;
 
     int keyTime=0;
     int interval=0;
     float percent=0;
     float percent2=0.0;
-    QString str(" ");
-    getPosInfo(keyTime,interval,percent,str);
+    QString strKeyWord(" ");
+    getPosInfo(keyTime,interval,percent,strKeyWord);
 
     QFont fontTemp=m_normalFont;
     fontTemp.setPixelSize(nFontSize);
@@ -152,9 +153,10 @@ void LyricWidget::GetMaskLen(int nFontSize)
 
     if(interval!=0)
     {
-       percent2=(float)(m_nCurPos-m_nCurStartPos-keyTime)/interval;
-       if(percent2<1.0)
-          m_nMaskLen=s_keyLen+metrics.width(str)*percent2;
+       percent2=fabs((float)(m_nCurPos-m_nCurStartPos-keyTime)/interval);
+       s_curLen=s_keyLen+metrics.width(strKeyWord)*percent2;
+       if(s_curLen >= m_nMaskLen)
+           m_nMaskLen=s_curLen;
     }
 }
 inline QString LyricWidget::GetLrcByIndex(int index)
@@ -195,8 +197,8 @@ void LyricWidget::positionChanged(qint64 length)
     int index = GetIndexByTime(m_nCurPos); //using binary search for the current lyric index;
     if (index != m_nCurIndex)//find a lyric // && 0==m_nOffset
     {
-        m_strCurLrc=GetLrcByIndex(index);
         m_nCurStartPos=GetPosByindex(index);
+        m_strCurLrc=GetLrcByIndex(index);
         m_nSroIndex=index-1; //变成上一行~
         m_nCurIndex=index;
         m_nMaskLen=0.0f;
@@ -252,6 +254,17 @@ void LyricWidget::clearLrc()
     m_percent_list.clear();
     m_lineMap.clear();
 }
+void LyricWidget::setOriginalStatus()
+{
+    clearLrc();
+    m_strCurLrc="";
+    m_nCurPos=0;
+    m_nCurStartPos=0;
+    m_nMaskLen=0;
+    m_nCurIndex=-1;
+    m_nSroIndex=0;
+    m_nOffset=0;
+}
 
 void LyricWidget::analyzeLrcContent(QByteArray &KlcData,const QString &filedir)
 {
@@ -276,7 +289,7 @@ void LyricWidget::analyzeLrcContent(QByteArray &KlcData,const QString &filedir)
 
     QStringList list=QString(getByt).split("\n");
     QRegExp regTemp0("^\\[\\d+,\\d+\\]");
-    QRegExp regTemp1("\\<\\d+,\\d+\\,\\d+\\>[\\w\\W]{0,8}(\\<|\\r)");//((\\w*|\\w*)|\\W{1}|\\w*\\s)
+    QRegExp regTemp1("\\<\\d+,\\d+\\,\\d+\\>[\\w\\W^(<\\d+,\\d+\\,\\d+\\>)]{0,10}(\\<|\\r)");//((\\w*|\\w*)|\\W{1}|\\w*\\s)
     QRegExp regTemp2("\\d+");
 
     foreach (QString strLine, list)

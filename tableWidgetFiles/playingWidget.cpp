@@ -123,33 +123,24 @@ void playingWidget::init()
 
 }
 
-void playingWidget::setLoveState()
+void playingWidget::setLoveState(bool bLoved)
 {
-    m_btnLove.setStyleSheet("QPushButton{border-image:url(:/image/middlewidget/btn_islove (1).png);}"
-                             "QPushButton:hover{border-image:url(:/image/middlewidget/btn_islove (2).png);}"
-                             "QPushButton:pressed{border-image:url(:/image/middlewidget/btn_islove (3).png);}");
-    m_islove=true;
+    if(bLoved)
+    {
+        m_btnLove.setStyleSheet("QPushButton{border-image:url(:/image/middlewidget/btn_islove (1).png);}"
+                                 "QPushButton:hover{border-image:url(:/image/middlewidget/btn_islove (2).png);}"
+                                 "QPushButton:pressed{border-image:url(:/image/middlewidget/btn_islove (3).png);}");
+        m_islove=true;
+    }
+    else
+    {
+        m_btnLove.setStyleSheet("QPushButton{border-image:url(:/image/middlewidget/btn_love (1).png);}"
+                                 "QPushButton:hover{border-image:url(:/image/middlewidget/btn_love (2).png);}"
+                                 "QPushButton:pressed{border-image:url(:/image/middlewidget/btn_love (3).png);}");
+        m_islove=false;
+    }
 }
 
-void playingWidget::setUnloveState()
-{
-    m_btnLove.setStyleSheet("QPushButton{border-image:url(:/image/middlewidget/btn_love (1).png);}"
-                             "QPushButton:hover{border-image:url(:/image/middlewidget/btn_love (2).png);}"
-                             "QPushButton:pressed{border-image:url(:/image/middlewidget/btn_love (3).png);}");
-    m_islove=false;
-}
-
-int playingWidget::currentSongIndex()
-{
-        if(!m_item)
-          return -1;
-        return m_item->row();
-}
-
-void playingWidget::setCurrentSongItem(QTableWidgetItem *it)
-{
-    m_item=it;
-}
 
 void playingWidget::setOriginalState()
 {

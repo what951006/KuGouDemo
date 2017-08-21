@@ -13,10 +13,14 @@ class buttonStackedWidget:public baseWidget
     Q_OBJECT
 public:
     buttonStackedWidget(QWidget*parent=0);
-    void addPushButton(const QString& name);
+
     void init();
+
+    void addPushButton(const QString& name);
+
     void showLayout();
-    QStackedWidget *m_stackwid;
+
+    void addWidget(QWidget*pWid){m_stackwid.addWidget(pWid);}
 protected:
     void paintEvent(QPaintEvent*);
 private slots:
@@ -24,8 +28,9 @@ private slots:
     void curWidIndexChange(int);
 private:
     QVector<myPushButton*> m_btnList;
-    QHBoxLayout *m_hlyout;
-    QVBoxLayout *m_vlyout;
+    QHBoxLayout m_hlyout;
+    QVBoxLayout m_vlyout;
+    QStackedWidget m_stackwid;
 };
 
 #endif // BUTTONSTACKEDWIDGET_H

@@ -5,8 +5,7 @@
 TextMovingWidget::TextMovingWidget(const QString str ,QWidget *parent)
     : QWidget(parent),_text(str),m_direction(1),m_x(0)
 {
-    _timer=new QTimer(this);
-    connect(_timer,SIGNAL(timeout()),this,SLOT(slot_UpdateTextGeometry()));
+    connect(&_timer,SIGNAL(timeout()),this,SLOT(slot_UpdateTextGeometry()));
    // _timer->start(30);
 }
 

@@ -54,6 +54,8 @@ public:
     void clearLrc();
 
     void getPosInfo(int &keyTime,int &interval, float &precent, QString &str);
+
+    void setOriginalStatus();
 protected:
     virtual void paintEvent(QPaintEvent*event);
 

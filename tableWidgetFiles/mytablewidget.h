@@ -90,19 +90,17 @@ signals:
 private:
      int m_prebgItem;
      int m_loveNowRow;//其余列表在喜欢列表的index处
-
-     myTableAddWidget *m_addWid;
-
-     QMenu *m_menu;
-     QMenu *m_Addtoplistmenu;
-     QString m_text;
-
      bool m_enter;
      bool m_isGiven;
+     QString m_text;
+
+     myTableAddWidget m_addWid;
+     QMenu m_menu;
+     QMenu m_Addtoplistmenu;
+
 
      pushButtonCrossWidget *m_crossWid;
      pushButtonGroupWidget *m_groupWid;
-
 
      myTablePlayListFinal*m_finalWidget;
      middleLeftStackWidget0 *m_middleftStack0;
