@@ -262,13 +262,13 @@ void myTablePlayListFinal::slot_showHideTable()
     else
     {
        m_table.show();
-           foreach(myTablePlayListFinal *f,m_midleft0->myTablePlayListFinalVector())
+       foreach(myTablePlayListFinal *f,m_midleft0->myTablePlayListFinalVector())
+       {
+           if(f!=this)//如果显示的话
            {
-               if(f!=this)//如果显示的话
-               {
-                   f->m_table.hide();
-               }
+               f->m_table.hide();
            }
+       }
     }
 }
 

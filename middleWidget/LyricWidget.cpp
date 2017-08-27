@@ -226,7 +226,7 @@ void LyricWidget::getPosInfo(int &keyTime,int &interval, float &precent, QString
 
     const QMap<int ,int> & interval_map= m_interval_list.at(m_nCurIndex);
 
-    const QMap<int ,float> & percent_map=m_percent_list.at(m_nCurIndex);
+
 
 
     int subvalue=abs(m_nCurPos-m_nCurStartPos);
@@ -254,7 +254,7 @@ void LyricWidget::clearLrc()
 {
     m_word_list.clear();
     m_interval_list.clear();
-    m_percent_list.clear();
+
     m_lineMap.clear();
 }
 void LyricWidget::setOriginalStatus()
@@ -285,7 +285,6 @@ void LyricWidget::analyzeLrcContent(QByteArray &KlcData,const QString &filedir)
 
     QMap<int,QString> word_map;
     QMap<int ,int> interval_map; //interval,间隔时间
-    QMap<int ,float> percent_map;
 
     QByteArray getByt;
     KrcDecode(KlcData,getByt);//here we got lrc text
@@ -300,7 +299,6 @@ void LyricWidget::analyzeLrcContent(QByteArray &KlcData,const QString &filedir)
         bool bFind=false;
         word_map.clear();
         interval_map.clear(); //interval,间隔时间
-        percent_map.clear();
         strGetLine="";
         for(int pos=0;pos=regTemp0.indexIn(strLine,pos),pos>=0; pos+=regTemp0.matchedLength())
         {
@@ -343,13 +341,11 @@ void LyricWidget::analyzeLrcContent(QByteArray &KlcData,const QString &filedir)
 
             interval_map.insert(nKeyTime,nDur);
             word_map.insert(nKeyTime,strWord);
-            percent_map.insert(nKeyTime,(float)nKeyTime/nRowTime);
         }
         if(bFind)
         {
             m_word_list<<word_map;
             m_interval_list<<interval_map;
-            m_percent_list<<percent_map;
             m_lineMap.insert(nPos,strGetLine);
         }
     }

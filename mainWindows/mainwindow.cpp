@@ -6,6 +6,7 @@
 #include <QSettings>
 #include <QDebug>
 #include <io.h>
+#include <QtMultimedia/qmediaplayer.h>
 
 #include "myTablePlayListFinal.h"
 

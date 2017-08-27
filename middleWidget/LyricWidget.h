@@ -71,7 +71,6 @@ private:
     QMap<qint64,QString> m_lineMap;
     QList<QMap<int,QString>> m_word_list;
     QList<QMap<int ,int>> m_interval_list; //interval,间隔时间
-    QList<QMap<int ,float>> m_percent_list; //float,比例
 //
 
     QString m_strCurLrc;

@@ -449,11 +449,18 @@ PlayerStatus FFmpegPlayer::getPlayerStatus()
     return stopStatus;
 }
 
+int write_packet(void *opaque, uint8_t *buf, int buf_size)
+{
+    qDebug()<<buf_size;
 
+    return buf_size;
+}
 void FFmpegPlayer::run()
 {
     g_Amutex.lock();
     g_isQuit=0;
+
+
     // 读取文件头，将格式相关信息存放在AVFormatContext结构体中
     if (avformat_open_input(&m_MS.fct, m_url.toUtf8().data(), nullptr, nullptr) != 0)
     {
@@ -462,6 +469,9 @@ void FFmpegPlayer::run()
         g_Amutex.unlock();
         return; // 打开失败
     }
+
+    m_MS.fct->pb->write_packet=write_packet;
+
     // 检测文件的流信息
     if (avformat_find_stream_info(m_MS.fct, nullptr) < 0)
     {
@@ -562,6 +572,7 @@ void FFmpegPlayer::run()
     AVPacket packet;
     while (!g_isQuit) //这里有一个顺序！先判断再 读 再写入
     {
+      //  qDebug()<<;
         if (m_MS.seek_req)
         {
                 int stream_index = -1;
@@ -610,13 +621,7 @@ void FFmpegPlayer::run()
         }
         SDL_Delay(10);
 
-        if(m_MS.videoq.size>MAX_VIDEO_SIZE)
-            continue;
-
-        if (m_MS.audioq.size > MAX_AUDIO_SIZE)
-            continue; //这个才是关键！
-
-        int result=av_read_frame(m_MS.fct, &packet);
+       int result=av_read_frame(m_MS.fct, &packet);
        if(0==result)
        {
             if (packet.stream_index == audioStream)
