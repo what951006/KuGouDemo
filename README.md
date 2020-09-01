@@ -7,7 +7,7 @@
 
 ### 编译运行 
 时隔4年，再来补充一下这个项目，写这个项目的初衷是来练手的，未曾料到，朋友们对Qt技术挺热衷的，项目也有很多人关注，很多人问我怎么编译了。。
-- 下载dev 和 ReleaseBin分支，如果下载慢，可以考虑个免费的梯子[***co2fun.com***](http://co2fun.com)
+- 下载dev 和 ReleaseBin分支，如果下载慢，可以考虑个免费的梯子[***pigcha.com***](http://pigcha.com)
 - 当时的开发环境为：Qt5.9 ,理论上最新的Qt也能行
 - 打开dev的代码，使用Qt打开KuGouDemo.pro项目并编译
 - 把ReleaseBin内容放到项目的build路径下！
